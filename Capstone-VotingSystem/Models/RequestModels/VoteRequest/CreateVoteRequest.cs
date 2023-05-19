@@ -1,0 +1,11 @@
+﻿namespace Capstone_VotingSystem.Models.RequestModels.VoteRequest
+{
+    public class CreateVoteRequest
+    {
+        public DateTime? Time { get; set; }
+        public Guid? TeacherId { get; set; }
+        public string? MssvStudent { get; set; }
+        public bool? Answer { get; set; }
+        public Guid? QuestionId { get; set; }
+    }
+}
