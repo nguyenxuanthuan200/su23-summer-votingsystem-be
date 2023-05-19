@@ -21,6 +21,7 @@
     <Folder Include="Entities\" />
     <Folder Include="Models\" />
     <Folder Include="Helpers\" />
+    <Folder Include="Controller\" />
     <Folder Include="Repositories\" />
   </ItemGroup>
 
