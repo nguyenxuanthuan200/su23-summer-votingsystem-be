@@ -1,9 +1,5 @@
-﻿using Capstone_VotingSystem.Entities;
-using Capstone_VotingSystem.Models;
-using Capstone_VotingSystem.Repositories.AuthenticationRepo;
+﻿using Capstone_VotingSystem.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -16,7 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IAuthenticationRepository, AuthenRepository>();
+
 builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSettings"));
 
 var secretKey = builder.Configuration["AppSettings:SecretKey"];

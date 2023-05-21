@@ -24,6 +24,7 @@
   <ItemGroup>
     <Folder Include="Entities\" />
     <Folder Include="Helpers\" />
+    <Folder Include="Repositories\" />
   </ItemGroup>
 
 </Project>
