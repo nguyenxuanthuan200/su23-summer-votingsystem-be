@@ -1,11 +1,11 @@
 ﻿using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Model;
-using Microsoft.AspNetCore.Http;
+using CoreApiResponse;
+using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Nest;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -14,7 +14,7 @@ namespace Capstone_VotingSystem.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthenticationController : ControllerBase
+    public class AuthenticationController : BaseController
     {
         private readonly VotingSystemContext _votingSystemContext;
         private readonly AppSetting _appSettings;
@@ -24,16 +24,26 @@ namespace Capstone_VotingSystem.Controller
             _votingSystemContext = votingSystemContext;
             _appSettings = optionsMonitor.CurrentValue;
         }
-        [HttpGet]
+        [HttpGet("getAccount")]
         public async Task<IActionResult> getAllAccount()
         {
             return Ok(await _votingSystemContext.Accounts.ToListAsync());
         }
+        [HttpPost("loginGG")]
+        public async Task<IActionResult> login(string idtoken)
+        {
+            FirebaseToken decoded = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(idtoken);
+            var uid = decoded.Uid;
+            UserRecord userrecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+
+            return Ok(userrecord);
+        }
         [HttpPost("Login")]
-        public IActionResult validate(LoginModel model)
+        public IActionResult Validate(LoginModel model)
         {
             var user = _votingSystemContext.Accounts.SingleOrDefault(
                 p => p.Username == model.UserName && model.Password == p.Password);
+            
             if (user == null)
             {
                 return Ok(new APIResponse
@@ -47,27 +57,29 @@ namespace Capstone_VotingSystem.Controller
             {
                 Success = true,
                 Message = "Authentication Success",
-                Data = GenerateToken(user)
+                Data = GenerateTokenAsync(user)
             });
         }
 
-        private string GenerateToken(Account account)
+        private  string GenerateTokenAsync(Account account)
         {
+           
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var secretKeybytes = Encoding.UTF8.GetBytes(_appSettings.SecretKey);
             var tokenDescription = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
                 {
+                    
                     new Claim("Id", account.Id.ToString()),
                     new Claim("Username", account.Username),
-
-
-
                     new Claim("TokenId", Guid.NewGuid().ToString())
 
+
+                    //role
+
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(1),
+                Expires = DateTime.UtcNow.AddHours(4),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKeybytes),
                 SecurityAlgorithms.HmacSha256Signature)
 
@@ -75,23 +87,7 @@ namespace Capstone_VotingSystem.Controller
             var token = jwtTokenHandler.CreateToken(tokenDescription);
             return jwtTokenHandler.WriteToken(token);
 
-
-            //return new TokenModel
-            //{
-            //    AccessToken = accessToken,
-            //    RefeshToken = GenerateRefeshToken(),
-            //};
-
         }
 
-        //private string GenerateRefeshToken()
-        //{
-        //    var random = new byte[32];
-        //    using (var raccount =RandomNumberGenerator.Create()) 
-        //    {
-        //        raccount.GetBytes(random);
-        //        return Convert.ToBase64String(random);
-        //    }
-        //}
     }
 }
