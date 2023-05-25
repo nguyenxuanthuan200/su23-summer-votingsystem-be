@@ -1,6 +1,6 @@
 ﻿using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Model;
-using Capstone_VotingSystem.Model.ResponseModel;
+using Capstone_VotingSystem.Model.ResponseModel.AccountReponse;
 
 namespace Capstone_VotingSystem.Repositories.AccountRepo
 {

@@ -1,5 +1,5 @@
 ﻿using Capstone_VotingSystem.Entities;
-using Capstone_VotingSystem.Model.TeacherRespone;
+using Capstone_VotingSystem.Model.ResponseModel.TeacherRespone;
 using Microsoft.EntityFrameworkCore;
 
 namespace Capstone_VotingSystem.Repositories.TeacherRepo
@@ -20,7 +20,7 @@ namespace Capstone_VotingSystem.Repositories.TeacherRepo
                 {
                     return new GetListTeacherResponse()
                     {
-                        Id = x.Id,
+                        Id = x.TeacherId,
                         Name = x.Name,
                         AmountVote = x.AmountVote,
                         Score = x.Score,

@@ -1,6 +1,7 @@
 ﻿using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Model;
 using Capstone_VotingSystem.Repositories.AccountRepo;
+using Capstone_VotingSystem.Repositories.AuthenRepo;
 using Capstone_VotingSystem.Repositories.TeacherRepo;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -27,30 +28,28 @@ builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSett
 //config firebase
 FirebaseApp.Create(new AppOptions()
 {
-    Credential = GoogleCredential.FromFile("Config/v-leagues-firebase-adminsdk-5gi04-4d65bc2f7b.json")
+    Credential = GoogleCredential.FromFile("config/fvssystemswp409-firebase-adminsdk-x9pg7-687b1c4ddd.json")
 });
 
 builder.Services.AddScoped<ITeacherRepositories, TeaccherRepositories>();
 builder.Services.AddScoped<IAccountRepositories, AccountRepositories>();
+builder.Services.AddScoped<IAuthenticationRepositories, AuthenticationRepositories>();
 
-var secretKey = builder.Configuration["AppSettings:SecretKey"];
-var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        //tự cấp token
-        ValidateIssuer = false,
-        ValidateAudience = false,
-
-        // ký vào token
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
-        ClockSkew = TimeSpan.Zero
-    };
-});
-
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+               .AddJwtBearer(options =>
+               {
+                   options.RequireHttpsMetadata = false;
+                   options.SaveToken = true;
+                   options.TokenValidationParameters = new TokenValidationParameters()
+                   {
+                       ValidateIssuerSigningKey = true,
+                       ValidateLifetime = true,
+                       ValidateIssuer = false,
+                       ValidateAudience = false,
+                       RequireExpirationTime = true,
+                       IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtConfig:Key"]))
+                   };
+               });
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

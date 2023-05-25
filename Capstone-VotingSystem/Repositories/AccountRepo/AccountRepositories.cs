@@ -1,8 +1,7 @@
 ﻿using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Model;
-using Capstone_VotingSystem.Model.ResponseModel;
+using Capstone_VotingSystem.Model.ResponseModel.AccountReponse;
 using Microsoft.EntityFrameworkCore;
-using Nest;
 
 namespace Capstone_VotingSystem.Repositories.AccountRepo
 {
@@ -17,23 +16,29 @@ namespace Capstone_VotingSystem.Repositories.AccountRepo
         public async Task<AccountResponse> CreateAccount(AccountModel model)
         {
           
-            var result = await _votingSystemContext.Accounts.SingleOrDefaultAsync(p => p.Username == model.Username);
+            var result = await _votingSystemContext.AccountMods.SingleOrDefaultAsync(p => p.Username == model.Username);
 
             if (result != null)
             {
                 return null;
             }
-            var roleId = await _votingSystemContext.Roles.SingleOrDefaultAsync(p => p.Name.Equals("admin"));
+            var roleId = await _votingSystemContext.Roles.SingleOrDefaultAsync(p => p.Name.Equals(model.Role));
             var id =  Guid.NewGuid();
-            Account user = new Account();
+            if (roleId == null)
             {
-                user.Id = id;
+                return null;
+            }
+
+
+            AccountMod user = new AccountMod();
+            {
+                user.RoleId = id;
                 user.Username = model.Username;
                 user.Password = model.Password;
-                user.RoleId = roleId.Id;
+                user.RoleId = roleId.RoleId;
                 
             }
-            await _votingSystemContext.Accounts.AddAsync(user);
+            await _votingSystemContext.AccountMods.AddAsync(user);
             await _votingSystemContext.SaveChangesAsync();
             AccountResponse response = new AccountResponse();
             {
@@ -45,13 +50,12 @@ namespace Capstone_VotingSystem.Repositories.AccountRepo
 
         public async void DeleteAccount(Guid Id)
         {
-            var delete = _votingSystemContext.Accounts
-               .SingleOrDefault(p => p.Id == Id);
+            var delete = _votingSystemContext.AccountMods
+               .SingleOrDefault(p => p.RoleId == Id);
            // change status fals 
             //delete.Status = false;
-            _votingSystemContext.Accounts.Update(delete);
+            _votingSystemContext.AccountMods.Update(delete);
             await _votingSystemContext.SaveChangesAsync();
-
 
         }
     }

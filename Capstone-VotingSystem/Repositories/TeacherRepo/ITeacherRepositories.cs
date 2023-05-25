@@ -1,4 +1,4 @@
-﻿using Capstone_VotingSystem.Model.TeacherRespone;
+﻿using Capstone_VotingSystem.Model.ResponseModel.TeacherRespone;
 
 namespace Capstone_VotingSystem.Repositories.TeacherRepo
 {

@@ -1,4 +1,4 @@
-﻿namespace Capstone_VotingSystem.Model.TeacherRespone
+﻿namespace Capstone_VotingSystem.Model.ResponseModel.TeacherRespone
 {
     public class GetListTeacherResponse
     {

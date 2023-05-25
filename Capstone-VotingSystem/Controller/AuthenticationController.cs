@@ -1,12 +1,16 @@
 ﻿using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Model;
+using Capstone_VotingSystem.Model.ResquestModel.AuthenRequest;
+using Capstone_VotingSystem.Repositories.AuthenRepo;
 using CoreApiResponse;
 using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 
@@ -17,12 +21,13 @@ namespace Capstone_VotingSystem.Controller
     public class AuthenticationController : BaseController
     {
         private readonly VotingSystemContext _votingSystemContext;
-        private readonly AppSetting _appSettings;
+        private readonly IAuthenticationRepositories _authenticationRepositories;
 
-        public AuthenticationController(VotingSystemContext votingSystemContext, IOptionsMonitor<AppSetting> optionsMonitor)
+
+        public AuthenticationController(VotingSystemContext votingSystemContext,  IAuthenticationRepositories authenticationRepositories)
         {
             _votingSystemContext = votingSystemContext;
-            _appSettings = optionsMonitor.CurrentValue;
+            _authenticationRepositories = authenticationRepositories;
         }
         [HttpGet("getAccount")]
         public async Task<IActionResult> getAllAccount()
@@ -39,53 +44,24 @@ namespace Capstone_VotingSystem.Controller
             return Ok(userrecord);
         }
         [HttpPost("Login")]
-        public IActionResult Validate(LoginModel model)
+
+        public async Task<IActionResult> login(LoginRequest payLoad) 
         {
-            var user = _votingSystemContext.Accounts.SingleOrDefault(
-                p => p.Username == model.UserName && model.Password == p.Password);
-            
-            if (user == null)
+            try
             {
-                return Ok(new APIResponse
+                var account = await _authenticationRepositories.SignInAsync(payLoad);
+                if (account == null)
                 {
-                    Success = false,
-                    Message = "Invalid Username or password"
-                });
+                    return CustomResult("Username Or Password wrong!!", HttpStatusCode.NotFound);
+                }
+                var result = await _authenticationRepositories.GenerateTokenAsync(account);
+                return CustomResult("Success", result, HttpStatusCode.OK);
             }
-            //cấp token
-            return Ok(new APIResponse
+            catch (Exception)
             {
-                Success = true,
-                Message = "Authentication Success",
-                Data = GenerateTokenAsync(user)
-            });
-        }
+                return CustomResult("Fail", HttpStatusCode.InternalServerError);
 
-        private  string GenerateTokenAsync(Account account)
-        {
-           
-            var jwtTokenHandler = new JwtSecurityTokenHandler();
-            var secretKeybytes = Encoding.UTF8.GetBytes(_appSettings.SecretKey);
-            var tokenDescription = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    
-                    new Claim("Id", account.Id.ToString()),
-                    new Claim("Username", account.Username),
-                    new Claim("TokenId", Guid.NewGuid().ToString())
-
-
-                    //role
-
-                }),
-                Expires = DateTime.UtcNow.AddHours(4),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKeybytes),
-                SecurityAlgorithms.HmacSha256Signature)
-
-            };
-            var token = jwtTokenHandler.CreateToken(tokenDescription);
-            return jwtTokenHandler.WriteToken(token);
+            }
 
         }
 

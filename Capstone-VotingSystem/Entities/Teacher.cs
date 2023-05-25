@@ -10,12 +10,14 @@ namespace Capstone_VotingSystem.Entities
             VoteDetails = new HashSet<VoteDetail>();
         }
 
-        public Guid Id { get; set; }
+        public Guid TeacherId { get; set; }
         public string? Name { get; set; }
         public double? AmountVote { get; set; }
+        public string? Email { get; set; }
         public double? Score { get; set; }
         public Guid? DepartmentId { get; set; }
         public Guid? CampaignId { get; set; }
+        public string? Img { get; set; }
 
         public virtual Campaign? Campaign { get; set; }
         public virtual Department? Department { get; set; }

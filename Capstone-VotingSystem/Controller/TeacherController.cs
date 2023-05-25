@@ -1,6 +1,6 @@
 ﻿using Capstone_VotingSystem.Repositories.TeacherRepo;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
+
 
 namespace Capstone_VotingSystem.Controller
 {

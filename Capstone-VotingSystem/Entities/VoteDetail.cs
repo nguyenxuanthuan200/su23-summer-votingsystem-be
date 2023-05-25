@@ -10,12 +10,12 @@ namespace Capstone_VotingSystem.Entities
             AnswerVotes = new HashSet<AnswerVote>();
         }
 
-        public Guid Id { get; set; }
+        public Guid VoteDetailId { get; set; }
         public DateTime? Time { get; set; }
         public Guid? TeacherId { get; set; }
-        public string? MssvStudent { get; set; }
+        public string? Mssv { get; set; }
 
-        public virtual Student? MssvStudentNavigation { get; set; }
+        public virtual Student? MssvNavigation { get; set; }
         public virtual Teacher? Teacher { get; set; }
         public virtual ICollection<AnswerVote> AnswerVotes { get; set; }
     }
