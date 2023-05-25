@@ -20,8 +20,8 @@ namespace Capstone_VotingSystem.Repositories.QuestionRepo
                 {
                     return new GetQuestionResponse()
                     {
-                        Id = x.Id,
-                        Question1 = x.Question1,
+                        QuestionId = x.QuestionId,
+                        QuestionOfCampaign = x.QuestionOfCampaign,
                         Description = x.Description,
                         CampaignId = x.CampaignId,
                     };

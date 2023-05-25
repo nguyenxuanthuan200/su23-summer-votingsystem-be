@@ -21,7 +21,7 @@ namespace Capstone_VotingSystem.Repositories.TeacherRepo
                 {
                     return new GetListTeacherResponse()
                     {
-                        Id = x.Id,
+                        Id = x.TeacherId,
                         Name = x.Name,
                         AmountVote = x.AmountVote,
                         Score = x.Score,

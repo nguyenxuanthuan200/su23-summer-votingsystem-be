@@ -8,15 +8,15 @@ namespace Capstone_VotingSystem.Entities
         public Campus()
         {
             Campaigns = new HashSet<Campaign>();
-            Departments = new HashSet<Department>();
+            DepartmentInCampuses = new HashSet<DepartmentInCampus>();
             Majors = new HashSet<Major>();
         }
 
-        public Guid Id { get; set; }
+        public Guid CampusId { get; set; }
         public string? Name { get; set; }
 
         public virtual ICollection<Campaign> Campaigns { get; set; }
-        public virtual ICollection<Department> Departments { get; set; }
+        public virtual ICollection<DepartmentInCampus> DepartmentInCampuses { get; set; }
         public virtual ICollection<Major> Majors { get; set; }
     }
 }

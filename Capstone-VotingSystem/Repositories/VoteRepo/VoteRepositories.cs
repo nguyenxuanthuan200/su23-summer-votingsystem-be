@@ -18,15 +18,15 @@ namespace Capstone_VotingSystem.Repositories.VoteRepo
             var id = Guid.NewGuid();
             VoteDetail votedetail = new VoteDetail();
             {
-                votedetail.Id = id;
+                votedetail.VoteDetailId = id;
                 votedetail.Time = DateTime.Now;
                 votedetail.TeacherId = request.TeacherId;
-                votedetail.MssvStudent = request.MssvStudent;
+                votedetail.Mssv = request.MssvStudent;
             };
             var idAnswerVote = Guid.NewGuid();
             AnswerVote answervote = new AnswerVote();
             {
-                answervote.Id = idAnswerVote;
+                answervote.AnswerVoteId = idAnswerVote;
                 answervote.Answer = request.Answer;
                 answervote.QuestionId = request.QuestionId;
                 answervote.VoteDetailId = id;

@@ -7,16 +7,16 @@ namespace Capstone_VotingSystem.Entities
     {
         public Department()
         {
+            DepartmentInCampuses = new HashSet<DepartmentInCampus>();
             Ratings = new HashSet<Rating>();
             Teachers = new HashSet<Teacher>();
         }
 
-        public Guid Id { get; set; }
+        public Guid DepartmentId { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
-        public Guid? CampusId { get; set; }
 
-        public virtual Campus? Campus { get; set; }
+        public virtual ICollection<DepartmentInCampus> DepartmentInCampuses { get; set; }
         public virtual ICollection<Rating> Ratings { get; set; }
         public virtual ICollection<Teacher> Teachers { get; set; }
     }

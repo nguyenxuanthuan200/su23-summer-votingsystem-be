@@ -10,8 +10,8 @@ namespace Capstone_VotingSystem.Entities
             AnswerVotes = new HashSet<AnswerVote>();
         }
 
-        public Guid Id { get; set; }
-        public string? Question1 { get; set; }
+        public Guid QuestionId { get; set; }
+        public string? QuestionOfCampaign { get; set; }
         public string? Description { get; set; }
         public Guid? CampaignId { get; set; }
 

@@ -21,9 +21,9 @@ namespace Capstone_VotingSystem.Repositories.CampaignRepo
                 {
                     return new GetCampaignResponse()
                     {
-                        Id = x.Id,
-                        TimeStart = x.TimeStart,
-                        TimeEnd = x.TimeEnd,
+                        Id = x.CampaignId,
+                        TimeStart = x.StartTime,
+                        TimeEnd = x.EndTime,
                         Status = x.Status,
                         CampaignTypeId = x.CampaignTypeId,
                         CampusId = x.CampusId,
