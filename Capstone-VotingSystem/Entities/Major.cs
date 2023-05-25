@@ -11,9 +11,8 @@ namespace Capstone_VotingSystem.Entities
             Students = new HashSet<Student>();
         }
 
-        public Guid Id { get; set; }
+        public Guid MajorId { get; set; }
         public string? Name { get; set; }
-        public string? Description { get; set; }
         public Guid? CampusId { get; set; }
 
         public virtual Campus? Campus { get; set; }

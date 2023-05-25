@@ -1,5 +1,12 @@
+using Capstone_VotingSystem.Configure;
 using Capstone_VotingSystem.Entities;
+using Capstone_VotingSystem.Repositories.CampaignRepo;
+using Capstone_VotingSystem.Repositories.TeacherRepo;
+using Capstone_VotingSystem.Repositories.VoteRepo;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +17,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<VotingSystemContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection")));
+ 
+builder.Services.AddScoped<ICampaignRepositories, CampaignRepositories>();
+builder.Services.AddScoped<ITeacherRepositories, TeacherRepositories>();
+builder.Services.AddScoped<IVoteRepositories, VoteRepositories>();
+
 
 var app = builder.Build();
 
@@ -21,6 +33,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors();
 
 app.UseAuthorization();
 

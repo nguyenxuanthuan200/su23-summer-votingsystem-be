@@ -3,14 +3,13 @@ using System.Collections.Generic;
 
 namespace Capstone_VotingSystem.Entities
 {
-    public partial class Rating
+    public partial class DepartmentInCampus
     {
-        public Guid RatingId { get; set; }
-        public double? Ratio { get; set; }
+        public Guid DepartmentInCampusId { get; set; }
+        public Guid? CampusId { get; set; }
         public Guid? DepartmentId { get; set; }
-        public Guid? MajorId { get; set; }
 
+        public virtual Campus? Campus { get; set; }
         public virtual Department? Department { get; set; }
-        public virtual Major? Major { get; set; }
     }
 }

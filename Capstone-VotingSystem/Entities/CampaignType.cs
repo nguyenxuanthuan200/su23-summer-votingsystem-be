@@ -10,7 +10,7 @@ namespace Capstone_VotingSystem.Entities
             Campaigns = new HashSet<Campaign>();
         }
 
-        public Guid Id { get; set; }
+        public Guid CampaignTypeId { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
 
