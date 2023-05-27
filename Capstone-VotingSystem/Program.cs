@@ -1,5 +1,6 @@
-using Capstone_VotingSystem.Configure;
 using Capstone_VotingSystem.Entities;
+using Capstone_VotingSystem.Repositories.AccountModRepo;
+using Capstone_VotingSystem.Repositories.AuthenRepo;
 using Capstone_VotingSystem.Repositories.CampaignRepo;
 using Capstone_VotingSystem.Repositories.TeacherRepo;
 using Capstone_VotingSystem.Repositories.VoteRepo;
@@ -21,6 +22,23 @@ builder.Services.AddDbContext<VotingSystemContext>(option => option.UseSqlServer
 builder.Services.AddScoped<ICampaignRepositories, CampaignRepositories>();
 builder.Services.AddScoped<ITeacherRepositories, TeacherRepositories>();
 builder.Services.AddScoped<IVoteRepositories, VoteRepositories>();
+builder.Services.AddScoped<IAuthenRepositories, AuthenRepositories>();
+builder.Services.AddScoped<IAccountModRepositories, AccountModRepositories>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuerSigningKey = true,
+        ValidateLifetime = true,
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        RequireExpirationTime = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtConfig:Key"]))
+    };
+});
 
 
 var app = builder.Build();

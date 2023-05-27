@@ -24,7 +24,6 @@
     <Folder Include="Entities\" />
     <Folder Include="Helpers\" />
     <Folder Include="Models\ResponseModels\StudentResponse\" />
-    <Folder Include="Repositories\AuthenRepo\" />
   </ItemGroup>
 
 </Project>
