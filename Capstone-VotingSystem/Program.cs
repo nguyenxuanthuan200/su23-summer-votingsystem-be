@@ -4,7 +4,10 @@ using Capstone_VotingSystem.Repositories.AuthenRepo;
 using Capstone_VotingSystem.Repositories.CampaignRepo;
 using Capstone_VotingSystem.Repositories.TeacherRepo;
 using Capstone_VotingSystem.Repositories.VoteRepo;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -18,7 +21,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<VotingSystemContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection")));
- 
+
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromFile("Config/fvssystemswp409-firebase-adminsdk-x9pg7-687b1c4ddd.json")
+});
+
 builder.Services.AddScoped<ICampaignRepositories, CampaignRepositories>();
 builder.Services.AddScoped<ITeacherRepositories, TeacherRepositories>();
 builder.Services.AddScoped<IVoteRepositories, VoteRepositories>();
