@@ -12,11 +12,11 @@ namespace Capstone_VotingSystem.Entities
 
         public Guid VoteDetailId { get; set; }
         public DateTime? Time { get; set; }
-        public Guid? TeacherId { get; set; }
         public string? Mssv { get; set; }
+        public Guid? TeacherCampaignId { get; set; }
 
         public virtual Student? MssvNavigation { get; set; }
-        public virtual Teacher? Teacher { get; set; }
+        public virtual TeacherCampaign? TeacherCampaign { get; set; }
         public virtual ICollection<AnswerVote> AnswerVotes { get; set; }
     }
 }

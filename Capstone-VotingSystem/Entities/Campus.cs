@@ -8,7 +8,7 @@ namespace Capstone_VotingSystem.Entities
         public Campus()
         {
             Campaigns = new HashSet<Campaign>();
-            DepartmentInCampuses = new HashSet<DepartmentInCampus>();
+            CampusDepartments = new HashSet<CampusDepartment>();
             Majors = new HashSet<Major>();
         }
 
@@ -16,7 +16,7 @@ namespace Capstone_VotingSystem.Entities
         public string? Name { get; set; }
 
         public virtual ICollection<Campaign> Campaigns { get; set; }
-        public virtual ICollection<DepartmentInCampus> DepartmentInCampuses { get; set; }
+        public virtual ICollection<CampusDepartment> CampusDepartments { get; set; }
         public virtual ICollection<Major> Majors { get; set; }
     }
 }

@@ -20,20 +20,22 @@ namespace Capstone_VotingSystem.Entities
         public virtual DbSet<AccountStudent> AccountStudents { get; set; } = null!;
         public virtual DbSet<AnswerVote> AnswerVotes { get; set; } = null!;
         public virtual DbSet<Campaign> Campaigns { get; set; } = null!;
-        public virtual DbSet<CampaignDetail> CampaignDetails { get; set; } = null!;
+        public virtual DbSet<CampaignStage> CampaignStages { get; set; } = null!;
         public virtual DbSet<CampaignType> CampaignTypes { get; set; } = null!;
         public virtual DbSet<Campus> Campuses { get; set; } = null!;
+        public virtual DbSet<CampusDepartment> CampusDepartments { get; set; } = null!;
         public virtual DbSet<Department> Departments { get; set; } = null!;
-        public virtual DbSet<DepartmentInCampus> DepartmentInCampuses { get; set; } = null!;
         public virtual DbSet<HistoryMod> HistoryMods { get; set; } = null!;
         public virtual DbSet<HistoryStudent> HistoryStudents { get; set; } = null!;
         public virtual DbSet<Major> Majors { get; set; } = null!;
         public virtual DbSet<Qrcode> Qrcodes { get; set; } = null!;
         public virtual DbSet<Question> Questions { get; set; } = null!;
+        public virtual DbSet<QuestionStage> QuestionStages { get; set; } = null!;
         public virtual DbSet<Rating> Ratings { get; set; } = null!;
         public virtual DbSet<Role> Roles { get; set; } = null!;
         public virtual DbSet<Student> Students { get; set; } = null!;
         public virtual DbSet<Teacher> Teachers { get; set; } = null!;
+        public virtual DbSet<TeacherCampaign> TeacherCampaigns { get; set; } = null!;
         public virtual DbSet<TypeAction> TypeActions { get; set; } = null!;
         public virtual DbSet<VoteDetail> VoteDetails { get; set; } = null!;
 
@@ -50,41 +52,32 @@ namespace Capstone_VotingSystem.Entities
         {
             modelBuilder.Entity<AccountMod>(entity =>
             {
-                entity.HasKey(e => e.Username)
-                    .HasName("PK_Account_1");
+                entity.HasKey(e => e.Username);
 
                 entity.ToTable("AccountMod");
 
                 entity.Property(e => e.Username)
                     .HasMaxLength(50)
-                    .IsUnicode(false)
                     .HasColumnName("username");
 
-                entity.Property(e => e.Img)
-                    .IsUnicode(false)
-                    .HasColumnName("img");
+                entity.Property(e => e.Img).HasColumnName("img");
 
                 entity.Property(e => e.Name)
-                    .HasMaxLength(200)
+                    .HasMaxLength(50)
                     .HasColumnName("name");
 
                 entity.Property(e => e.Password)
                     .HasMaxLength(50)
-                    .IsUnicode(false)
                     .HasColumnName("password");
 
                 entity.Property(e => e.RoleId).HasColumnName("role_Id");
 
-                entity.Property(e => e.Status).HasColumnName("status");
-
-                entity.Property(e => e.Token)
-                    .IsUnicode(false)
-                    .HasColumnName("token");
+                entity.Property(e => e.Token).HasColumnName("token");
 
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.AccountMods)
                     .HasForeignKey(d => d.RoleId)
-                    .HasConstraintName("FK_Account_Role");
+                    .HasConstraintName("FK_AccountMod_Role");
             });
 
             modelBuilder.Entity<AccountStudent>(entity =>
@@ -94,13 +87,10 @@ namespace Capstone_VotingSystem.Entities
                 entity.ToTable("AccountStudent");
 
                 entity.Property(e => e.Mssv)
-                    .HasMaxLength(10)
-                    .IsUnicode(false)
+                    .HasMaxLength(50)
                     .HasColumnName("mssv");
 
-                entity.Property(e => e.Token)
-                    .IsUnicode(false)
-                    .HasColumnName("token");
+                entity.Property(e => e.Token).HasColumnName("token");
             });
 
             modelBuilder.Entity<AnswerVote>(entity =>
@@ -109,18 +99,18 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.AnswerVoteId)
                     .ValueGeneratedNever()
-                    .HasColumnName("answerVoteId");
+                    .HasColumnName("answerVote_Id");
 
                 entity.Property(e => e.Answer).HasColumnName("answer");
 
-                entity.Property(e => e.QuestionId).HasColumnName("question_Id");
+                entity.Property(e => e.QuestionStageId).HasColumnName("questionStage_Id");
 
                 entity.Property(e => e.VoteDetailId).HasColumnName("voteDetail_Id");
 
-                entity.HasOne(d => d.Question)
+                entity.HasOne(d => d.QuestionStage)
                     .WithMany(p => p.AnswerVotes)
-                    .HasForeignKey(d => d.QuestionId)
-                    .HasConstraintName("FK_AnswerVote_Question");
+                    .HasForeignKey(d => d.QuestionStageId)
+                    .HasConstraintName("FK_AnswerVote_CampaignStage");
 
                 entity.HasOne(d => d.VoteDetail)
                     .WithMany(p => p.AnswerVotes)
@@ -134,15 +124,15 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.CampaignId)
                     .ValueGeneratedNever()
-                    .HasColumnName("campaignId");
+                    .HasColumnName("campaign_Id");
 
                 entity.Property(e => e.CampaignTypeId).HasColumnName("campaignType_Id");
 
                 entity.Property(e => e.CampusId).HasColumnName("campus_Id");
 
-                entity.Property(e => e.EndTime)
+                entity.Property(e => e.Endtime)
                     .HasColumnType("datetime")
-                    .HasColumnName("endTime");
+                    .HasColumnName("endtime");
 
                 entity.Property(e => e.StartTime)
                     .HasColumnType("datetime")
@@ -161,26 +151,22 @@ namespace Capstone_VotingSystem.Entities
                     .HasConstraintName("FK_Campaign_Campus");
             });
 
-            modelBuilder.Entity<CampaignDetail>(entity =>
+            modelBuilder.Entity<CampaignStage>(entity =>
             {
-                entity.ToTable("CampaignDetail");
+                entity.ToTable("CampaignStage");
 
-                entity.Property(e => e.CampaignDetailId)
+                entity.Property(e => e.CampaignStageId)
                     .ValueGeneratedNever()
-                    .HasColumnName("campaignDetailId");
+                    .HasColumnName("campaignStage_Id");
 
                 entity.Property(e => e.AmountVote).HasColumnName("amountVote");
 
                 entity.Property(e => e.CampaignId).HasColumnName("campaign_Id");
 
-                entity.Property(e => e.Day)
-                    .HasColumnType("date")
-                    .HasColumnName("day");
-
                 entity.HasOne(d => d.Campaign)
-                    .WithMany(p => p.CampaignDetails)
+                    .WithMany(p => p.CampaignStages)
                     .HasForeignKey(d => d.CampaignId)
-                    .HasConstraintName("FK_CampaignDetail_Campaign");
+                    .HasConstraintName("FK_CampaignStage_Campaign");
             });
 
             modelBuilder.Entity<CampaignType>(entity =>
@@ -189,7 +175,7 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.CampaignTypeId)
                     .ValueGeneratedNever()
-                    .HasColumnName("campaignTypeId");
+                    .HasColumnName("campaignType_Id");
 
                 entity.Property(e => e.Description).HasColumnName("description");
 
@@ -204,11 +190,34 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.CampusId)
                     .ValueGeneratedNever()
-                    .HasColumnName("campusId");
+                    .HasColumnName("campus_Id");
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(50)
                     .HasColumnName("name");
+            });
+
+            modelBuilder.Entity<CampusDepartment>(entity =>
+            {
+                entity.ToTable("CampusDepartment");
+
+                entity.Property(e => e.CampusDepartmentId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("campusDepartment_Id");
+
+                entity.Property(e => e.CampusId).HasColumnName("campus_Id");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("department_Id");
+
+                entity.HasOne(d => d.Campus)
+                    .WithMany(p => p.CampusDepartments)
+                    .HasForeignKey(d => d.CampusId)
+                    .HasConstraintName("FK_CampusDepartment_Campus");
+
+                entity.HasOne(d => d.Department)
+                    .WithMany(p => p.CampusDepartments)
+                    .HasForeignKey(d => d.DepartmentId)
+                    .HasConstraintName("FK_CampusDepartment_Department");
             });
 
             modelBuilder.Entity<Department>(entity =>
@@ -217,57 +226,31 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.DepartmentId)
                     .ValueGeneratedNever()
-                    .HasColumnName("departmentId");
+                    .HasColumnName("department_Id");
 
-                entity.Property(e => e.Description)
-                    .HasMaxLength(500)
-                    .HasColumnName("description");
+                entity.Property(e => e.Description).HasColumnName("description");
 
                 entity.Property(e => e.Name)
-                    .HasMaxLength(100)
+                    .HasMaxLength(50)
                     .HasColumnName("name");
-            });
-
-            modelBuilder.Entity<DepartmentInCampus>(entity =>
-            {
-                entity.ToTable("departmentInCampus");
-
-                entity.Property(e => e.DepartmentInCampusId)
-                    .ValueGeneratedNever()
-                    .HasColumnName("departmentInCampusId");
-
-                entity.Property(e => e.CampusId).HasColumnName("campus_Id");
-
-                entity.Property(e => e.DepartmentId).HasColumnName("department_Id");
-
-                entity.HasOne(d => d.Campus)
-                    .WithMany(p => p.DepartmentInCampuses)
-                    .HasForeignKey(d => d.CampusId)
-                    .HasConstraintName("FK_departmentInCampus_Campus");
-
-                entity.HasOne(d => d.Department)
-                    .WithMany(p => p.DepartmentInCampuses)
-                    .HasForeignKey(d => d.DepartmentId)
-                    .HasConstraintName("FK_departmentInCampus_Department");
             });
 
             modelBuilder.Entity<HistoryMod>(entity =>
             {
+                entity.HasKey(e => e.HistoryId);
+
                 entity.ToTable("HistoryMod");
 
-                entity.Property(e => e.HistoryModId)
+                entity.Property(e => e.HistoryId)
                     .ValueGeneratedNever()
-                    .HasColumnName("historyModId");
+                    .HasColumnName("history_Id");
 
-                entity.Property(e => e.Description)
-                    .HasMaxLength(200)
-                    .HasColumnName("description");
+                entity.Property(e => e.Description).HasColumnName("description");
 
                 entity.Property(e => e.TypeActionId).HasColumnName("typeAction_Id");
 
                 entity.Property(e => e.Username)
                     .HasMaxLength(50)
-                    .IsUnicode(false)
                     .HasColumnName("username");
 
                 entity.HasOne(d => d.TypeAction)
@@ -287,13 +270,12 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.HistoryStudentId)
                     .ValueGeneratedNever()
-                    .HasColumnName("historyStudentId");
+                    .HasColumnName("historyStudent_Id");
 
                 entity.Property(e => e.Description).HasColumnName("description");
 
                 entity.Property(e => e.Mssv)
-                    .HasMaxLength(10)
-                    .IsUnicode(false)
+                    .HasMaxLength(50)
                     .HasColumnName("mssv");
 
                 entity.Property(e => e.TypeActionId).HasColumnName("typeAction_Id");
@@ -315,12 +297,14 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.MajorId)
                     .ValueGeneratedNever()
-                    .HasColumnName("majorId");
+                    .HasColumnName("major_Id");
 
                 entity.Property(e => e.CampusId).HasColumnName("campus_Id");
 
+                entity.Property(e => e.Description).HasColumnName("description");
+
                 entity.Property(e => e.Name)
-                    .HasMaxLength(100)
+                    .HasMaxLength(50)
                     .HasColumnName("name");
 
                 entity.HasOne(d => d.Campus)
@@ -333,30 +317,23 @@ namespace Capstone_VotingSystem.Entities
             {
                 entity.HasKey(e => e.QrId);
 
-                entity.ToTable("QRcode");
+                entity.ToTable("QRCode");
 
                 entity.Property(e => e.QrId)
                     .ValueGeneratedNever()
-                    .HasColumnName("qrId");
+                    .HasColumnName("qr_Id");
 
                 entity.Property(e => e.CampaignId).HasColumnName("campaign_Id");
 
-                entity.Property(e => e.Img)
-                    .HasMaxLength(500)
-                    .IsUnicode(false)
-                    .HasColumnName("img");
+                entity.Property(e => e.ImgQrcode)
+                    .HasMaxLength(50)
+                    .HasColumnName("img_QRcode");
 
                 entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.Property(e => e.Url)
-                    .HasMaxLength(500)
-                    .IsUnicode(false)
+                    .HasMaxLength(50)
                     .HasColumnName("url");
-
-                entity.HasOne(d => d.Campaign)
-                    .WithMany(p => p.Qrcodes)
-                    .HasForeignKey(d => d.CampaignId)
-                    .HasConstraintName("FK_QRcode_Campaign");
             });
 
             modelBuilder.Entity<Question>(entity =>
@@ -365,20 +342,41 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.QuestionId)
                     .ValueGeneratedNever()
-                    .HasColumnName("questionId");
+                    .HasColumnName("Question_Id");
+
+                entity.Property(e => e.Ask).HasColumnName("ask");
 
                 entity.Property(e => e.CampaignId).HasColumnName("campaign_Id");
 
                 entity.Property(e => e.Description).HasColumnName("description");
 
-                entity.Property(e => e.QuestionOfCampaign)
-                    .HasMaxLength(500)
-                    .HasColumnName("questionOfCampaign");
-
                 entity.HasOne(d => d.Campaign)
                     .WithMany(p => p.Questions)
                     .HasForeignKey(d => d.CampaignId)
                     .HasConstraintName("FK_Question_Campaign");
+            });
+
+            modelBuilder.Entity<QuestionStage>(entity =>
+            {
+                entity.ToTable("QuestionStage");
+
+                entity.Property(e => e.QuestionStageId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("questionStage_Id");
+
+                entity.Property(e => e.CampaignStageId).HasColumnName("campaignStage_Id");
+
+                entity.Property(e => e.QuestionId).HasColumnName("question_Id");
+
+                entity.HasOne(d => d.CampaignStage)
+                    .WithMany(p => p.QuestionStages)
+                    .HasForeignKey(d => d.CampaignStageId)
+                    .HasConstraintName("FK_QuestionStage_CampaignStage");
+
+                entity.HasOne(d => d.Question)
+                    .WithMany(p => p.QuestionStages)
+                    .HasForeignKey(d => d.QuestionId)
+                    .HasConstraintName("FK_QuestionStage_Question");
             });
 
             modelBuilder.Entity<Rating>(entity =>
@@ -387,7 +385,7 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.RatingId)
                     .ValueGeneratedNever()
-                    .HasColumnName("ratingId");
+                    .HasColumnName("rating_Id");
 
                 entity.Property(e => e.DepartmentId).HasColumnName("department_Id");
 
@@ -412,11 +410,10 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.RoleId)
                     .ValueGeneratedNever()
-                    .HasColumnName("roleId");
+                    .HasColumnName("role_Id");
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(50)
-                    .IsUnicode(false)
                     .HasColumnName("name");
             });
 
@@ -427,13 +424,11 @@ namespace Capstone_VotingSystem.Entities
                 entity.ToTable("Student");
 
                 entity.Property(e => e.Mssv)
-                    .HasMaxLength(10)
-                    .IsUnicode(false)
+                    .HasMaxLength(50)
                     .HasColumnName("mssv");
 
                 entity.Property(e => e.K)
-                    .HasMaxLength(10)
-                    .IsUnicode(false)
+                    .HasMaxLength(50)
                     .HasColumnName("k");
 
                 entity.Property(e => e.MajorId).HasColumnName("major_Id");
@@ -450,38 +445,53 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.TeacherId)
                     .ValueGeneratedNever()
-                    .HasColumnName("teacherId");
+                    .HasColumnName("teacher_Id");
 
-                entity.Property(e => e.AmountVote).HasColumnName("amountVote");
-
-                entity.Property(e => e.CampaignId).HasColumnName("campaign_Id");
-
-                entity.Property(e => e.DepartmentId).HasColumnName("department_Id");
+                entity.Property(e => e.CampusDepartmentId).HasColumnName("campusDepartment_Id");
 
                 entity.Property(e => e.Email)
                     .HasMaxLength(50)
-                    .IsUnicode(false)
                     .HasColumnName("email");
 
                 entity.Property(e => e.Img)
-                    .IsUnicode(false)
+                    .HasMaxLength(50)
                     .HasColumnName("img");
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(50)
                     .HasColumnName("name");
 
+                entity.HasOne(d => d.CampusDepartment)
+                    .WithMany(p => p.Teachers)
+                    .HasForeignKey(d => d.CampusDepartmentId)
+                    .HasConstraintName("FK_Teacher_CampusDepartment");
+            });
+
+            modelBuilder.Entity<TeacherCampaign>(entity =>
+            {
+                entity.ToTable("TeacherCampaign");
+
+                entity.Property(e => e.TeacherCampaignId)
+                    .ValueGeneratedNever()
+                    .HasColumnName("teacherCampaign_Id");
+
+                entity.Property(e => e.AmountVote).HasColumnName("amountVote");
+
+                entity.Property(e => e.CampaignId).HasColumnName("campaign_Id");
+
                 entity.Property(e => e.Score).HasColumnName("score");
 
-                entity.HasOne(d => d.Campaign)
-                    .WithMany(p => p.Teachers)
-                    .HasForeignKey(d => d.CampaignId)
-                    .HasConstraintName("FK_Teacher_Campaign");
+                entity.Property(e => e.TeacherId).HasColumnName("teacher_Id");
 
-                entity.HasOne(d => d.Department)
-                    .WithMany(p => p.Teachers)
-                    .HasForeignKey(d => d.DepartmentId)
-                    .HasConstraintName("FK_Teacher_Department");
+                entity.HasOne(d => d.Campaign)
+                    .WithMany(p => p.TeacherCampaigns)
+                    .HasForeignKey(d => d.CampaignId)
+                    .HasConstraintName("FK_TeacherCampaign_Campaign");
+
+                entity.HasOne(d => d.Teacher)
+                    .WithMany(p => p.TeacherCampaigns)
+                    .HasForeignKey(d => d.TeacherId)
+                    .HasConstraintName("FK_TeacherCampaign_Teacher");
             });
 
             modelBuilder.Entity<TypeAction>(entity =>
@@ -490,10 +500,10 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.TypeActionId)
                     .ValueGeneratedNever()
-                    .HasColumnName("typeActionId");
+                    .HasColumnName("typeAction_Id");
 
                 entity.Property(e => e.Name)
-                    .HasMaxLength(200)
+                    .HasMaxLength(50)
                     .HasColumnName("name");
             });
 
@@ -503,14 +513,13 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.VoteDetailId)
                     .ValueGeneratedNever()
-                    .HasColumnName("voteDetailId");
+                    .HasColumnName("voteDetail_Id");
 
                 entity.Property(e => e.Mssv)
-                    .HasMaxLength(10)
-                    .IsUnicode(false)
+                    .HasMaxLength(50)
                     .HasColumnName("mssv");
 
-                entity.Property(e => e.TeacherId).HasColumnName("teacher_Id");
+                entity.Property(e => e.TeacherCampaignId).HasColumnName("teacherCampaign_Id");
 
                 entity.Property(e => e.Time)
                     .HasColumnType("datetime")
@@ -521,10 +530,10 @@ namespace Capstone_VotingSystem.Entities
                     .HasForeignKey(d => d.Mssv)
                     .HasConstraintName("FK_VoteDetail_Student");
 
-                entity.HasOne(d => d.Teacher)
+                entity.HasOne(d => d.TeacherCampaign)
                     .WithMany(p => p.VoteDetails)
-                    .HasForeignKey(d => d.TeacherId)
-                    .HasConstraintName("FK_VoteDetail_Teacher");
+                    .HasForeignKey(d => d.TeacherCampaignId)
+                    .HasConstraintName("FK_VoteDetail_TeacherCampaign");
             });
 
             OnModelCreatingPartial(modelBuilder);

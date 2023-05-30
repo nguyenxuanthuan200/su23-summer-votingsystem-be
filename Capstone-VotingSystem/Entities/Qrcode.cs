@@ -6,11 +6,9 @@ namespace Capstone_VotingSystem.Entities
     public partial class Qrcode
     {
         public Guid QrId { get; set; }
-        public string? Url { get; set; }
-        public string? Img { get; set; }
-        public bool? Status { get; set; }
         public Guid? CampaignId { get; set; }
-
-        public virtual Campaign? Campaign { get; set; }
+        public string? Url { get; set; }
+        public string? ImgQrcode { get; set; }
+        public bool? Status { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using Capstone_VotingSystem.Models.ResponseModels.AuthenResponse;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Octokit.Internal;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -38,7 +39,10 @@ namespace Capstone_VotingSystem.Repositories.AuthenRepo
 
                 var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-                var token = new JwtSecurityToken(_configuration["JwtJwtConfig:Issuer"], _configuration["JwtJwtConfig:Audience"], claims, expires: DateTime.UtcNow.AddMinutes(120), signingCredentials: signIn);
+                var token = new JwtSecurityToken(_configuration["JwtJwtConfig:Issuer"], _configuration["JwtJwtConfig:Audience"], 
+                    claims, 
+                    expires: DateTime.UtcNow.AddMinutes(120), 
+                    signingCredentials: signIn);
 
                 var result = new LoginResponse();
                 result.Id = Guid.NewGuid();
@@ -54,7 +58,7 @@ namespace Capstone_VotingSystem.Repositories.AuthenRepo
                     new Claim(JwtRegisteredClaimNames.Sub,_configuration["JwtConfig:Subject"]),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                    new Claim("Id", accountMod.RoleId.ToString())
+                    new Claim("Id", accountMod.RoleId.ToString()),
                     };
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtConfig:Key"]));
@@ -70,6 +74,11 @@ namespace Capstone_VotingSystem.Repositories.AuthenRepo
                 return result;
             }
             return null;
+        }
+
+        public Task<FirebaseResponse<LoginResponse>> Login(LoginFirebaseModel model)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<AccountMod> SignInAsync(LoginRequest payload)
@@ -96,6 +105,11 @@ namespace Capstone_VotingSystem.Repositories.AuthenRepo
                     return account;
             }
             return null;
+        }
+
+        public Task<ApiResponse<LoginResponse>> SignInAsync(LoginFirebaseModel model)
+        {
+            throw new NotImplementedException();
         }
     }
 }

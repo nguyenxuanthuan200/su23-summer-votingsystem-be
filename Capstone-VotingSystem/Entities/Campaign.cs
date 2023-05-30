@@ -7,24 +7,22 @@ namespace Capstone_VotingSystem.Entities
     {
         public Campaign()
         {
-            CampaignDetails = new HashSet<CampaignDetail>();
-            Qrcodes = new HashSet<Qrcode>();
+            CampaignStages = new HashSet<CampaignStage>();
             Questions = new HashSet<Question>();
-            Teachers = new HashSet<Teacher>();
+            TeacherCampaigns = new HashSet<TeacherCampaign>();
         }
 
         public Guid CampaignId { get; set; }
         public DateTime? StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
+        public DateTime? Endtime { get; set; }
         public bool? Status { get; set; }
-        public Guid? CampaignTypeId { get; set; }
         public Guid? CampusId { get; set; }
+        public Guid? CampaignTypeId { get; set; }
 
         public virtual CampaignType? CampaignType { get; set; }
         public virtual Campus? Campus { get; set; }
-        public virtual ICollection<CampaignDetail> CampaignDetails { get; set; }
-        public virtual ICollection<Qrcode> Qrcodes { get; set; }
+        public virtual ICollection<CampaignStage> CampaignStages { get; set; }
         public virtual ICollection<Question> Questions { get; set; }
-        public virtual ICollection<Teacher> Teachers { get; set; }
+        public virtual ICollection<TeacherCampaign> TeacherCampaigns { get; set; }
     }
 }
