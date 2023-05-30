@@ -1,6 +1,7 @@
 ﻿using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Models.RequestModels.VoteRequest;
 using Capstone_VotingSystem.Repositories.VoteRepo;
+using Microsoft.EntityFrameworkCore;
 
 namespace Capstone_VotingSystem.Repositories.VoteRepo
 {
@@ -15,12 +16,19 @@ namespace Capstone_VotingSystem.Repositories.VoteRepo
 
         public async Task<bool> CreateVote(CreateVoteRequest request)
         {
+            var student = await dbContext.Students.Where(
+              p => p.Mssv == request.MssvStudent).SingleOrDefaultAsync();
+
+            if (student == null)
+            {
+                return false;
+            }
             var id = Guid.NewGuid();
             VoteDetail votedetail = new VoteDetail();
             {
                 votedetail.VoteDetailId = id;
                 votedetail.Time = DateTime.Now;
-                votedetail.TeacherId = request.TeacherId;
+                votedetail.TeacherCampaignId = request.TeacherCampaignId;
                 votedetail.Mssv = request.MssvStudent;
             };
             var idAnswerVote = Guid.NewGuid();
@@ -28,7 +36,7 @@ namespace Capstone_VotingSystem.Repositories.VoteRepo
             {
                 answervote.AnswerVoteId = idAnswerVote;
                 answervote.Answer = request.Answer;
-                answervote.QuestionId = request.QuestionId;
+                answervote.QuestionStageId = request.QuestionId;
                 answervote.VoteDetailId = id;
             }
             await dbContext.VoteDetails.AddAsync(votedetail);

@@ -23,7 +23,7 @@ namespace Capstone_VotingSystem.Repositories.CampaignRepo
                     {
                         Id = x.CampaignId,
                         TimeStart = x.StartTime,
-                        TimeEnd = x.EndTime,
+                        TimeEnd = x.Endtime,
                         Status = x.Status,
                         CampaignTypeId = x.CampaignTypeId,
                         CampusId = x.CampusId,

@@ -21,12 +21,11 @@ namespace Capstone_VotingSystem.Repositories.TeacherRepo
                 {
                     return new GetListTeacherResponse()
                     {
-                        Id = x.TeacherId,
-                        Name = x.Name,
-                        AmountVote = x.AmountVote,
-                        Score = x.Score,
-                        DepartmentId = x.DepartmentId,
-                        CampaignId = x.CampaignId,
+                        TeacherId = x.TeacherId,
+                        Name = x.Name,                       
+                        Email = x.Email,
+                        Img = x.Img,
+                        CampusDepartmentId = x.CampusDepartmentId,
                     };
                 }
                 ).ToList();

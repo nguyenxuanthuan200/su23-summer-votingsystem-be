@@ -21,7 +21,7 @@ namespace Capstone_VotingSystem.Repositories.QuestionRepo
                     return new GetQuestionResponse()
                     {
                         QuestionId = x.QuestionId,
-                        QuestionOfCampaign = x.QuestionOfCampaign,
+                        QuestionOfCampaign = x.Ask,
                         Description = x.Description,
                         CampaignId = x.CampaignId,
                     };

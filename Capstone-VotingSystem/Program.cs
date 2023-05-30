@@ -2,6 +2,8 @@ using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Repositories.AccountModRepo;
 using Capstone_VotingSystem.Repositories.AuthenRepo;
 using Capstone_VotingSystem.Repositories.CampaignRepo;
+using Capstone_VotingSystem.Repositories.CampaignStageRepo;
+using Capstone_VotingSystem.Repositories.QuestionRepo;
 using Capstone_VotingSystem.Repositories.TeacherRepo;
 using Capstone_VotingSystem.Repositories.VoteRepo;
 using FirebaseAdmin;
@@ -29,7 +31,9 @@ FirebaseApp.Create(new AppOptions()
 
 builder.Services.AddScoped<ICampaignRepositories, CampaignRepositories>();
 builder.Services.AddScoped<ITeacherRepositories, TeacherRepositories>();
+builder.Services.AddScoped<IQuestionRepositories, QuestionRepositories>();
 builder.Services.AddScoped<IVoteRepositories, VoteRepositories>();
+builder.Services.AddScoped<ICampaignStageRepositories, CampaignStageRepositories>();
 builder.Services.AddScoped<IAuthenRepositories, AuthenRepositories>();
 builder.Services.AddScoped<IAccountModRepositories, AccountModRepositories>();
 
