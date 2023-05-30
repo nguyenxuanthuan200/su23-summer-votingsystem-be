@@ -7,8 +7,8 @@ namespace Capstone_VotingSystem.Entities
     {
         public Guid RatingId { get; set; }
         public double? Ratio { get; set; }
-        public Guid? DepartmentId { get; set; }
         public Guid? MajorId { get; set; }
+        public Guid? DepartmentId { get; set; }
 
         public virtual Department? Department { get; set; }
         public virtual Major? Major { get; set; }
