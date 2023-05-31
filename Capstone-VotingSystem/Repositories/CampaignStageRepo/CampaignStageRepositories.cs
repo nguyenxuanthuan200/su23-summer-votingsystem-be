@@ -59,7 +59,7 @@ namespace Capstone_VotingSystem.Repositories.CampaignStageRepo
             return result;
         }
 
-        public async Task<GetCampaignStageByCampaignResponse> UpdateBuilding(Guid id)
+        public async Task<GetCampaignStageByCampaignResponse> UpdateCampaignStageVote(Guid id)
         {
             var upCam = await dbContext.CampaignStages.SingleOrDefaultAsync(c => c.CampaignStageId == id);
             if (upCam == null) return null;
@@ -75,5 +75,6 @@ namespace Capstone_VotingSystem.Repositories.CampaignStageRepo
             }
             return up;
         }
+
     }
 }

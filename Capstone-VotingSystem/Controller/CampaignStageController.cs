@@ -55,7 +55,7 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBuilding(Guid id, float vote)
+        public async Task<IActionResult> UpdateCampaignStage(Guid id, float vote)
         {
             try
             {
