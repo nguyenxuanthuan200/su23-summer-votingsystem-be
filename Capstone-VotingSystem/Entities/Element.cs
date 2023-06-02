@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace Capstone_VotingSystem.Entities
 {
-    public partial class QuestionStage
+    public partial class Element
     {
-        public Guid QuestionStageId { get; set; }
-        public Guid? CampaignStageId { get; set; }
+        public Guid ElementId { get; set; }
+        public string? Text { get; set; }
         public Guid? QuestionId { get; set; }
 
-        public virtual CampaignStage? CampaignStage { get; set; }
         public virtual Question? Question { get; set; }
+        public virtual Answer? Answer { get; set; }
     }
 }

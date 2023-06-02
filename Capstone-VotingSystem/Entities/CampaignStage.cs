@@ -7,16 +7,19 @@ namespace Capstone_VotingSystem.Entities
     {
         public CampaignStage()
         {
-            AnswerVotes = new HashSet<AnswerVote>();
-            QuestionStages = new HashSet<QuestionStage>();
+            Votings = new HashSet<Voting>();
         }
 
         public Guid CampaignStageId { get; set; }
+        public string? Title { get; set; }
+        public string? Description { get; set; }
+        public bool? Status { get; set; }
+        public string? Text { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime? EndTime { get; set; }
         public Guid? CampaignId { get; set; }
-        public double? AmountVote { get; set; }
 
         public virtual Campaign? Campaign { get; set; }
-        public virtual ICollection<AnswerVote> AnswerVotes { get; set; }
-        public virtual ICollection<QuestionStage> QuestionStages { get; set; }
+        public virtual ICollection<Voting> Votings { get; set; }
     }
 }
