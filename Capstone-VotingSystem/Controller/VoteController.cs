@@ -14,19 +14,29 @@ namespace Capstone_VotingSystem.Controller
     public class VoteController : BaseController
     {
         private readonly IVoteRepositories voteRepositories;
-        private readonly VotingSystemContext dbContext;
+     
 
-        public VoteController(IVoteRepositories voteRepositories , VotingSystemContext votingSystemContext)
+        public VoteController(IVoteRepositories voteRepositories)
         {
             this.voteRepositories = voteRepositories;
-            this.dbContext = votingSystemContext;
+            
         }
-        [HttpGet]
+        [HttpGet("GetAllVotingDetail")]
         public async Task<IActionResult> getall()
         {
-            return Ok(await dbContext.VotingDetails.ToListAsync());
+            try
+            {
+                var result = await voteRepositories.GetAll();
+                if (result == null)
+                    return CustomResult("Not Found", HttpStatusCode.NotFound);
+                return CustomResult("Success", result, HttpStatusCode.OK);
+            }
+            catch (Exception)
+            {
+                return CustomResult("Fail", HttpStatusCode.InternalServerError);
+            }
         }
-        [HttpPost]
+        [HttpPost("CreateVotingDetail")]
         public async Task<IActionResult> CreateVote(CreateVoteRequest request)
         {
             try

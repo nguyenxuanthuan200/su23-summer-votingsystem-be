@@ -1,5 +1,6 @@
 ﻿using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Models.RequestModels.VoteRequest;
+using Capstone_VotingSystem.Models.ResponseModels.ActionHistory;
 using Capstone_VotingSystem.Models.ResponseModels.VoteResponse;
 using Capstone_VotingSystem.Repositories.VoteRepo;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,7 @@ namespace Capstone_VotingSystem.Repositories.VoteRepo
                 votingDetail.VotingId = request.VotingId;
                 votingDetail.RatioCategoryId = request.RatioCategoryId;
                 votingDetail.Time = request.Time;
+                votingDetail.CandidateProfileId = request.CandidateProfileId;
                 votingDetail.FormStageId = request.FormStageId;
 
             }
@@ -47,6 +49,25 @@ namespace Capstone_VotingSystem.Repositories.VoteRepo
             }
             await dbContext.VotingDetails.AddAsync(votingDetail);
             await dbContext.SaveChangesAsync();
+            return response;
+        }
+
+        public async Task<IEnumerable<VoteDetailResponse>> GetAll()
+        {
+            var actionHistory = await dbContext.VotingDetails.ToListAsync();
+            IEnumerable<VoteDetailResponse> response = actionHistory.Select(x =>
+            {
+                return new VoteDetailResponse()
+                {
+                   VotingDetailId = x.VotingDetailId,
+                   CandidateProfileId = x.CandidateProfileId,
+                   FormStageId = x.FormStageId,
+                   VotingId = x.VotingId,
+                   RatioCategoryId = x.RatioCategoryId,
+                   Time = x.Time,
+
+                };
+            }).ToList();
             return response;
         }
     }

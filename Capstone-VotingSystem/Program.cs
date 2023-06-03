@@ -1,4 +1,6 @@
 using Capstone_VotingSystem.Entities;
+using Capstone_VotingSystem.Repositories.ActionHistoryRepo;
+using Capstone_VotingSystem.Repositories.CandidateProfileRepo;
 using Capstone_VotingSystem.Repositories.VoteRepo;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -25,6 +27,8 @@ FirebaseApp.Create(new AppOptions()
 
 
 builder.Services.AddScoped<IVoteRepositories, VoteRepositories>();
+builder.Services.AddScoped<IActionHistoryRepositories, ActionHistoryRepositories>();
+builder.Services.AddScoped<ICandidateProfileRepositories, CandidateProfileRepositories>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>

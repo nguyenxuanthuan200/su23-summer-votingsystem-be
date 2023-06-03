@@ -4,6 +4,8 @@ namespace Capstone_VotingSystem.Repositories.ActionHistoryRepo
 {
     public interface IActionHistoryRepositories
     {
-        public Task<ActionHistoryResponse> GetActionHistorybyUsername();
+        public Task<IEnumerable<ActionHistoryResponse>> GetAllActionHistory();
+
+        public Task<IEnumerable<ActionHistoryResponse>> GetActionHistoryByUser(string? username);
     }
 }
