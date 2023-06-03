@@ -3,6 +3,6 @@ namespace Capstone_VotingSystem.Repositories.VoteRepo
 {
     public interface IVoteRepositories
     {
-        Task<Boolean> CreateVote(CreateVoteRequest request);
+        Task<bool> CreateVote(CreateVoteRequest request);
     }
 }

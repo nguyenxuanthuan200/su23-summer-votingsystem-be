@@ -3,9 +3,10 @@
     public class CreateVoteRequest
     {
         public DateTime? Time { get; set; }
-        public Guid? TeacherCampaignId { get; set; }
-        public string? MssvStudent { get; set; }
-        public int? Answer { get; set; }
-        public Guid? QuestionId { get; set; }
+        public Guid? VotingId { get; set; }
+        public Guid? FormStageId { get; set; }
+        public Guid? CandidateProfileId { get; set; }
+        public Guid? RatioCategoryId { get; set; }
+        public bool? AnswerSelect { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using Capstone_VotingSystem.Models.RequestModels.VoteRequest;
 using Capstone_VotingSystem.Repositories.VoteRepo;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
 
 namespace Capstone_VotingSystem.Repositories.VoteRepo
 {
@@ -16,38 +17,34 @@ namespace Capstone_VotingSystem.Repositories.VoteRepo
 
         public async Task<bool> CreateVote(CreateVoteRequest request)
         {
-            var student = await dbContext.Students.Where(
-              p => p.Mssv == request.MssvStudent).SingleOrDefaultAsync();
-
-            if (student == null)
+            var check = await dbContext.Votings.Where(p => p.VotingId == request.VotingId).SingleOrDefaultAsync();
+            if(check != null)
             {
                 return false;
             }
+           
             var id = Guid.NewGuid();
-            VoteDetail votedetail = new VoteDetail();
+            VotingDetail votingDetail = new VotingDetail();
             {
-                votedetail.VoteDetailId = id;
-                votedetail.Time = DateTime.Now;
-                votedetail.TeacherCampaignId = request.TeacherCampaignId;
-                votedetail.Mssv = request.MssvStudent;
-            };
-            var idAnswerVote = Guid.NewGuid();
-            AnswerVote answervote = new AnswerVote();
-            {
-                answervote.AnswerVoteId = idAnswerVote;
-                answervote.Answer = request.Answer;
-                answervote.QuestionStageId = request.QuestionId;
-                answervote.VoteDetailId = id;
-            }
-            await dbContext.VoteDetails.AddAsync(votedetail);
-            await dbContext.AnswerVotes.AddAsync(answervote);
-            await dbContext.SaveChangesAsync();
-            //var re = _mapper.map<createpostresponse>(post);
-            //var mapproduct = _mapper.map<getproductresponse>(product);
-            //re.product = mapproduct;
+                votingDetail.VotingDetailId = id;
+                votingDetail.VotingId = request.VotingId;
+                votingDetail.RatioCategoryId = request.RatioCategoryId;
+                votingDetail.Time = request.Time;
+                votingDetail.FormStageId = request.FormStageId;
 
+            }
+            var idAnswer = Guid.NewGuid();
+            Answer answer = new Answer();
+            {
+                answer.AnswerId = idAnswer;
+                answer.VotingDetailId = id;
+                answer.AnswerSelect = request.AnswerSelect;
+               
+            }
+            await dbContext.VotingDetails.AddAsync(votingDetail);
+            await dbContext.Answers.AddAsync(answer);
+            await dbContext.SaveChangesAsync();
             return true;
         }
-
     }
 }
