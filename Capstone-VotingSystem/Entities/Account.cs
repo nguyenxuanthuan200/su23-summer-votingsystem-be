@@ -5,7 +5,7 @@ namespace Capstone_VotingSystem.Entities
 {
     public partial class Account
     {
-        public string UserName { get; set; } = null!;
+        public string Username { get; set; } = null!;
         public string? Password { get; set; }
         public string? Token { get; set; }
         public bool? Status { get; set; }

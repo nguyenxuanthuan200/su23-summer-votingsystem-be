@@ -38,7 +38,7 @@ namespace Capstone_VotingSystem.Controller
                 var create = await voteRepositories.CreateVote(request);
                 if (create == null)
                 {
-                    return CustomResult("vote da ton tai", HttpStatusCode.Accepted);
+                    return CustomResult("voting không tồn tại", HttpStatusCode.Accepted);
                 }
                 //var result = _mapper.Map<CreateAccountResponse>(create);
                 return CustomResult("tạo vote thành công", create, HttpStatusCode.Created);

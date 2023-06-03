@@ -8,9 +8,9 @@ namespace Capstone_VotingSystem.Entities
         public Guid ActionHistoryId { get; set; }
         public string? Description { get; set; }
         public Guid? ActionTypeId { get; set; }
-        public string? UserName { get; set; }
+        public string? Username { get; set; }
 
         public virtual ActionType? ActionType { get; set; }
-        public virtual User? UserNameNavigation { get; set; }
+        public virtual User? UsernameNavigation { get; set; }
     }
 }

@@ -12,10 +12,10 @@ namespace Capstone_VotingSystem.Entities
 
         public Guid FormId { get; set; }
         public string? Name { get; set; }
-        public string? UserName { get; set; }
         public bool? Visibility { get; set; }
+        public string? Username { get; set; }
 
-        public virtual User? UserNameNavigation { get; set; }
+        public virtual User? UsernameNavigation { get; set; }
         public virtual ICollection<FormStage> FormStages { get; set; }
     }
 }

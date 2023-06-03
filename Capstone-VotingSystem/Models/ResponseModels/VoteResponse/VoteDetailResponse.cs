@@ -1,7 +1,8 @@
-﻿namespace Capstone_VotingSystem.Models.RequestModels.VoteRequest
+﻿namespace Capstone_VotingSystem.Models.ResponseModels.VoteResponse
 {
-    public class CreateVoteRequest
+    public class VoteDetailResponse
     {
+        public Guid VotingDetailId { get; set; }
         public DateTime? Time { get; set; }
         public Guid? VotingId { get; set; }
         public Guid? FormStageId { get; set; }

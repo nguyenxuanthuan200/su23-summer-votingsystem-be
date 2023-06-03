@@ -15,16 +15,16 @@ namespace Capstone_VotingSystem.Entities
             Notifications = new HashSet<Notification>();
         }
 
-        public string UserName { get; set; } = null!;
         public string? Name { get; set; }
         public string? Gender { get; set; }
         public string? Address { get; set; }
+        public string Username { get; set; } = null!;
         public Guid? CategoryId { get; set; }
         public Guid? RoleId { get; set; }
 
         public virtual Category? Category { get; set; }
         public virtual Role? Role { get; set; }
-        public virtual Account UserNameNavigation { get; set; } = null!;
+        public virtual Account UsernameNavigation { get; set; } = null!;
         public virtual ICollection<ActionHistory> ActionHistories { get; set; }
         public virtual ICollection<Campaign> Campaigns { get; set; }
         public virtual ICollection<CandidateProfile> CandidateProfiles { get; set; }

@@ -8,8 +8,8 @@ namespace Capstone_VotingSystem.Entities
         public Guid FeedbackId { get; set; }
         public string? Title { get; set; }
         public string? Text { get; set; }
-        public string? UserName { get; set; }
+        public string? Username { get; set; }
 
-        public virtual User? UserNameNavigation { get; set; }
+        public virtual User? UsernameNavigation { get; set; }
     }
 }

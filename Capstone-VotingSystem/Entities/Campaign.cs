@@ -18,9 +18,9 @@ namespace Capstone_VotingSystem.Entities
         public DateTime? EndTime { get; set; }
         public bool? Visibility { get; set; }
         public bool? Status { get; set; }
-        public string? UserName { get; set; }
+        public string? Username { get; set; }
 
-        public virtual User? UserNameNavigation { get; set; }
+        public virtual User? UsernameNavigation { get; set; }
         public virtual ICollection<CampaignStage> CampaignStages { get; set; }
         public virtual ICollection<CandidateProfile> CandidateProfiles { get; set; }
         public virtual ICollection<RatioCategory> RatioCategories { get; set; }

@@ -1,5 +1,6 @@
 ﻿using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Models.RequestModels.VoteRequest;
+using Capstone_VotingSystem.Models.ResponseModels.VoteResponse;
 using Capstone_VotingSystem.Repositories.VoteRepo;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
@@ -15,12 +16,12 @@ namespace Capstone_VotingSystem.Repositories.VoteRepo
             this.dbContext = dbContext;
         }
 
-        public async Task<bool> CreateVote(CreateVoteRequest request)
+        public async Task<VoteDetailResponse> CreateVote(CreateVoteRequest request)
         {
             var check = await dbContext.Votings.Where(p => p.VotingId == request.VotingId).SingleOrDefaultAsync();
-            if(check != null)
+            if(check == null)
             {
-                return false;
+                return null;
             }
            
             var id = Guid.NewGuid();
@@ -33,18 +34,20 @@ namespace Capstone_VotingSystem.Repositories.VoteRepo
                 votingDetail.FormStageId = request.FormStageId;
 
             }
-            var idAnswer = Guid.NewGuid();
-            Answer answer = new Answer();
+           
+            
+            VoteDetailResponse response = new VoteDetailResponse();
             {
-                answer.AnswerId = idAnswer;
-                answer.VotingDetailId = id;
-                answer.AnswerSelect = request.AnswerSelect;
-               
+                response.VotingDetailId = id;
+                response.VotingId = request.VotingId;
+                response.FormStageId =request.FormStageId;
+                response.CandidateProfileId = request.CandidateProfileId;
+                response.RatioCategoryId = request.RatioCategoryId;
+                response.Time = request.Time;
             }
             await dbContext.VotingDetails.AddAsync(votingDetail);
-            await dbContext.Answers.AddAsync(answer);
             await dbContext.SaveChangesAsync();
-            return true;
+            return response;
         }
     }
 }
