@@ -1,5 +1,6 @@
 ﻿using Capstone_VotingSystem.Repositories.ActionHistoryRepo;
 using CoreApiResponse;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -16,6 +17,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.actionHistory = actionHistoryRepositories;
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet("GetAllActionHistory")]
         public async Task<IActionResult> GetActionHistory() 
         {

@@ -13,10 +13,10 @@ namespace Capstone_VotingSystem.Controller
     [ApiController]
     public class VotingDetailController : BaseController
     {
-        private readonly IVoteRepositories voteRepositories;
+        private readonly IVotingDetailService voteRepositories;
      
 
-        public VotingDetailController(IVoteRepositories voteRepositories)
+        public VotingDetailController(IVotingDetailService voteRepositories)
         {
             this.voteRepositories = voteRepositories;
             

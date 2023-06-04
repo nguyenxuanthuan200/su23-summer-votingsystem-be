@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
 
 namespace Capstone_VotingSystem.Repositories.VoteRepo
 {
-    public class VoteRepositories : IVoteRepositories
+    public class VotingDetailService : IVotingDetailService
     {
         private readonly VotingSystemContext dbContext;
 
-        public VoteRepositories(VotingSystemContext dbContext)
+        public VotingDetailService(VotingSystemContext dbContext)
         {
             this.dbContext = dbContext;
         }

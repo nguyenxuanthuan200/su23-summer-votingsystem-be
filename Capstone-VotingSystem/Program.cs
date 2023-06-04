@@ -1,5 +1,6 @@
 using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Repositories.ActionHistoryRepo;
+using Capstone_VotingSystem.Repositories.AuthenRepo;
 using Capstone_VotingSystem.Repositories.CandidateProfileRepo;
 using Capstone_VotingSystem.Repositories.RateCategoryRepo;
 using Capstone_VotingSystem.Repositories.VoteRepo;
@@ -9,7 +10,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,10 +30,12 @@ FirebaseApp.Create(new AppOptions()
 });
 
 
-builder.Services.AddScoped<IVoteRepositories, VoteRepositories>();
+builder.Services.AddScoped<IVotingDetailService, VotingDetailService>();
 builder.Services.AddScoped<IActionHistoryRepositories, ActionHistoryRepositories>();
-builder.Services.AddScoped<ICandidateProfileRepositories, CandidateProfileRepositories>();
-builder.Services.AddScoped<IRatioRepositories, RatioRepositories>();
+builder.Services.AddScoped<ICandidateProfileService, CandidateProfileService>();
+builder.Services.AddScoped<IRatioCategoryService, RatioCategoryService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -50,6 +55,32 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "VotingSystem", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT Authorization header using the Bearer scheme.",
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+                {
+                new OpenApiSecurityScheme {
+                Reference = new OpenApiReference {
+                    Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                }
+                },
+                new string[] {}
+                }
+                });
+});
+        
+
 
 var app = builder.Build();
 
@@ -63,7 +94,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -4,7 +4,7 @@ using Capstone_VotingSystem.Models.ResponseModels.CandidateProfile;
 
 namespace Capstone_VotingSystem.Repositories.CandidateProfileRepo
 {
-    public interface ICandidateProfileRepositories
+    public interface ICandidateProfileService
     {
         public Task<IEnumerable<CandidateProfileResponse>> GetAll();
 

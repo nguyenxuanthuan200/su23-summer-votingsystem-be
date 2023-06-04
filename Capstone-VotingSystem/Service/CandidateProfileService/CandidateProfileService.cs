@@ -8,11 +8,11 @@ using Octokit;
 
 namespace Capstone_VotingSystem.Repositories.CandidateProfileRepo
 {
-    public class CandidateProfileRepositories : ICandidateProfileRepositories
+    public class CandidateProfileService : ICandidateProfileService
     {
         private readonly VotingSystemContext dbContext;
 
-        public CandidateProfileRepositories( VotingSystemContext votingSystemContext)
+        public CandidateProfileService( VotingSystemContext votingSystemContext)
         {
             this.dbContext = votingSystemContext;
         }

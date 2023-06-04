@@ -1,6 +1,6 @@
 ﻿namespace Capstone_VotingSystem.Repositories.CampaignRepo
 {
-    public interface ICampaignRepositories
+    public class CampaignService : ICampaignService
     {
     }
 }

@@ -2,6 +2,7 @@
 using Capstone_VotingSystem.Models.RequestModels.CandidateProfile;
 using Capstone_VotingSystem.Repositories.CandidateProfileRepo;
 using CoreApiResponse;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -12,14 +13,15 @@ namespace Capstone_VotingSystem.Controller
     [ApiController]
     public class CandidateProfileController : BaseController
     {
-        private readonly ICandidateProfileRepositories candidateProfile;
+        private readonly ICandidateProfileService candidateProfile;
 
-        public CandidateProfileController(ICandidateProfileRepositories candidateProfileRepositories) 
+        public CandidateProfileController(ICandidateProfileService candidateProfileRepositories) 
         {
             this.candidateProfile = candidateProfileRepositories;
         }
-
+        [Authorize(Roles = "User")]
         [HttpGet("GetAllCandidate")]
+        
         public async Task<IActionResult> GetAll()
         {
             try
@@ -34,6 +36,7 @@ namespace Capstone_VotingSystem.Controller
                 return CustomResult("Fail", HttpStatusCode.InternalServerError);
             }
         }
+        
         [HttpGet("GetCandidateProfileCampaign")]
         public async Task<IActionResult> GetCandidateProfile(Guid campaign)
         {

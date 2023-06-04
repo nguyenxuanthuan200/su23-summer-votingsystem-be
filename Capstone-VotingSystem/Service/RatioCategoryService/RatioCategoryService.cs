@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Capstone_VotingSystem.Repositories.RateCategoryRepo
 {
-    public class RatioRepositories : IRatioRepositories
+    public class RatioCategoryService : IRatioCategoryService
     {
         private readonly VotingSystemContext dbContext;
 
-        public RatioRepositories(VotingSystemContext votingSystemContext) 
+        public RatioCategoryService(VotingSystemContext votingSystemContext) 
         {
             this.dbContext = votingSystemContext;
         }

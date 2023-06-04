@@ -11,9 +11,9 @@ namespace Capstone_VotingSystem.Controller
     [ApiController]
     public class RatioController : BaseController
     {
-        private readonly IRatioRepositories ratio;
+        private readonly IRatioCategoryService ratio;
 
-        public RatioController(IRatioRepositories ratioRepositories) 
+        public RatioController(IRatioCategoryService ratioRepositories) 
         {
             this.ratio = ratioRepositories;
         }
