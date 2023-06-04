@@ -35,7 +35,10 @@ namespace Capstone_VotingSystem.Repositories.CandidateProfileRepo
             return response;
         }
 
-        
+        public Task<IEnumerable<CandidateProfileResponse>> GetCandidateByAddress(string address)
+        {
+            throw new NotImplementedException();
+        }
 
         public async Task<IEnumerable<CandidateProfileResponse>> GetCandidateByCampaign(Guid campaignId)
         {

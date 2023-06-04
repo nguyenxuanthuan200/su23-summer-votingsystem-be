@@ -10,5 +10,7 @@ namespace Capstone_VotingSystem.Repositories.CandidateProfileRepo
 
         public Task<IEnumerable<CandidateProfileResponse>> GetCandidateByCampaign(Guid campaignId);
         public Task<UpdateResponse> UpdateCandidate(Guid id, UpdateCandidateProfile update);
+
+        public Task<IEnumerable<CandidateProfileResponse>> GetCandidateByAddress(string address);
     }
 }
