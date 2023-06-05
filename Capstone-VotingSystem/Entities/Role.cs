@@ -7,12 +7,12 @@ namespace Capstone_VotingSystem.Entities
     {
         public Role()
         {
-            AccountMods = new HashSet<AccountMod>();
+            Users = new HashSet<User>();
         }
 
         public Guid RoleId { get; set; }
         public string? Name { get; set; }
 
-        public virtual ICollection<AccountMod> AccountMods { get; set; }
+        public virtual ICollection<User> Users { get; set; }
     }
 }

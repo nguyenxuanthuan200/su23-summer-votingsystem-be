@@ -7,15 +7,17 @@ namespace Capstone_VotingSystem.Entities
     {
         public Question()
         {
-            QuestionStages = new HashSet<QuestionStage>();
+            Answers = new HashSet<Answer>();
+            Elements = new HashSet<Element>();
         }
 
         public Guid QuestionId { get; set; }
-        public string? Ask { get; set; }
-        public string? Description { get; set; }
-        public Guid? CampaignId { get; set; }
+        public string? QuestionName { get; set; }
+        public Guid? FormId { get; set; }
+        public Guid? QuestionTypeId { get; set; }
 
-        public virtual Campaign? Campaign { get; set; }
-        public virtual ICollection<QuestionStage> QuestionStages { get; set; }
+        public virtual QuestionType? QuestionType { get; set; }
+        public virtual ICollection<Answer> Answers { get; set; }
+        public virtual ICollection<Element> Elements { get; set; }
     }
 }

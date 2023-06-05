@@ -1,8 +1,7 @@
-﻿namespace Capstone_VotingSystem.Models.ResponseModels.CampaignResponse
+﻿namespace Capstone_VotingSystem.Models.RequestModels.CampaignRequest
 {
-    public class GetCampaignResponse
+    public class CreateCampaignRequest
     {
-        public Guid CampaignId { get; set; }
         public string? Title { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }

@@ -8,21 +8,21 @@ namespace Capstone_VotingSystem.Entities
         public Campaign()
         {
             CampaignStages = new HashSet<CampaignStage>();
-            Questions = new HashSet<Question>();
-            TeacherCampaigns = new HashSet<TeacherCampaign>();
+            CandidateProfiles = new HashSet<CandidateProfile>();
+            RatioCategories = new HashSet<RatioCategory>();
         }
 
         public Guid CampaignId { get; set; }
+        public string? Title { get; set; }
         public DateTime? StartTime { get; set; }
-        public DateTime? Endtime { get; set; }
+        public DateTime? EndTime { get; set; }
+        public bool? Visibility { get; set; }
         public bool? Status { get; set; }
-        public Guid? CampusId { get; set; }
-        public Guid? CampaignTypeId { get; set; }
+        public string? UserName { get; set; }
 
-        public virtual CampaignType? CampaignType { get; set; }
-        public virtual Campus? Campus { get; set; }
+        public virtual User? UserNameNavigation { get; set; }
         public virtual ICollection<CampaignStage> CampaignStages { get; set; }
-        public virtual ICollection<Question> Questions { get; set; }
-        public virtual ICollection<TeacherCampaign> TeacherCampaigns { get; set; }
+        public virtual ICollection<CandidateProfile> CandidateProfiles { get; set; }
+        public virtual ICollection<RatioCategory> RatioCategories { get; set; }
     }
 }

@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Capstone_VotingSystem.Entities
+﻿namespace Capstone_VotingSystem.Models.ResponseModels.CampaignStageResponse
 {
-    public partial class CampaignStage
+    public class GetCampaignStageByCampaignResponse
     {
-        public CampaignStage()
-        {
-            Votings = new HashSet<Voting>();
-        }
-
         public Guid CampaignStageId { get; set; }
         public string? Title { get; set; }
         public string? Description { get; set; }
@@ -18,8 +10,5 @@ namespace Capstone_VotingSystem.Entities
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public Guid? CampaignId { get; set; }
-
-        public virtual Campaign? Campaign { get; set; }
-        public virtual ICollection<Voting> Votings { get; set; }
     }
 }
