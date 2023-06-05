@@ -1,6 +1,6 @@
-﻿namespace Capstone_VotingSystem.Models.ResponseModels.CampaignStageResponse
+﻿namespace Capstone_VotingSystem.Models.RequestModels.CampaignStageRequest
 {
-    public class GetCampaignStageByCampaignResponse
+    public class UpdateCampaignStageRequest
     {
         public Guid CampaignStageId { get; set; }
         public string? Title { get; set; }

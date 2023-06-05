@@ -529,7 +529,9 @@ namespace Capstone_VotingSystem.Entities
                     .HasColumnType("datetime")
                     .HasColumnName("time");
 
-                entity.Property(e => e.UserId).HasColumnName("userId");
+                entity.Property(e => e.Username)
+                   .HasMaxLength(100)
+                   .HasColumnName("username");
 
                 entity.HasOne(d => d.CampaignStage)
                     .WithMany(p => p.Votings)
@@ -556,6 +558,11 @@ namespace Capstone_VotingSystem.Entities
                     .HasColumnName("time");
 
                 entity.Property(e => e.VotingId).HasColumnName("votingId");
+
+                entity.HasOne(d => d.CandidateProfile)
+                    .WithMany(p => p.VotingDetails)
+                    .HasForeignKey(d => d.CandidateProfileId)
+                    .HasConstraintName("FK_VotingDetail_CandidateProfile");
 
                 entity.HasOne(d => d.FormStage)
                     .WithMany(p => p.VotingDetails)

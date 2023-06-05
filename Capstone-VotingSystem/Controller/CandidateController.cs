@@ -11,17 +11,17 @@ namespace Capstone_VotingSystem.Controller
     [ApiController]
     public class CandidateController : BaseController
     {
-        private readonly ICandidateRepositories candidateRepositories;
-        public CandidateController(ICandidateRepositories candidateRepositories)
+        private readonly ICandidateService candidateService;
+        public CandidateController(ICandidateService candidateService)
         {
-            this.candidateRepositories = candidateRepositories;
+            this.candidateService = candidateService;
         }
         [HttpGet("campaignId")]
         public async Task<IActionResult> GetListCandidateCampaign(Guid campaignId)
         {
             try
             {
-                var result = await candidateRepositories.GetListCandidateCampaign(campaignId);
+                var result = await candidateService.GetListCandidateCampaign(campaignId);
                 if (result == null)
                     return CustomResult("Not Found", HttpStatusCode.NotFound);
                 return CustomResult("Success", result, HttpStatusCode.OK);
@@ -32,7 +32,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [HttpPost]
+        [HttpPost("account")]
         public async Task<IActionResult> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request)
         {
             try
@@ -41,7 +41,7 @@ namespace Capstone_VotingSystem.Controller
                 {
                     return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
                 }
-                var create = await candidateRepositories.CreateAccountCandidateCampaign(request);
+                var create = await candidateService.CreateAccountCandidateCampaign(request);
                 if (create == null)
                 {
                     return CustomResult("account candidate thuoc campaign da ton tai", HttpStatusCode.Accepted);
@@ -65,7 +65,7 @@ namespace Capstone_VotingSystem.Controller
                 {
                     return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
                 }
-                var create = await candidateRepositories.CreateCandidateCampaign(request);
+                var create = await candidateService.CreateCandidateCampaign(request);
                 if (create == null)
                 {
                     return CustomResult("candidate da ton tai", HttpStatusCode.Accepted);
@@ -73,9 +73,9 @@ namespace Capstone_VotingSystem.Controller
                 //var result = _mapper.Map<CreateAccountResponse>(create);
                 return CustomResult("Success", create, HttpStatusCode.Created);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return CustomResult("Fail", HttpStatusCode.InternalServerError);
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
 
 
             }

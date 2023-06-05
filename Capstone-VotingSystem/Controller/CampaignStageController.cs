@@ -11,8 +11,8 @@ namespace Capstone_VotingSystem.Controller
     [ApiController]
     public class CampaignStageController : BaseController
     {
-        private readonly ICampaignStageRepositories campaignStageRepositories;
-        public CampaignStageController(ICampaignStageRepositories campaignStageRepositories)
+        private readonly ICampaignStageService campaignStageRepositories;
+        public CampaignStageController(ICampaignStageService campaignStageRepositories)
         {
             this.campaignStageRepositories = campaignStageRepositories;
         }
@@ -32,6 +32,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> CreateCampaignStage(CreateCampaignStageRequest request)
         {
@@ -55,7 +56,7 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCampaignStage(Guid id, float vote)
+        public async Task<IActionResult> UpdateCampaignStage(UpdateCampaignStageRequest request)
         {
             try
             {
@@ -63,7 +64,7 @@ namespace Capstone_VotingSystem.Controller
                 //{
                 //    return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
                 //}
-                var update = await campaignStageRepositories.UpdateCampaignStageVote(id);
+                var update = await campaignStageRepositories.UpdateCampaignStage(request);
 
                 if (update == null)
                 {

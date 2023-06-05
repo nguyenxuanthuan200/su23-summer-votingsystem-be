@@ -15,5 +15,6 @@ namespace Capstone_VotingSystem.Entities
         public virtual Campaign? Campaign { get; set; }
         public virtual Score CandidateProfileNavigation { get; set; } = null!;
         public virtual User? UserNameNavigation { get; set; }
+        public virtual ICollection<VotingDetail> VotingDetails { get; set; }
     }
 }

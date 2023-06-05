@@ -25,33 +25,33 @@ namespace Capstone_VotingSystem.Controller
     [ApiController]
     public class AuthenController : BaseController
     {
-        private static string API_KEY = "AIzaSyDFsJS8u9XsIClfCOGZJQ4vg7JsJFSNA7Q";
-        private readonly VotingSystemContext _votingSystemContext;
-        private readonly IAuthenRepositories _authenRepositories;
-        private readonly IConfiguration _configuration;
-      
-        public AuthenController(VotingSystemContext votingSystemContext, IAuthenRepositories authenticationRepositories, IConfiguration configuration)
+        private readonly IAuthenticationService authentiaction;
+
+        public AuthenController(IAuthenticationService authenticationService)
         {
-            _votingSystemContext = votingSystemContext;
-            _authenRepositories = authenticationRepositories;
-            _configuration = configuration;
+            this.authentiaction = authenticationService;
         }
-        [HttpGet("getAccount")]
-        public async Task<IActionResult> getAllAccount()
+        [HttpPost("Firebase")]
+        public async Task<IActionResult> login(string idtoken)
         {
-            return Ok(await _votingSystemContext.AccountMods.ToListAsync());
+            FirebaseToken decoded = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(idtoken);
+            var uid = decoded.Uid;
+            UserRecord userrecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+
+            return Ok();
         }
-        [HttpPost("Login")]
-        public async Task<IActionResult> Login(LoginRequest payLoad)
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginRequest request)
         {
             try
             {
-                var account = await _authenRepositories.SignInAsync(payLoad);
+                var account = await authentiaction.Login(request);
                 if (account == null)
                 {
                     return CustomResult("Username Or Password wrong!!", HttpStatusCode.NotFound);
                 }
-                var result = await _authenRepositories.GenerateTokenAsync(account);
+
+                var result = await authentiaction.GenerateToken(account);
                 return CustomResult("Success", result, HttpStatusCode.OK);
             }
             catch (Exception)
@@ -59,17 +59,7 @@ namespace Capstone_VotingSystem.Controller
                 return CustomResult("Fail", HttpStatusCode.InternalServerError);
 
             }
-
         }
-        [HttpPost("Google")]
-        public async Task<ActionResult> LoginBygoogle(string idtoken)
-        {
-            FirebaseToken decoded = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(idtoken);
-            var uid = decoded.Uid;
-            UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
 
-            return Ok(userRecord);
-        }
-      
     }
 }

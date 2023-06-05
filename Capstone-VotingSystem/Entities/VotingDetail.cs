@@ -17,6 +17,7 @@ namespace Capstone_VotingSystem.Entities
         public Guid? CandidateProfileId { get; set; }
         public Guid? RatioCategoryId { get; set; }
 
+        public virtual CandidateProfile? CandidateProfile { get; set; }
         public virtual FormStage? FormStage { get; set; }
         public virtual RatioCategory? RatioCategory { get; set; }
         public virtual Voting? Voting { get; set; }

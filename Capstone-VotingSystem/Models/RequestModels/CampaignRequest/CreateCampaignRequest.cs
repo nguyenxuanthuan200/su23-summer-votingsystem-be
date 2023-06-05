@@ -2,10 +2,11 @@
 {
     public class CreateCampaignRequest
     {
+        public string? Title { get; set; }
         public DateTime? StartTime { get; set; }
-        public DateTime? Endtime { get; set; }
+        public DateTime? EndTime { get; set; }
+        public bool? Visibility { get; set; }
         public bool? Status { get; set; }
-        public Guid? CampusId { get; set; }
-        public Guid? CampaignTypeId { get; set; }
+        public string? UserName { get; set; }
     }
 }

@@ -5,10 +5,10 @@ using Octokit.Internal;
 
 namespace Capstone_VotingSystem.Repositories.AuthenRepo
 {
-    public interface IAuthenRepositories
+    public interface IAuthenticationService
     {
-        public Task<LoginResponse> GenerateTokenAsync(AccountMod accountMod);
-        Task<FirebaseResponse<LoginResponse>> Login(LoginFirebaseModel model);
-        public Task<AccountMod> SignInAsync(LoginRequest payload);
+        public Task<Account> Login(LoginRequest model);
+        public Task<AccountResponse> GenerateToken(Account account);
+        public Task<LoginResponse> LoginFirebase(LoginFirebaseModel model);
     }
 }

@@ -3,7 +3,7 @@ using Capstone_VotingSystem.Models.ResponseModels.CandidateResponse;
 
 namespace Capstone_VotingSystem.Repositories.CandidateRepo
 {
-    public interface ICandidateRepositories
+    public interface ICandidateService
     {
         Task<IEnumerable<GetListCandidateCampaignResponse>> GetListCandidateCampaign(Guid campaignId);
         Task<GetCandidateCampaignResponse> CreateCandidateCampaign(CreateCandidateCampaignRequest request);

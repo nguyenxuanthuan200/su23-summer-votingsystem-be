@@ -3,10 +3,10 @@ using Capstone_VotingSystem.Models.ResponseModels.CampaignStageResponse;
 
 namespace Capstone_VotingSystem.Repositories.CampaignStageRepo
 {
-    public interface ICampaignStageRepositories
+    public interface ICampaignStageService
     {
         Task<IEnumerable<GetCampaignStageByCampaignResponse>> GetCampaignStageByCampaign(Guid campaignId);
         Task<CreateCampaginStageResponse> CreateCampaignStage(CreateCampaignStageRequest request);
-        Task<GetCampaignStageByCampaignResponse> UpdateCampaignStageVote(Guid id);
+        Task<GetCampaignStageByCampaignResponse> UpdateCampaignStage(UpdateCampaignStageRequest request);
     }
 }

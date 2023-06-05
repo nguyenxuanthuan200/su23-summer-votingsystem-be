@@ -11,8 +11,8 @@ namespace Capstone_VotingSystem.Controller
     [ApiController]
     public class CampaignController : BaseController
     {
-        private readonly ICampaignRepositories campaignRepositories;
-        public CampaignController(ICampaignRepositories campaignRepositories)
+        private readonly ICampaignService campaignRepositories;
+        public CampaignController(ICampaignService campaignRepositories)
         {
             this.campaignRepositories = campaignRepositories;
         }
@@ -57,11 +57,11 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, UpdateCampaignRequest request)
+        public async Task<IActionResult> UpdateCampaign(Guid id, UpdateCampaignRequest request)
         {
             try
             {
-                if (request == null || id != request.CampusId)
+                if (request == null || id != request.CampaignId)
                 {
                     return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
                 }
@@ -80,41 +80,41 @@ namespace Capstone_VotingSystem.Controller
                 return CustomResult("Fail", HttpStatusCode.InternalServerError);
             }
         }
-        [HttpGet("campus")]
-        public async Task<IActionResult> GetCampaignByCampus(Guid id)
-        {
-            try
-            {
-                var result = await campaignRepositories.GetCampaignByCampus(id);
-                if (result == null)
-                {
-                    return CustomResult("Not Found", HttpStatusCode.NotFound);
-                }
-                return CustomResult("Success", result, HttpStatusCode.OK);
-            }
-            catch (Exception)
-            {
-                return CustomResult("Fail", HttpStatusCode.InternalServerError);
+        //[HttpGet("campus")]
+        //public async Task<IActionResult> GetCampaignByCampus(Guid id)
+        //{
+        //    try
+        //    {
+        //        var result = await campaignRepositories.GetCampaignByCampus(id);
+        //        if (result == null)
+        //        {
+        //            return CustomResult("Not Found", HttpStatusCode.NotFound);
+        //        }
+        //        return CustomResult("Success", result, HttpStatusCode.OK);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return CustomResult("Fail", HttpStatusCode.InternalServerError);
 
-            }
-        }
-        [HttpGet("campaigntype")]
-        public async Task<IActionResult> GetCampaignByType(Guid id)
-        {
-            try
-            {
-                var result = await campaignRepositories.GetCampaignByType(id);
-                if (result == null)
-                {
-                    return CustomResult("Not Found", HttpStatusCode.NotFound);
-                }
-                return CustomResult("Success", result, HttpStatusCode.OK);
-            }
-            catch (Exception)
-            {
-                return CustomResult("Fail", HttpStatusCode.InternalServerError);
+        //    }
+        //}
+        //[HttpGet("campaigntype")]
+        //public async Task<IActionResult> GetCampaignByType(Guid id)
+        //{
+        //    try
+        //    {
+        //        var result = await campaignRepositories.GetCampaignByType(id);
+        //        if (result == null)
+        //        {
+        //            return CustomResult("Not Found", HttpStatusCode.NotFound);
+        //        }
+        //        return CustomResult("Success", result, HttpStatusCode.OK);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return CustomResult("Fail", HttpStatusCode.InternalServerError);
 
-            }
-        }
+        //    }
+        //}
     }
 }

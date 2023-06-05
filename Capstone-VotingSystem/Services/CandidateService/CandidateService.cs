@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Capstone_VotingSystem.Repositories.CandidateRepo
 {
-    public class CandidateRepositories : ICandidateRepositories
+    public class CandidateService : ICandidateService
     {
         private readonly VotingSystemContext dbContext;
         private readonly IMapper _mapper;
 
-        public CandidateRepositories(VotingSystemContext dbContext, IMapper mapper)
+        public CandidateService(VotingSystemContext dbContext, IMapper mapper)
         {
             this.dbContext = dbContext;
             this._mapper = mapper;
@@ -49,26 +49,35 @@ namespace Capstone_VotingSystem.Repositories.CandidateRepo
 
         public async Task<GetCandidateCampaignResponse> CreateCandidateCampaign(CreateCandidateCampaignRequest request)
         {
-            if(request.UserName==null || request.CampaignId == null)
+            if (request.UserName == null || request.CampaignId == null)
             {
                 return null;
             }
+            var check = await dbContext.Users.Where(p => p.UserName == request.UserName).SingleOrDefaultAsync();
+            if (check == null) return null;
             var id = Guid.NewGuid();
             CandidateProfile cam = new CandidateProfile();
             {
                 cam.CandidateProfileId = id;
                 cam.NickName = request.NickName;
-                cam.Dob = request.Dob;
+                cam.Dob = DateTime.Now;
                 cam.Image = request.Image;
                 cam.UserName = request.UserName;
                 cam.CampaignId = request.CampaignId;
             };
-            await dbContext.CandidateProfiles.AddAsync(cam);
-            await dbContext.SaveChangesAsync();
-           //var user = await dbContext.Users.Where(p => p.UserName == request.UserName).SingleOrDefaultAsync();
-            var map = _mapper.Map<GetCandidateCampaignResponse>(cam);
-            //map.Address = user.Address;
-            return map;
+            Score score = new Score();
+            {
+                score.ScoreId = cam.CandidateProfileId;
+            }
+            {
+                await dbContext.CandidateProfiles.AddAsync(cam);
+                await dbContext.Scores.AddAsync(score);
+                await dbContext.SaveChangesAsync();
+                //var user = await dbContext.Users.Where(p => p.UserName == request.UserName).SingleOrDefaultAsync();
+                var map = _mapper.Map<GetCandidateCampaignResponse>(cam);
+                //map.Address = user.Address;
+                return map;
+            }
         }
 
         public Task<bool> DeleteCandidateCampaign(Guid id)

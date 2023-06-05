@@ -3,10 +3,10 @@
     public class UpdateCampaignRequest
     {
         public Guid CampaignId { get; set; }
+        public string? Title { get; set; }
         public DateTime? StartTime { get; set; }
-        public DateTime? Endtime { get; set; }
+        public DateTime? EndTime { get; set; }
         public bool? Status { get; set; }
-        public Guid? CampusId { get; set; }
-        public Guid? CampaignTypeId { get; set; }
+        public bool? Visibility { get; set; }
     }
 }

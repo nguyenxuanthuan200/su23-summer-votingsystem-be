@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Capstone_VotingSystem.Repositories.VoteRepo;
 using System.Net;
 using Capstone_VotingSystem.Models.RequestModels.VoteRequest;
+using Capstone_VotingSystem.Models.RequestModels.VoteDetailRequest;
 
 namespace Capstone_VotingSystem.Controller
 {
@@ -11,8 +12,8 @@ namespace Capstone_VotingSystem.Controller
     [ApiController]
     public class VoteController : BaseController
     {
-        private readonly IVoteRepositories voteRepositories;
-        public VoteController(IVoteRepositories voteRepositories)
+        private readonly IVoteService voteRepositories;
+        public VoteController(IVoteService voteRepositories)
         {
             this.voteRepositories = voteRepositories;
         }
@@ -40,5 +41,29 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
+            [HttpPost("votedetail")]
+            public async Task<IActionResult> CreateVoteDetail(CreateVoteDetailRequest request)
+            {
+                try
+                {
+                    if (request == null)
+                    {
+                        return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
+                    }
+                    var create = await voteRepositories.CreateVoteDetail(request);
+                    if (create == null)
+                    {
+                        return CustomResult("vote da ton tai", HttpStatusCode.Accepted);
+                    }
+                    //var result = _mapper.Map<CreateAccountResponse>(create);
+                    return CustomResult("Success", create, HttpStatusCode.Created);
+                }
+                catch (Exception)
+                {
+                    return CustomResult("Fail", HttpStatusCode.InternalServerError);
+
+
+                }
+            }
     }
 }
