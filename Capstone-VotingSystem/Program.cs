@@ -31,7 +31,6 @@ FirebaseApp.Create(new AppOptions()
 builder.Services.AddScoped<ICampaignService, CampaignService>();
 builder.Services.AddScoped<IVoteService, VoteService>();
 builder.Services.AddScoped<ICampaignStageService, CampaignStageService>();
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<ICandidateService, CandidateService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
