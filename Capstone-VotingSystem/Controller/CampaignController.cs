@@ -1,9 +1,9 @@
 ﻿using CoreApiResponse;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Capstone_VotingSystem.Repositories.CampaignRepo;
 using System.Net;
 using Capstone_VotingSystem.Models.RequestModels.CampaignRequest;
+using Capstone_VotingSystem.Services.CampaignService;
 
 namespace Capstone_VotingSystem.Controller
 {

@@ -8,6 +8,7 @@ namespace Capstone_VotingSystem.Entities
         public Form()
         {
             FormStages = new HashSet<FormStage>();
+            Questions = new HashSet<Question>();
         }
 
         public Guid FormId { get; set; }
@@ -17,5 +18,6 @@ namespace Capstone_VotingSystem.Entities
 
         public virtual User? UserNameNavigation { get; set; }
         public virtual ICollection<FormStage> FormStages { get; set; }
+        public virtual ICollection<Question> Questions { get; set; }
     }
 }

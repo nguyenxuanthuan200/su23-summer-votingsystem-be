@@ -1,10 +1,9 @@
 ﻿using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Models.RequestModels.VoteDetailRequest;
 using Capstone_VotingSystem.Models.RequestModels.VoteRequest;
-using Capstone_VotingSystem.Repositories.VoteRepo;
 using Microsoft.EntityFrameworkCore;
 
-namespace Capstone_VotingSystem.Repositories.VoteRepo
+namespace Capstone_VotingSystem.Services.VoteService
 {
     public class VoteService : IVoteService
     {
@@ -37,7 +36,7 @@ namespace Capstone_VotingSystem.Repositories.VoteRepo
                 vote.VotingId = id;
                 vote.Time = request.Time;
                 vote.CampaignStageId = request.CampaignStageId;
-                vote.Username = request.UserName;
+                vote.UserName = request.UserName;
             }
             await dbContext.Votings.AddAsync(vote);
             await dbContext.SaveChangesAsync();
@@ -84,11 +83,11 @@ namespace Capstone_VotingSystem.Repositories.VoteRepo
              p => p.CandidateProfileId == request.CandidateProfileId).SingleOrDefaultAsync();
             if (checkcandidate == null) return false;
 
-            var id=Guid.NewGuid();
+            var id = Guid.NewGuid();
             VotingDetail votedetail = new VotingDetail();
             {
                 votedetail.VotingDetailId = id;
-                votedetail.Time=request.Time;
+                votedetail.Time = request.Time;
                 votedetail.VotingId = request.VotingId;
                 votedetail.FormStageId = request.FormStageId;
                 votedetail.RatioCategoryId = request.RatioCategoryId;

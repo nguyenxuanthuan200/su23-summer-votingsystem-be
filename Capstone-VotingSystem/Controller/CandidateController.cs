@@ -1,5 +1,5 @@
 ﻿using Capstone_VotingSystem.Models.RequestModels.CandidateRequest;
-using Capstone_VotingSystem.Repositories.CandidateRepo;
+using Capstone_VotingSystem.Services.CandidateService;
 using CoreApiResponse;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

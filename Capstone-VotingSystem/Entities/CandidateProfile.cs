@@ -5,6 +5,11 @@ namespace Capstone_VotingSystem.Entities
 {
     public partial class CandidateProfile
     {
+        public CandidateProfile()
+        {
+            VotingDetails = new HashSet<VotingDetail>();
+        }
+
         public Guid CandidateProfileId { get; set; }
         public string? NickName { get; set; }
         public DateTime? Dob { get; set; }

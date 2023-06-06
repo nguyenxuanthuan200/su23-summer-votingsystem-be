@@ -16,6 +16,7 @@ namespace Capstone_VotingSystem.Entities
         public Guid? FormId { get; set; }
         public Guid? QuestionTypeId { get; set; }
 
+        public virtual Form? Form { get; set; }
         public virtual QuestionType? QuestionType { get; set; }
         public virtual ICollection<Answer> Answers { get; set; }
         public virtual ICollection<Element> Elements { get; set; }

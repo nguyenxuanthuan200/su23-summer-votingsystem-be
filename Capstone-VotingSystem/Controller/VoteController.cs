@@ -1,10 +1,10 @@
 ﻿using CoreApiResponse;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Capstone_VotingSystem.Repositories.VoteRepo;
 using System.Net;
 using Capstone_VotingSystem.Models.RequestModels.VoteRequest;
 using Capstone_VotingSystem.Models.RequestModels.VoteDetailRequest;
+using Capstone_VotingSystem.Services.VoteService;
 
 namespace Capstone_VotingSystem.Controller
 {
@@ -41,29 +41,29 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
-            [HttpPost("votedetail")]
-            public async Task<IActionResult> CreateVoteDetail(CreateVoteDetailRequest request)
+        [HttpPost("votedetail")]
+        public async Task<IActionResult> CreateVoteDetail(CreateVoteDetailRequest request)
+        {
+            try
             {
-                try
+                if (request == null)
                 {
-                    if (request == null)
-                    {
-                        return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
-                    }
-                    var create = await voteRepositories.CreateVoteDetail(request);
-                    if (create == null)
-                    {
-                        return CustomResult("vote da ton tai", HttpStatusCode.Accepted);
-                    }
-                    //var result = _mapper.Map<CreateAccountResponse>(create);
-                    return CustomResult("Success", create, HttpStatusCode.Created);
+                    return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
                 }
-                catch (Exception)
+                var create = await voteRepositories.CreateVoteDetail(request);
+                if (create == null)
                 {
-                    return CustomResult("Fail", HttpStatusCode.InternalServerError);
-
-
+                    return CustomResult("vote da ton tai", HttpStatusCode.Accepted);
                 }
+                //var result = _mapper.Map<CreateAccountResponse>(create);
+                return CustomResult("Success", create, HttpStatusCode.Created);
             }
+            catch (Exception)
+            {
+                return CustomResult("Fail", HttpStatusCode.InternalServerError);
+
+
+            }
+        }
     }
 }
