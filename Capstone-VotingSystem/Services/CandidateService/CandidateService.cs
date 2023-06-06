@@ -4,7 +4,7 @@ using Capstone_VotingSystem.Models.RequestModels.CandidateRequest;
 using Capstone_VotingSystem.Models.ResponseModels.CandidateResponse;
 using Microsoft.EntityFrameworkCore;
 
-namespace Capstone_VotingSystem.Repositories.CandidateRepo
+namespace Capstone_VotingSystem.Services.CandidateService
 {
     public class CandidateService : ICandidateService
     {
@@ -29,7 +29,7 @@ namespace Capstone_VotingSystem.Repositories.CandidateRepo
                 acc.Password = request.Password;
                 acc.Status = true;
             };
-            var role= await dbContext.Roles.Where(p => p.Name.Equals("user")).SingleOrDefaultAsync();
+            var role = await dbContext.Roles.Where(p => p.Name.Equals("user")).SingleOrDefaultAsync();
             User us = new User();
             {
                 us.UserName = request.UserName;
@@ -99,7 +99,7 @@ namespace Capstone_VotingSystem.Repositories.CandidateRepo
                       Dob = x.Dob,
                       Image = x.Image,
                       UserName = x.UserName,
-              };
+                  };
               }
               ).ToList();
             return result;
@@ -128,7 +128,7 @@ namespace Capstone_VotingSystem.Repositories.CandidateRepo
             map.Name = user.Name;
             map.Gender = user.Gender;
             map.Address = user.Address;
-          
+
             return map;
         }
     }

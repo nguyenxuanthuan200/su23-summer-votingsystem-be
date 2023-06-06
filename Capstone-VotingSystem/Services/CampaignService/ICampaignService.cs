@@ -1,6 +1,7 @@
 ﻿using Capstone_VotingSystem.Models.RequestModels.CampaignRequest;
 using Capstone_VotingSystem.Models.ResponseModels.CampaignResponse;
-namespace Capstone_VotingSystem.Repositories.CampaignRepo
+
+namespace Capstone_VotingSystem.Services.CampaignService
 {
     public interface ICampaignService
     {

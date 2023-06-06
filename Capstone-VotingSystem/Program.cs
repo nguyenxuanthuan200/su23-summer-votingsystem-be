@@ -1,13 +1,15 @@
 using Capstone_VotingSystem.Entities;
-using Capstone_VotingSystem.Repositories.AuthenRepo;
-using Capstone_VotingSystem.Repositories.CampaignRepo;
-using Capstone_VotingSystem.Repositories.CampaignStageRepo;
-using Capstone_VotingSystem.Repositories.CandidateRepo;
+using Capstone_VotingSystem.Repositories.ActionHistoryRepo;
+using Capstone_VotingSystem.Repositories.RateCategoryRepo;
 using Capstone_VotingSystem.Repositories.VoteRepo;
+using Capstone_VotingSystem.Services.AuthenticationService;
+using Capstone_VotingSystem.Services.CampaignService;
+using Capstone_VotingSystem.Services.CampaignStageService;
+using Capstone_VotingSystem.Services.CandidateService;
+using Capstone_VotingSystem.Services.VoteService;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -32,6 +34,10 @@ builder.Services.AddScoped<ICampaignService, CampaignService>();
 builder.Services.AddScoped<IVoteService, VoteService>();
 builder.Services.AddScoped<ICampaignStageService, CampaignStageService>();
 builder.Services.AddScoped<ICandidateService, CandidateService>();
+builder.Services.AddScoped<IActionHistoryService, ActionHistoryService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IVotingDetailService, VotingDetailService>();
+builder.Services.AddScoped<IRatioCategoryService, RatioCategoryService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {

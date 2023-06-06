@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Capstone_VotingSystem.Models.RequestModels.CampaignRequest;
 using AutoMapper;
 
-namespace Capstone_VotingSystem.Repositories.CampaignRepo
+namespace Capstone_VotingSystem.Services.CampaignService
 {
     public class CampaignService : ICampaignService
     {
@@ -14,7 +14,7 @@ namespace Capstone_VotingSystem.Repositories.CampaignRepo
         public CampaignService(VotingSystemContext dbContext, IMapper mapper)
         {
             this.dbContext = dbContext;
-            this._mapper = mapper;
+            _mapper = mapper;
         }
 
         public async Task<GetCampaignResponse> CreateCampaign(CreateCampaignRequest request)

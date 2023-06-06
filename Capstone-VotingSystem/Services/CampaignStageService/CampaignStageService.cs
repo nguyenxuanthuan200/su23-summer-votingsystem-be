@@ -4,7 +4,7 @@ using Capstone_VotingSystem.Models.RequestModels.CampaignStageRequest;
 using Capstone_VotingSystem.Models.ResponseModels.CampaignStageResponse;
 using Microsoft.EntityFrameworkCore;
 
-namespace Capstone_VotingSystem.Repositories.CampaignStageRepo
+namespace Capstone_VotingSystem.Services.CampaignStageService
 {
     public class CampaignStageService : ICampaignStageService
     {
@@ -14,7 +14,7 @@ namespace Capstone_VotingSystem.Repositories.CampaignStageRepo
         public CampaignStageService(VotingSystemContext dbContext, IMapper mapper)
         {
             this.dbContext = dbContext;
-            this._mapper = mapper;
+            _mapper = mapper;
         }
 
         public async Task<CreateCampaginStageResponse> CreateCampaignStage(CreateCampaignStageRequest request)

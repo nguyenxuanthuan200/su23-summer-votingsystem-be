@@ -13,6 +13,7 @@ namespace Capstone_VotingSystem.Entities
             Feedbacks = new HashSet<Feedback>();
             Forms = new HashSet<Form>();
             Notifications = new HashSet<Notification>();
+            Votings = new HashSet<Voting>();
         }
 
         public string UserName { get; set; } = null!;
@@ -31,5 +32,6 @@ namespace Capstone_VotingSystem.Entities
         public virtual ICollection<Feedback> Feedbacks { get; set; }
         public virtual ICollection<Form> Forms { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
+        public virtual ICollection<Voting> Votings { get; set; }
     }
 }

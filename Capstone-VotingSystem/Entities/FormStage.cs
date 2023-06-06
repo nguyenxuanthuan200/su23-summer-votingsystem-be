@@ -14,6 +14,7 @@ namespace Capstone_VotingSystem.Entities
         public Guid? FormId { get; set; }
 
         public virtual Form? Form { get; set; }
+        public virtual CampaignStage FormStageNavigation { get; set; } = null!;
         public virtual ICollection<VotingDetail> VotingDetails { get; set; }
     }
 }

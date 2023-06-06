@@ -43,7 +43,7 @@ namespace Capstone_VotingSystem.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=XUANTHUAN\\SQLEXPRESS;Initial Catalog=VotingSystem;Persist Security Info=True;User ID=sa;Password=123");
+                optionsBuilder.UseSqlServer("Data Source=DESKTOP-NNLOED3;Initial Catalog=VotingSystem;User ID=sa;Password=123456");
             }
         }
 
@@ -347,6 +347,12 @@ namespace Capstone_VotingSystem.Entities
                     .WithMany(p => p.FormStages)
                     .HasForeignKey(d => d.FormId)
                     .HasConstraintName("FK_FormStage_Form");
+
+                entity.HasOne(d => d.FormStageNavigation)
+                    .WithOne(p => p.FormStage)
+                    .HasForeignKey<FormStage>(d => d.FormStageId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_FormStage_CampaignStage");
             });
 
             modelBuilder.Entity<Notification>(entity =>
@@ -389,6 +395,11 @@ namespace Capstone_VotingSystem.Entities
                     .HasColumnName("questionName");
 
                 entity.Property(e => e.QuestionTypeId).HasColumnName("questionTypeId");
+
+                entity.HasOne(d => d.Form)
+                    .WithMany(p => p.Questions)
+                    .HasForeignKey(d => d.FormId)
+                    .HasConstraintName("FK_Question_Form");
 
                 entity.HasOne(d => d.QuestionType)
                     .WithMany(p => p.Questions)
@@ -529,14 +540,20 @@ namespace Capstone_VotingSystem.Entities
                     .HasColumnType("datetime")
                     .HasColumnName("time");
 
-                entity.Property(e => e.Username)
-                   .HasMaxLength(100)
-                   .HasColumnName("username");
+                entity.Property(e => e.UserName)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("userName");
 
                 entity.HasOne(d => d.CampaignStage)
                     .WithMany(p => p.Votings)
                     .HasForeignKey(d => d.CampaignStageId)
                     .HasConstraintName("FK_Voting_CampaignStage");
+
+                entity.HasOne(d => d.UserNameNavigation)
+                    .WithMany(p => p.Votings)
+                    .HasForeignKey(d => d.UserName)
+                    .HasConstraintName("FK_Voting_User");
             });
 
             modelBuilder.Entity<VotingDetail>(entity =>

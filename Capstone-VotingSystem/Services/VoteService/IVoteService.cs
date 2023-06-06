@@ -1,11 +1,12 @@
 ﻿using Capstone_VotingSystem.Models.RequestModels.VoteDetailRequest;
 using Capstone_VotingSystem.Models.RequestModels.VoteRequest;
-namespace Capstone_VotingSystem.Repositories.VoteRepo
+
+namespace Capstone_VotingSystem.Services.VoteService
 {
     public interface IVoteService
     {
-        Task<Boolean> CreateVote(CreateVoteRequest request);
+        Task<bool> CreateVote(CreateVoteRequest request);
 
-        Task<Boolean> CreateVoteDetail(CreateVoteDetailRequest request);
+        Task<bool> CreateVoteDetail(CreateVoteDetailRequest request);
     }
 }
