@@ -18,14 +18,11 @@ namespace Capstone_VotingSystem.Controller
         {
             this.authentiaction = authenticationService;
         }
-        [HttpPost("Firebase")]
+        [HttpPost("firebase")]
         public async Task<IActionResult> login(string idtoken)
         {
-            FirebaseToken decoded = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(idtoken);
-            var uid = decoded.Uid;
-            UserRecord userrecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
-
-            return Ok();
+            var result = await authentiaction.LoginFirebase(idtoken);
+            return CustomResult("Success", result, HttpStatusCode.OK);
         }
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest request)

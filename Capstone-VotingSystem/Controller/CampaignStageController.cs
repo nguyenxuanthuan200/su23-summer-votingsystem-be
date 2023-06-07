@@ -11,17 +11,17 @@ namespace Capstone_VotingSystem.Controller
     [ApiController]
     public class CampaignStageController : BaseController
     {
-        private readonly ICampaignStageService campaignStageRepositories;
-        public CampaignStageController(ICampaignStageService campaignStageRepositories)
+        private readonly ICampaignStageService campaignStageService;
+        public CampaignStageController(ICampaignStageService campaignStageService)
         {
-            this.campaignStageRepositories = campaignStageRepositories;
+            this.campaignStageService = campaignStageService;
         }
         [HttpGet]
         public async Task<IActionResult> GetCampaignStage(Guid campaignId)
         {
             try
             {
-                var result = await campaignStageRepositories.GetCampaignStageByCampaign(campaignId);
+                var result = await campaignStageService.GetCampaignStageByCampaign(campaignId);
                 if (result == null)
                     return CustomResult("Not Found", HttpStatusCode.NotFound);
                 return CustomResult("Success", result, HttpStatusCode.OK);
@@ -42,7 +42,7 @@ namespace Capstone_VotingSystem.Controller
                 {
                     return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
                 }
-                var create = await campaignStageRepositories.CreateCampaignStage(request);
+                var create = await campaignStageService.CreateCampaignStage(request);
                 if (create == null)
                 {
                     return CustomResult("CampaignStage da ton tai", HttpStatusCode.Accepted);
@@ -64,7 +64,7 @@ namespace Capstone_VotingSystem.Controller
                 //{
                 //    return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
                 //}
-                var update = await campaignStageRepositories.UpdateCampaignStage(request);
+                var update = await campaignStageService.UpdateCampaignStage(request);
 
                 if (update == null)
                 {

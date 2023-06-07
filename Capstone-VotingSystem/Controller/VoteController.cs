@@ -12,10 +12,10 @@ namespace Capstone_VotingSystem.Controller
     [ApiController]
     public class VoteController : BaseController
     {
-        private readonly IVoteService voteRepositories;
-        public VoteController(IVoteService voteRepositories)
+        private readonly IVoteService voteService;
+        public VoteController(IVoteService voteService)
         {
-            this.voteRepositories = voteRepositories;
+            this.voteService = voteService;
         }
         [HttpPost]
         public async Task<IActionResult> CreateVote(CreateVoteRequest request)
@@ -26,7 +26,7 @@ namespace Capstone_VotingSystem.Controller
                 {
                     return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
                 }
-                var create = await voteRepositories.CreateVote(request);
+                var create = await voteService.CreateVote(request);
                 if (create == null)
                 {
                     return CustomResult("vote da ton tai", HttpStatusCode.Accepted);
@@ -50,7 +50,7 @@ namespace Capstone_VotingSystem.Controller
                 {
                     return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
                 }
-                var create = await voteRepositories.CreateVoteDetail(request);
+                var create = await voteService.CreateVoteDetail(request);
                 if (create == null)
                 {
                     return CustomResult("vote da ton tai", HttpStatusCode.Accepted);
