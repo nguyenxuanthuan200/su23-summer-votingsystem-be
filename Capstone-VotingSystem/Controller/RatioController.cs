@@ -1,5 +1,5 @@
 ﻿using Capstone_VotingSystem.Entities;
-using Capstone_VotingSystem.Repositories.RateCategoryRepo;
+using Capstone_VotingSystem.Services.RateCategoryService;
 using CoreApiResponse;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

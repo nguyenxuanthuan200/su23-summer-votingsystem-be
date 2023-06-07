@@ -5,7 +5,7 @@ using Octokit;
 using System.Drawing;
 using System.Xml.Linq;
 
-namespace Capstone_VotingSystem.Repositories.ActionHistoryRepo
+namespace Capstone_VotingSystem.Services.ActionHistoryService
 {
     public class ActionHistoryService : IActionHistoryService
     {

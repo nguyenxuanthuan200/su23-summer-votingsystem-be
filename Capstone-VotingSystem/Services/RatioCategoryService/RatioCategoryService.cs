@@ -2,7 +2,7 @@
 using Capstone_VotingSystem.Models.ResponseModels.RateResponse;
 using Microsoft.EntityFrameworkCore;
 
-namespace Capstone_VotingSystem.Repositories.RateCategoryRepo
+namespace Capstone_VotingSystem.Services.RateCategoryService
 {
     public class RatioCategoryService : IRatioCategoryService
     {

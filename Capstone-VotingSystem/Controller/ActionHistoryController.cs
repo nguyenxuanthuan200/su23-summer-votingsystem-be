@@ -1,4 +1,4 @@
-﻿using Capstone_VotingSystem.Repositories.ActionHistoryRepo;
+﻿using Capstone_VotingSystem.Services.ActionHistoryService;
 using CoreApiResponse;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

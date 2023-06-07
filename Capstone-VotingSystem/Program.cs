@@ -1,7 +1,6 @@
 using Capstone_VotingSystem.Entities;
-using Capstone_VotingSystem.Repositories.ActionHistoryRepo;
-using Capstone_VotingSystem.Repositories.RateCategoryRepo;
-using Capstone_VotingSystem.Repositories.VoteRepo;
+using Capstone_VotingSystem.Services.ActionHistoryService;
+using Capstone_VotingSystem.Services.RateCategoryService;
 using Capstone_VotingSystem.Services.AuthenticationService;
 using Capstone_VotingSystem.Services.CampaignService;
 using Capstone_VotingSystem.Services.CampaignStageService;
@@ -36,7 +35,6 @@ builder.Services.AddScoped<ICampaignStageService, CampaignStageService>();
 builder.Services.AddScoped<ICandidateService, CandidateService>();
 builder.Services.AddScoped<IActionHistoryService, ActionHistoryService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<IVotingDetailService, VotingDetailService>();
 builder.Services.AddScoped<IRatioCategoryService, RatioCategoryService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -101,9 +99,16 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ShopSecondHand v1"));
+   
 }
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ShopSecondHand v1");
+    c.RoutePrefix = string.Empty;
+});
 
 app.UseHttpsRedirection();
 

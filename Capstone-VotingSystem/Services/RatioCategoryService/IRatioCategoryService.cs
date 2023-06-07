@@ -1,6 +1,6 @@
 ﻿using Capstone_VotingSystem.Models.ResponseModels.RateResponse;
 
-namespace Capstone_VotingSystem.Repositories.RateCategoryRepo
+namespace Capstone_VotingSystem.Services.RateCategoryService
 {
     public interface IRatioCategoryService
     {
