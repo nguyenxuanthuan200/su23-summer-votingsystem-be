@@ -8,6 +8,6 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
     {
         public Task<Account> Login(LoginRequest model);
         public Task<ResponseAccount> GenerateToken(Account account);
-        public Task<ResponseLogin> LoginFirebase(LoginFirebaseModel model);
+        public Task<ResponseFireBase> LoginFirebase(string idToken);
     }
 }

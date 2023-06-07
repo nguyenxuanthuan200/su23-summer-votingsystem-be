@@ -11,18 +11,18 @@ namespace Capstone_VotingSystem.Controller
     [ApiController]
     public class RatioController : BaseController
     {
-        private readonly IRatioCategoryService ratio;
+        private readonly IRatioCategoryService ratioCategoryService;
 
-        public RatioController(IRatioCategoryService ratioRepositories) 
+        public RatioController(IRatioCategoryService ratioCategoryService)
         {
-            this.ratio = ratioRepositories;
+            this.ratioCategoryService = ratioCategoryService;
         }
         [HttpGet("getAll")]
         public async Task<IActionResult> GetAll()
         {
             try
             {
-                var result = await ratio.GetAllRatio();
+                var result = await ratioCategoryService.GetAllRatio();
                 if (result == null)
                     return CustomResult("Not Found", HttpStatusCode.NotFound);
                 return CustomResult("Success", result, HttpStatusCode.OK);
@@ -37,7 +37,7 @@ namespace Capstone_VotingSystem.Controller
         {
             try
             {
-                var result = await ratio.GetRatioById(id);
+                var result = await ratioCategoryService.GetRatioById(id);
                 if (result == null)
                     return CustomResult("Not Found", HttpStatusCode.NotFound);
                 return CustomResult("Success", result, HttpStatusCode.OK);
