@@ -18,7 +18,7 @@ namespace Capstone_VotingSystem.Controller
             this.actionHistory = actionHistoryRepositories;
         }
         //[Authorize(Roles = "Admin")]
-        [HttpGet("getallactionhistory")]
+        [HttpGet]
         public async Task<IActionResult> GetActionHistory()
         {
             try
@@ -33,7 +33,7 @@ namespace Capstone_VotingSystem.Controller
                 return CustomResult("Fail", HttpStatusCode.InternalServerError);
             }
         }
-        [HttpGet("getactionhistoryusers/{username}")]
+        [HttpGet("{username}")]
         public async Task<IActionResult> GetActionHistoryByUser(string? username)
         {
             try
