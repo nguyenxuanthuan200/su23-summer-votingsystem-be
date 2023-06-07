@@ -22,7 +22,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<VotingSystemContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
+builder.Services.AddDbContext<VotingSystemContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection")));
 
 FirebaseApp.Create(new AppOptions()
 {
@@ -54,19 +54,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 builder.Services.AddCors(opt =>
 {
-    opt.AddPolicy("AllowOrigin",
-        builder =>
+    opt.AddPolicy("MyCors",
+        build =>
         {
-            builder
-            .AllowAnyOrigin()
+            build
+            .WithOrigins("*")
             .AllowAnyHeader()
-            .AllowAnyMethod()
-            .WithExposedHeaders(new string[] { "Authorization", "authorization" });
+            .AllowAnyMethod();
+            //.WithExposedHeaders(new string[] { "Authorization", "authorization" });
         });
 });
-builder.Services.AddCors(opt => opt.AddDefaultPolicy(builder => builder.AllowAnyOrigin()
-                                                                         .AllowAnyMethod()
-                                                                         .AllowAnyHeader()));
+//builder.Services.AddCors(opt => opt.AddDefaultPolicy(builder => builder.AllowAnyOrigin()
+//                                                                         .AllowAnyMethod()
+//                                                                         .AllowAnyHeader()));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddSwaggerGen(c =>
@@ -114,7 +114,7 @@ app.UseSwaggerUI(c =>
 
 app.UseHttpsRedirection();
 
-app.UseCors();
+app.UseCors("MyCors");
 
 app.UseAuthentication();
 
