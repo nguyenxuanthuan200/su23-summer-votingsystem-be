@@ -1,82 +1,81 @@
-﻿using Capstone_VotingSystem.Models.RequestModels.CandidateRequest;
+﻿using Capstone_VotingSystem.Controllers;
+using Capstone_VotingSystem.Core.CoreModel;
+using Capstone_VotingSystem.Models.RequestModels.CandidateRequest;
+using Capstone_VotingSystem.Models.ResponseModels.CandidateResponse;
 using Capstone_VotingSystem.Services.CandidateService;
 using CoreApiResponse;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using Swashbuckle.AspNetCore.Annotations;
+
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/candidate")]
+    [Route("api/v1.0/candidate")]
     [ApiController]
-    public class CandidateController : BaseController
+    public class CandidateController : BaseApiController
     {
         private readonly ICandidateService candidateService;
         public CandidateController(ICandidateService candidateService)
         {
             this.candidateService = candidateService;
         }
-        [HttpGet("campaignId")]
-        public async Task<IActionResult> GetListCandidateCampaign(Guid campaignId)
+
+        [HttpGet("campaignid")]
+        public async Task<IActionResult> getListCandidateCampaign(Guid campaignid)
         {
             try
             {
-                var result = await candidateService.GetListCandidateCampaign(campaignId);
-                if (result == null)
-                    return CustomResult("Not Found", HttpStatusCode.NotFound);
-                return CustomResult("Success", result, HttpStatusCode.OK);
+                var result = await candidateService.GetListCandidateCampaign(campaignid);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
             }
             catch (Exception)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database.");
+                return BadRequest();
             }
         }
+
         [HttpPost("account")]
+        [SwaggerOperation(summary: "Add account Candidate to Campagin with some info of Candidate")]
         public async Task<IActionResult> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request)
         {
             try
             {
-                if (request == null)
+                var response = await candidateService.CreateAccountCandidateCampaign(request);
+                if (response.Success == false)
                 {
-                    return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
+                    return BadRequest(response);
                 }
-                var create = await candidateService.CreateAccountCandidateCampaign(request);
-                if (create == null)
-                {
-                    return CustomResult("account candidate thuoc campaign da ton tai", HttpStatusCode.Accepted);
-                }
-                //var result = _mapper.Map<CreateAccountResponse>(create);
-                return CustomResult("Success", create, HttpStatusCode.Created);
+                return Ok(response);
             }
             catch (Exception)
             {
-                return CustomResult("Fail", HttpStatusCode.InternalServerError);
+                return BadRequest();
 
 
             }
         }
         [HttpPost]
+        [SwaggerOperation(summary: "Add Candidate to Campagin with some info of Candidate")]
         public async Task<IActionResult> CreateCandidateCampaign(CreateCandidateCampaignRequest request)
         {
             try
             {
-                if (request == null)
+                APIResponse<GetCandidateCampaignResponse> response = await candidateService.CreateCandidateCampaign(request);
+                if (response.Success == false)
                 {
-                    return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
+                    return BadRequest(response);
                 }
-                var create = await candidateService.CreateCandidateCampaign(request);
-                if (create == null)
-                {
-                    return CustomResult("candidate da ton tai", HttpStatusCode.Accepted);
-                }
-                //var result = _mapper.Map<CreateAccountResponse>(create);
-                return CustomResult("Success", create, HttpStatusCode.Created);
+                return Ok(response);
             }
             catch (Exception ex)
             {
-                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
-
+                return BadRequest(ex);
 
             }
         }

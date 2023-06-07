@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Capstone_VotingSystem.Core.CoreModel;
 using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Models.RequestModels.CandidateRequest;
 using Capstone_VotingSystem.Models.ResponseModels.CandidateResponse;
@@ -16,12 +17,14 @@ namespace Capstone_VotingSystem.Services.CandidateService
             this.dbContext = dbContext;
             this._mapper = mapper;
         }
-        public async Task<CreateAccountCandidateResponse> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request)
+        public async Task<APIResponse<CreateAccountCandidateResponse>> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request)
         {
+            APIResponse<CreateAccountCandidateResponse> response = new();
             var check = await dbContext.Accounts.Where(p => p.UserName == request.UserName).SingleOrDefaultAsync();
             if (check != null)
             {
-                return null;
+                response.ToFailedResponse("UserName đã tồn tại", StatusCodes.Status400BadRequest);
+                return response;
             }
             Account acc = new Account();
             {
@@ -29,6 +32,12 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 acc.Password = request.Password;
                 acc.Status = true;
             };
+            var checkcategory = await dbContext.Categories.Where(p => p.CategoryId == request.CategoryId).SingleOrDefaultAsync();
+            if (checkcategory == null)
+            {
+                response.ToFailedResponse("Category không tồn tại", StatusCodes.Status400BadRequest);
+                return response;
+            }
             var role = await dbContext.Roles.Where(p => p.Name.Equals("user")).SingleOrDefaultAsync();
             User us = new User();
             {
@@ -40,21 +49,35 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 us.RoleId = role.RoleId;
 
             }
-            await dbContext.Accounts.AddAsync(acc);
             await dbContext.Users.AddAsync(us);
+            await dbContext.Accounts.AddAsync(acc);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<CreateAccountCandidateResponse>(us);
-            return map;
+            response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
+            response.Data = map;
+            return response;
         }
 
-        public async Task<GetCandidateCampaignResponse> CreateCandidateCampaign(CreateCandidateCampaignRequest request)
+        public async Task<APIResponse<GetCandidateCampaignResponse>> CreateCandidateCampaign(CreateCandidateCampaignRequest request)
         {
+            APIResponse<GetCandidateCampaignResponse> response = new();
             if (request.UserName == null || request.CampaignId == null)
             {
-                return null;
+                response.ToFailedResponse("UserName hoặc Campaign Không được bỏ trống", StatusCodes.Status400BadRequest);
+                return response;
             }
             var check = await dbContext.Users.Where(p => p.UserName == request.UserName).SingleOrDefaultAsync();
-            if (check == null) return null;
+            if (check == null)
+            {
+                response.ToFailedResponse("UserName không đúng!!", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var check2 = await dbContext.Campaigns.Where(p => p.CampaignId == request.CampaignId).SingleOrDefaultAsync();
+            if (check2 == null)
+            {
+                response.ToFailedResponse("Campaign không đúng!!", StatusCodes.Status404NotFound);
+                return response;
+            }
             var id = Guid.NewGuid();
             CandidateProfile cam = new CandidateProfile();
             {
@@ -73,10 +96,10 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 await dbContext.CandidateProfiles.AddAsync(cam);
                 await dbContext.Scores.AddAsync(score);
                 await dbContext.SaveChangesAsync();
-                //var user = await dbContext.Users.Where(p => p.UserName == request.UserName).SingleOrDefaultAsync();
                 var map = _mapper.Map<GetCandidateCampaignResponse>(cam);
-                //map.Address = user.Address;
-                return map;
+                response.ToSuccessResponse("Thành công!!", StatusCodes.Status200OK);
+                response.Data = map;
+                return response;
             }
         }
 
@@ -85,8 +108,15 @@ namespace Capstone_VotingSystem.Services.CandidateService
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<GetListCandidateCampaignResponse>> GetListCandidateCampaign(Guid campaignId)
+        public async Task<APIResponse<IEnumerable<GetListCandidateCampaignResponse>>> GetListCandidateCampaign(Guid campaignId)
         {
+            APIResponse<IEnumerable<GetListCandidateCampaignResponse>> response = new();
+            var checkcam =await dbContext.Campaigns.SingleOrDefaultAsync(p => p.CampaignId == campaignId);
+            if (checkcam == null) { 
+                response.ToFailedResponse("Campaign chưa được tạo", StatusCodes.Status400BadRequest);
+                return response;
+            }
+           
             var listCandidate = await dbContext.CandidateProfiles
                .Where(p => p.CampaignId == campaignId).ToListAsync();
             IEnumerable<GetListCandidateCampaignResponse> result = listCandidate.Select(
@@ -102,7 +132,13 @@ namespace Capstone_VotingSystem.Services.CandidateService
                   };
               }
               ).ToList();
-            return result;
+            if(result==null)
+            {
+                response.ToFailedResponse("Không có Candidate nào trong Campaign", StatusCodes.Status400BadRequest);
+                return response;
+            }           
+            response.ToSuccessResponse(response.Data = result,"Lấy danh sách thành công", StatusCodes.Status200OK);
+            return response;
         }
 
         public async Task<UpdateCandidateProfileResponse> UpdateCandidateProfile(Guid id, UpdateCandidateProfileRequesst request)
