@@ -7,7 +7,7 @@ using System.Net;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/[controller]")]
+    [Route("api/v1.0/actionhistory")]
     [ApiController]
     public class ActionHistoryController : BaseController
     {
@@ -18,7 +18,7 @@ namespace Capstone_VotingSystem.Controller
             this.actionHistory = actionHistoryRepositories;
         }
         //[Authorize(Roles = "Admin")]
-        [HttpGet("GetAllActionHistory")]
+        [HttpGet]
         public async Task<IActionResult> GetActionHistory()
         {
             try
@@ -33,7 +33,7 @@ namespace Capstone_VotingSystem.Controller
                 return CustomResult("Fail", HttpStatusCode.InternalServerError);
             }
         }
-        [HttpGet("GetActionHistoryUser")]
+        [HttpGet("{username}")]
         public async Task<IActionResult> GetActionHistoryByUser(string? username)
         {
             try

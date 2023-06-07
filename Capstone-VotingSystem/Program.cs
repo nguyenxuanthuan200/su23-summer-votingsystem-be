@@ -54,17 +54,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 builder.Services.AddCors(opt =>
 {
-    opt.AddPolicy("AllowOrigin",
-        builder =>
+    opt.AddPolicy("MyCors",
+        build =>
         {
-            builder
-            .AllowAnyOrigin()
+            build
+            .WithOrigins("*")
             .AllowAnyHeader()
-            .AllowAnyMethod()
-            .WithExposedHeaders(new string[] { "Authorization", "authorization" });
+            .AllowAnyMethod();
+            //.WithExposedHeaders(new string[] { "Authorization", "authorization" });
         });
 });
-
+//builder.Services.AddCors(opt => opt.AddDefaultPolicy(builder => builder.AllowAnyOrigin()
+//                                                                         .AllowAnyMethod()
+//                                                                         .AllowAnyHeader()));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddSwaggerGen(c =>
@@ -92,7 +94,7 @@ builder.Services.AddSwaggerGen(c =>
                 });
 });
 
-
+builder.Services.AddResponseCompression();
 
 var app = builder.Build();
 
@@ -101,7 +103,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ShopSecondHand v1"));
-   
+
 }
 app.UseSwagger();
 app.UseSwaggerUI(c =>
@@ -112,7 +114,7 @@ app.UseSwaggerUI(c =>
 
 app.UseHttpsRedirection();
 
-app.UseCors();
+app.UseCors("MyCors");
 
 app.UseAuthentication();
 

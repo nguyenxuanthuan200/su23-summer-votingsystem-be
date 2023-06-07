@@ -11,17 +11,17 @@ namespace Capstone_VotingSystem.Controller
     [ApiController]
     public class CampaignController : BaseController
     {
-        private readonly ICampaignService campaignRepositories;
-        public CampaignController(ICampaignService campaignRepositories)
+        private readonly ICampaignService campaignService;
+        public CampaignController(ICampaignService campaignService)
         {
-            this.campaignRepositories = campaignRepositories;
+            this.campaignService = campaignService;
         }
         [HttpGet]
         public async Task<IActionResult> GetCampaign()
         {
             try
             {
-                var result = await campaignRepositories.GetCampaign();
+                var result = await campaignService.GetCampaign();
                 if (result == null)
                     return CustomResult("Not Found", HttpStatusCode.NotFound);
                 return CustomResult("Success", result, HttpStatusCode.OK);
@@ -41,7 +41,7 @@ namespace Capstone_VotingSystem.Controller
                 {
                     return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
                 }
-                var create = await campaignRepositories.CreateCampaign(request);
+                var create = await campaignService.CreateCampaign(request);
                 if (create == null)
                 {
                     return CustomResult("Campaign da ton tai", HttpStatusCode.Accepted);
@@ -66,7 +66,7 @@ namespace Capstone_VotingSystem.Controller
                     return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
                 }
 
-                var update = await campaignRepositories.UpdateCampaign(request);
+                var update = await campaignService.UpdateCampaign(request);
 
                 if (update == null)
                 {
