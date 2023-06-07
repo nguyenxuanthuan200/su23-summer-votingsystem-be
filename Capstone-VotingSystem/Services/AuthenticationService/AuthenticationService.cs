@@ -35,11 +35,14 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
             {
                 var claims = new[]
                 {
-                    new Claim(ClaimTypes.Role, "Admin"),
-                    new Claim(JwtRegisteredClaimNames.Sub,_configuration["JwtConfig:Subject"]),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                    //new Claim(ClaimTypes.Role, "Admin"),
+                    new Claim("Username", account.UserName),
+                    new Claim("RoleId", roleName.RoleId.ToString()),
+                    new Claim("RoleName", roleName.Name),
+                    //new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                    
                     };
+
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtConfig:Key"]));
 
@@ -53,10 +56,9 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
 
                 ResponseAccount result = new ResponseAccount();
                 {
-                    result.Username = account.UserName;
+
                     result.Token = new JwtSecurityTokenHandler().WriteToken(token);
-                    result.Status = account.Status;
-                    result.roleName = roleName.Name;
+
 
 
                 }
@@ -70,10 +72,11 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
             {
                 var claims = new[]
                 {
-                    new Claim(ClaimTypes.Role, "User"),
-                    new Claim(JwtRegisteredClaimNames.Sub,_configuration["JwtConfig:Subject"]),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                    //new Claim(ClaimTypes.Role, "User"),
+                    new Claim("Username", account.UserName),
+                    new Claim("RoleId", roleName.RoleId.ToString()),
+                    new Claim("RoleName", roleName.Name),
+                   // new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                     };
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtConfig:Key"]));
@@ -88,10 +91,7 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
 
                 ResponseAccount result = new ResponseAccount();
                 {
-                    result.Username = account.UserName;
                     result.Token = new JwtSecurityTokenHandler().WriteToken(token);
-                    result.Status = account.Status;
-                    result.roleName = roleName.Name;
                 }
                 tokenSave.Token = result.Token;
                 dbContext.Accounts.Update(tokenSave);

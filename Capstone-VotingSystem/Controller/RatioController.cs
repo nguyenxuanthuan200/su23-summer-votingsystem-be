@@ -17,7 +17,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.ratioCategoryService = ratioCategoryService;
         }
-        [HttpGet("getAll")]
+        [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -32,7 +32,7 @@ namespace Capstone_VotingSystem.Controller
                 return CustomResult("Fail", HttpStatusCode.InternalServerError);
             }
         }
-        [HttpGet("GetById")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetCandidateProfile(Guid id)
         {
             try
