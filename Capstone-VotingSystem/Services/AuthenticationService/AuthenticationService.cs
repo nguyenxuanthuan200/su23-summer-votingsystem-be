@@ -120,10 +120,10 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
             UserRecord userrecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
 
             var check = await dbContext.Users.Where(p => p.UserName == userrecord.Email).SingleOrDefaultAsync();
-
+            var role = await dbContext.Roles.Where(p => p.Name.Equals("user")).SingleOrDefaultAsync();
             if (check == null)
             {
-                var role = await dbContext.Roles.Where(p => p.Name.Equals("user")).SingleOrDefaultAsync();
+
                 User user = new User();
                 {
                     user.UserName = userrecord.Email;
@@ -133,9 +133,11 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                 var claims = new[]
                    {
                     new Claim(ClaimTypes.Role, "User"),
-                    new Claim(JwtRegisteredClaimNames.Sub,_configuration["JwtConfig:Subject"]),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                    new Claim("RoleId", role.RoleId.ToString()),
+                    new Claim("Username", user.UserName),
+                    new Claim("RoleName", role.Name),
+                    new Claim("Photo", userrecord.PhotoUrl),
+
                     };
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtConfig:Key"]));
@@ -170,10 +172,12 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                 {
                     var claims = new[]
                    {
-                    new Claim(ClaimTypes.Role, "User"),
-                    new Claim(JwtRegisteredClaimNames.Sub,_configuration["JwtConfig:Subject"]),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                    //new Claim(ClaimTypes.Role, "User"),
+                   new Claim(ClaimTypes.Role, "User"),
+                    new Claim("RoleId", role.RoleId.ToString()),
+                    new Claim("RoleName", role.Name),
+                    new Claim("Email", userrecord.Email),
+                    new Claim("Photo", userrecord.PhotoUrl),
                     };
 
                     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtConfig:Key"]));
