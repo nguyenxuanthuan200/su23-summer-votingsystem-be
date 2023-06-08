@@ -1,15 +1,15 @@
-﻿using Capstone_VotingSystem.Models.RequestModels.CampaignRequest;
+﻿using Capstone_VotingSystem.Core.CoreModel;
+using Capstone_VotingSystem.Models.RequestModels.CampaignRequest;
 using Capstone_VotingSystem.Models.ResponseModels.CampaignResponse;
 
 namespace Capstone_VotingSystem.Services.CampaignService
 {
     public interface ICampaignService
     {
-        Task<IEnumerable<GetCampaignResponse>> GetCampaign();
-        //Task<IEnumerable<GetCampaignResponse>> GetCampaignByType(Guid id);
-        //Task<IEnumerable<GetCampaignResponse>> GetCampaignByCampus(Guid id);
-        Task<GetCampaignResponse> UpdateCampaign(UpdateCampaignRequest request);
-        Task<GetCampaignResponse> CreateCampaign(CreateCampaignRequest request);
-        Task<GetCampaignResponse> GetCampaignById(Guid id);
+        Task<APIResponse<IEnumerable<GetCampaignResponse>>> GetCampaign();
+        Task<APIResponse<GetCampaignResponse>> UpdateCampaign(Guid id,UpdateCampaignRequest request);
+        Task<APIResponse<GetCampaignResponse>> CreateCampaign(CreateCampaignRequest request);
+        Task<APIResponse<GetCampaignResponse>> GetCampaignById(Guid id);
+        Task<APIResponse<GetCampaignResponse>> DeleteCampaign(DeleteCampaignRequest request);
     }
 }

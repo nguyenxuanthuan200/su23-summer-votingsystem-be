@@ -6,6 +6,8 @@ using Capstone_VotingSystem.Services.CampaignService;
 using Capstone_VotingSystem.Services.CampaignStageService;
 using Capstone_VotingSystem.Services.CandidateService;
 using Capstone_VotingSystem.Services.VoteService;
+using Capstone_VotingSystem.Services.FormService;
+using Capstone_VotingSystem.Services.QuestionService;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -22,7 +24,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<VotingSystemContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection")));
+builder.Services.AddDbContext<VotingSystemContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
 
 FirebaseApp.Create(new AppOptions()
 {
@@ -36,6 +38,8 @@ builder.Services.AddScoped<ICandidateService, CandidateService>();
 builder.Services.AddScoped<IActionHistoryService, ActionHistoryService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IRatioCategoryService, RatioCategoryService>();
+builder.Services.AddScoped<IFormService, FormService>();
+builder.Services.AddScoped<IQuestionService, QuestionService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
@@ -71,6 +75,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddSwaggerGen(c =>
 {
+    c.EnableAnnotations();
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "VotingSystem", Version = "v1" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {

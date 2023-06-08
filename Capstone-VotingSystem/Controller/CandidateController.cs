@@ -12,7 +12,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1.0/candidate")]
+    [Route("api/v1.0/candidates")]
     [ApiController]
     public class CandidateController : BaseApiController
     {
@@ -22,7 +22,8 @@ namespace Capstone_VotingSystem.Controller
             this.candidateService = candidateService;
         }
 
-        [HttpGet("campaignid")]
+        [HttpGet("campaign/{id}")]
+        [SwaggerOperation(summary: "Get list candidate by campaign id")]
         public async Task<IActionResult> getListCandidateCampaign(Guid campaignid)
         {
             try
