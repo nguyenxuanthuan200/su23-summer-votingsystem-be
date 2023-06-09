@@ -1,4 +1,5 @@
 ﻿using Capstone_VotingSystem.Controllers;
+using Capstone_VotingSystem.Models.RequestModels.ElementRequest;
 using Capstone_VotingSystem.Models.RequestModels.QuestionRequest;
 using Capstone_VotingSystem.Services.QuestionService;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +16,24 @@ namespace Capstone_VotingSystem.Controller
         public QuestionController(IQuestionService questionService)
         {
             this.questionService = questionService;
+        }
+        [HttpGet("form/{id}")]
+        [SwaggerOperation(summary: "Get list question by form id")]
+        public async Task<IActionResult> GetListQuestionForm(Guid id)
+        {
+            try
+            {
+                var result = await questionService.GetListQuestionForm(id);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
         [HttpPost]
         [SwaggerOperation(summary: "Create new question and element")]
@@ -35,6 +54,48 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
 
 
+            }
+        }
+        [HttpPost("{questionId}")]
+        [SwaggerOperation(summary: "Create new element for question")]
+        public async Task<IActionResult> CreateElementQuestion(Guid questionId,CreateElementRequest request)
+        {
+            try
+            {
+                var result = await questionService.CreateElementQuestion(questionId,request);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+
+
+            }
+        }
+        [HttpPut("{id}")]
+        [SwaggerOperation(summary: "Update Question and Element")]
+        public async Task<IActionResult> UpdateCampaign(Guid id, UpdateQuestionRequest request)
+        {
+            try
+            {
+                var result = await questionService.UpdateQuestion(id, request);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
             }
         }
     }

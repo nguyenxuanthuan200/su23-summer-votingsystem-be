@@ -24,11 +24,11 @@ namespace Capstone_VotingSystem.Controller
 
         [HttpGet("campaign/{id}")]
         [SwaggerOperation(summary: "Get list candidate by campaign id")]
-        public async Task<IActionResult> getListCandidateCampaign(Guid campaignid)
+        public async Task<IActionResult> getListCandidateCampaign(Guid id)
         {
             try
             {
-                var result = await candidateService.GetListCandidateCampaign(campaignid);
+                var result = await candidateService.GetListCandidateCampaign(id);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
