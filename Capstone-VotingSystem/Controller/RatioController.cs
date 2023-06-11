@@ -1,6 +1,7 @@
 ﻿using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Services.RateCategoryService;
 using CoreApiResponse;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -17,6 +18,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.ratioCategoryService = ratioCategoryService;
         }
+        [Authorize(Roles = "User,Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -33,7 +35,7 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCandidateProfile(Guid id)
+        public async Task<IActionResult> GetRatioById(Guid id)
         {
             try
             {

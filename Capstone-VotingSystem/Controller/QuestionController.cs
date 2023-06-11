@@ -2,6 +2,7 @@
 using Capstone_VotingSystem.Models.RequestModels.ElementRequest;
 using Capstone_VotingSystem.Models.RequestModels.QuestionRequest;
 using Capstone_VotingSystem.Services.QuestionService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -17,6 +18,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.questionService = questionService;
         }
+        [Authorize(Roles = "User")]
         [HttpGet("form/{id}")]
         [SwaggerOperation(summary: "Get list question by form id")]
         public async Task<IActionResult> GetListQuestionForm(Guid id)
@@ -35,6 +37,7 @@ namespace Capstone_VotingSystem.Controller
                 return BadRequest();
             }
         }
+        [Authorize(Roles = "User")]
         [HttpPost]
         [SwaggerOperation(summary: "Create new question and element")]
         public async Task<IActionResult> CreateQuestion(CreateQuestionRequest request)
@@ -56,6 +59,7 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
+        [Authorize(Roles = "User")]
         [HttpPost("{questionId}")]
         [SwaggerOperation(summary: "Create new element for question")]
         public async Task<IActionResult> CreateElementQuestion(Guid questionId,CreateElementRequest request)
@@ -77,6 +81,7 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
+        [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Question and Element")]
         public async Task<IActionResult> UpdateCampaign(Guid id, UpdateQuestionRequest request)

@@ -6,6 +6,7 @@ using Capstone_VotingSystem.Models.RequestModels.CampaignRequest;
 using Capstone_VotingSystem.Services.CampaignService;
 using Swashbuckle.AspNetCore.Annotations;
 using Capstone_VotingSystem.Controllers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Capstone_VotingSystem.Controller
 {
@@ -18,6 +19,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.campaignService = campaignService;
         }
+        [Authorize(Roles = "User,Admin")]
         [HttpGet]
         [SwaggerOperation(summary: "Get all campaign")]
         public async Task<IActionResult> GetCampaign()
@@ -37,6 +39,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
+        [Authorize(Roles = "User")]
         [HttpPost]
         [SwaggerOperation(summary: "Create new Campaign")]
         public async Task<IActionResult> CreateCampaign(CreateCampaignRequest request)
@@ -58,6 +61,7 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
+        [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Campaign")]
         public async Task<IActionResult> UpdateCampaign(Guid id, UpdateCampaignRequest request)
@@ -79,6 +83,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
+        [Authorize(Roles = "User,Admin")]
         [HttpDelete]
         [SwaggerOperation(summary: "Delete Campaign")]
         public async Task<IActionResult> DeleteCampaign(DeleteCampaignRequest request)
