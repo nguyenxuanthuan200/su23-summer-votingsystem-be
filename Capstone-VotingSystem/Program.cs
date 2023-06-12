@@ -26,6 +26,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<VotingSystemContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection")));
 
+//FireBase
 FirebaseApp.Create(new AppOptions()
 {
     Credential = GoogleCredential.FromFile("Config/fvssystemswp409-firebase-adminsdk-x9pg7-687b1c4ddd.json")
@@ -41,6 +42,7 @@ builder.Services.AddScoped<IRatioCategoryService, RatioCategoryService>();
 builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 
+// Authen
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.RequireHttpsMetadata = false;
@@ -56,6 +58,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
+//CORS
 builder.Services.AddCors(opt =>
 {
     opt.AddPolicy("MyCors",
@@ -65,14 +68,13 @@ builder.Services.AddCors(opt =>
             .WithOrigins("*")
             .AllowAnyHeader()
             .AllowAnyMethod();
-            //.WithExposedHeaders(new string[] { "Authorization", "authorization" });
         });
 });
-//builder.Services.AddCors(opt => opt.AddDefaultPolicy(builder => builder.AllowAnyOrigin()
-//                                                                         .AllowAnyMethod()
-//                                                                         .AllowAnyHeader()));
+
+//Mapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+//Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.EnableAnnotations();
@@ -80,7 +82,7 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
         Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
+        Type = SecuritySchemeType.Http,
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
@@ -91,12 +93,12 @@ builder.Services.AddSwaggerGen(c =>
                 new OpenApiSecurityScheme {
                 Reference = new OpenApiReference {
                     Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
+                        Id ="Bearer"
                 }
                 },
                 new string[] {}
                 }
-                });
+                }) ;
 });
 
 builder.Services.AddResponseCompression();
