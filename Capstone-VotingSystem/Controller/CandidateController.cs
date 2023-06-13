@@ -12,7 +12,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1.0/candidates")]
+    [Route("api/v1/candidates")]
     [ApiController]
     public class CandidateController : BaseApiController
     {

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Capstone_VotingSystem.Core.CoreModel;
 using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Models.RequestModels.CampaignStageRequest;
 using Capstone_VotingSystem.Models.ResponseModels.CampaignStageResponse;
@@ -17,14 +18,16 @@ namespace Capstone_VotingSystem.Services.CampaignStageService
             _mapper = mapper;
         }
 
-        public async Task<CreateCampaginStageResponse> CreateCampaignStage(CreateCampaignStageRequest request)
+        public async Task<APIResponse<CreateCampaginStageResponse>> CreateCampaignStage(CreateCampaignStageRequest request)
         {
+            APIResponse<CreateCampaginStageResponse> response = new();
             var campaign = await dbContext.Campaigns.Where(
              p => p.CampaignId == request.CampaignId).SingleOrDefaultAsync();
 
             if (campaign == null)
             {
-                return null;
+                response.ToFailedResponse("Campaign không tồn tại", StatusCodes.Status400BadRequest);
+                return response;
             }
             var id = Guid.NewGuid();
             CampaignStage campaignStage = new CampaignStage();
@@ -40,14 +43,22 @@ namespace Capstone_VotingSystem.Services.CampaignStageService
             };
             await dbContext.CampaignStages.AddAsync(campaignStage);
             await dbContext.SaveChangesAsync();
-            var re = _mapper.Map<CreateCampaginStageResponse>(campaignStage);
-            return re;
+            var map = _mapper.Map<CreateCampaginStageResponse>(campaignStage);
+            response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
+            response.Data = map;
+            return response;
         }
 
-        public async Task<IEnumerable<GetCampaignStageByCampaignResponse>> GetCampaignStageByCampaign(Guid campaignId)
+        public async Task<APIResponse<IEnumerable<GetCampaignStageByCampaignResponse>>> GetCampaignStageByCampaign(Guid campaignId)
         {
-            var campaign = await dbContext.CampaignStages.Where(p => p.CampaignId == campaignId).ToListAsync();
-            IEnumerable<GetCampaignStageByCampaignResponse> result = campaign.Select(
+            APIResponse<IEnumerable<GetCampaignStageByCampaignResponse>> response = new();
+            var campaignstage = await dbContext.CampaignStages.Where(p => p.CampaignId == campaignId).ToListAsync();
+            if (campaignstage == null)
+            {
+                response.ToFailedResponse("Không có CampaignStage nào", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            IEnumerable<GetCampaignStageByCampaignResponse> result = campaignstage.Select(
                 x =>
                 {
                     return new GetCampaignStageByCampaignResponse()
@@ -64,16 +75,25 @@ namespace Capstone_VotingSystem.Services.CampaignStageService
                     };
                 }
                 ).ToList();
-            return result;
+            response.ToSuccessResponse(response.Data = result, "Lấy danh sách thành công", StatusCodes.Status200OK);
+            return response;
         }
 
-        public async Task<GetCampaignStageByCampaignResponse> UpdateCampaignStage(UpdateCampaignStageRequest request)
+        public async Task<APIResponse<GetCampaignStageByCampaignResponse>> UpdateCampaignStage(Guid id,UpdateCampaignStageRequest request)
         {
-            var upCam = await dbContext.CampaignStages.SingleOrDefaultAsync(c => c.CampaignStageId == request.CampaignStageId);
-            if (upCam == null) return null;
+            APIResponse<GetCampaignStageByCampaignResponse> response = new();
+            var upCam = await dbContext.CampaignStages.SingleOrDefaultAsync(c => c.CampaignStageId == id);
+            if (upCam == null)
+            {
+                response.ToFailedResponse("CampaignStage không tồn tại", StatusCodes.Status400BadRequest);
+                return response;
+            }
             var checkcampaign = await dbContext.Campaigns.SingleOrDefaultAsync(c => c.CampaignId == request.CampaignId);
-            if (upCam == null) return null;
-
+            if (checkcampaign == null)
+            {
+                response.ToFailedResponse("Campaign không tồn tại", StatusCodes.Status400BadRequest);
+                return response;
+            }
             upCam.Description = upCam.Description;
             upCam.Title = upCam.Title;
             upCam.StartTime = upCam.StartTime;
@@ -82,8 +102,10 @@ namespace Capstone_VotingSystem.Services.CampaignStageService
             upCam.Status = upCam.Status;
             dbContext.CampaignStages.Update(upCam);
             await dbContext.SaveChangesAsync();
-            var result = _mapper.Map<GetCampaignStageByCampaignResponse>(upCam);
-            return result;
+            var map = _mapper.Map<GetCampaignStageByCampaignResponse>(upCam);
+            response.ToSuccessResponse("Cập nhật thành công", StatusCodes.Status200OK);
+            response.Data = map;
+            return response;
         }
 
     }

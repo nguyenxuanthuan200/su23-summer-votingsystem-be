@@ -1,30 +1,37 @@
-﻿using Capstone_VotingSystem.Models.RequestModels.CampaignStageRequest;
+﻿using Capstone_VotingSystem.Controllers;
+using Capstone_VotingSystem.Models.RequestModels.CampaignStageRequest;
 using Capstone_VotingSystem.Services.CampaignStageService;
 using CoreApiResponse;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/campaignstage")]
+    [Route("api/v1/campaignstage")]
     [ApiController]
-    public class CampaignStageController : BaseController
+    public class CampaignStageController : BaseApiController
     {
         private readonly ICampaignStageService campaignStageService;
         public CampaignStageController(ICampaignStageService campaignStageService)
         {
             this.campaignStageService = campaignStageService;
         }
+        [Authorize(Roles = "User,Admin")]
+        [SwaggerOperation(summary: "Get CampaignStage By Campaign")]
         [HttpGet]
         public async Task<IActionResult> GetCampaignStage(Guid campaignId)
         {
             try
             {
                 var result = await campaignStageService.GetCampaignStageByCampaign(campaignId);
-                if (result == null)
-                    return CustomResult("Not Found", HttpStatusCode.NotFound);
-                return CustomResult("Success", result, HttpStatusCode.OK);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
             }
             catch (Exception)
             {
@@ -32,22 +39,19 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-
+        [Authorize(Roles = "User")]
         [HttpPost]
+        [SwaggerOperation(summary: "Create new CampaignStage")]
         public async Task<IActionResult> CreateCampaignStage(CreateCampaignStageRequest request)
         {
             try
             {
-                if (request == null)
+                var result = await campaignStageService.CreateCampaignStage(request);
+                if (result.Success == false)
                 {
-                    return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
+                    return BadRequest(result);
                 }
-                var create = await campaignStageService.CreateCampaignStage(request);
-                if (create == null)
-                {
-                    return CustomResult("CampaignStage da ton tai", HttpStatusCode.Accepted);
-                }
-                return CustomResult("Success", create, HttpStatusCode.Created);
+                return Ok(result);
             }
             catch (Exception e)
             {
@@ -55,23 +59,20 @@ namespace Capstone_VotingSystem.Controller
                    e.Message);
             }
         }
+        [Authorize(Roles = "User")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCampaignStage(UpdateCampaignStageRequest request)
+        [SwaggerOperation(summary: "Update CampaignStage")]
+        public async Task<IActionResult> UpdateCampaignStage(Guid id,UpdateCampaignStageRequest request)
         {
             try
             {
-                //if (request == null)
-                //{
-                //    return CustomResult("Cu Phap Sai", HttpStatusCode.BadRequest);
-                //}
-                var update = await campaignStageService.UpdateCampaignStage(request);
+                var result = await campaignStageService.UpdateCampaignStage(id,request);
 
-                if (update == null)
+                if (result.Success == false)
                 {
-                    return CustomResult("Not Found", HttpStatusCode.NotFound);
+                    return BadRequest(result);
                 }
-
-                return CustomResult("Success", update, HttpStatusCode.OK);
+                return Ok(result);
             }
             catch (Exception)
             {

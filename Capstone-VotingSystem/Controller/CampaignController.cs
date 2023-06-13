@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1.0/campaigns")]
+    [Route("api/v1/campaigns")]
     [ApiController]
     public class CampaignController : BaseApiController
     {

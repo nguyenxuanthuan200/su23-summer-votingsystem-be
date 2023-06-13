@@ -2,7 +2,7 @@
 {
     public class UpdateCampaignStageRequest
     {
-        public Guid CampaignStageId { get; set; }
+        //public Guid CampaignStageId { get; set; }
         public string? Title { get; set; }
         public string? Description { get; set; }
         public bool? Status { get; set; }

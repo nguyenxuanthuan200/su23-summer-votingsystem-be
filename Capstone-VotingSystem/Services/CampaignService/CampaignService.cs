@@ -75,6 +75,11 @@ namespace Capstone_VotingSystem.Services.CampaignService
         {
             APIResponse<IEnumerable<GetCampaignResponse>> response = new();
             var campaign = await dbContext.Campaigns.ToListAsync();
+            if (campaign == null)
+            {
+                response.ToFailedResponse("Không có Campaign nào", StatusCodes.Status400BadRequest);
+                return response;
+            }
             IEnumerable<GetCampaignResponse> result = campaign.Select(
                 x =>
                 {
