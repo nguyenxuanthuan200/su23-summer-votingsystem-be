@@ -50,7 +50,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
         {
             APIResponse<GetCampaignResponse> response = new();
             var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == request.CampaignId);
-            
+
             if (cam == null)
             {
                 response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
@@ -118,7 +118,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
             response.Data = map;
             return response;
         }
-        public async Task<APIResponse<GetCampaignResponse>> UpdateCampaign(Guid id,UpdateCampaignRequest request)
+        public async Task<APIResponse<GetCampaignResponse>> UpdateCampaign(Guid id, UpdateCampaignRequest request)
         {
             APIResponse<GetCampaignResponse> response = new();
             var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == id);
