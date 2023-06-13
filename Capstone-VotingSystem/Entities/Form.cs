@@ -7,17 +7,18 @@ namespace Capstone_VotingSystem.Entities
     {
         public Form()
         {
-            FormStages = new HashSet<FormStage>();
             Questions = new HashSet<Question>();
+            Stages = new HashSet<Stage>();
         }
 
         public Guid FormId { get; set; }
         public string? Name { get; set; }
-        public string? UserName { get; set; }
-        public bool? Visibility { get; set; }
+        public string? Visibility { get; set; }
+        public bool? Status { get; set; }
+        public Guid? CategoryId { get; set; }
 
-        public virtual User? UserNameNavigation { get; set; }
-        public virtual ICollection<FormStage> FormStages { get; set; }
+        public virtual Category? Category { get; set; }
         public virtual ICollection<Question> Questions { get; set; }
+        public virtual ICollection<Stage> Stages { get; set; }
     }
 }

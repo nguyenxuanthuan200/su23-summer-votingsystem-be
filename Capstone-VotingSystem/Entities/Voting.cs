@@ -10,13 +10,18 @@ namespace Capstone_VotingSystem.Entities
             VotingDetails = new HashSet<VotingDetail>();
         }
 
-        public Guid VotingId { get; set; }
-        public DateTime? Time { get; set; }
-        public Guid? CampaignStageId { get; set; }
-        public string? UserName { get; set; }
+        public Guid VoringId { get; set; }
+        public DateTime? SendingTime { get; set; }
+        public bool? Status { get; set; }
+        public Guid? RatioGroupId { get; set; }
+        public string? UserId { get; set; }
+        public Guid? CandidateProfileId { get; set; }
+        public Guid? StageId { get; set; }
 
-        public virtual CampaignStage? CampaignStage { get; set; }
-        public virtual User? UserNameNavigation { get; set; }
+        public virtual Candidate? CandidateProfile { get; set; }
+        public virtual Ratio? RatioGroup { get; set; }
+        public virtual Stage? Stage { get; set; }
+        public virtual User? User { get; set; }
         public virtual ICollection<VotingDetail> VotingDetails { get; set; }
     }
 }

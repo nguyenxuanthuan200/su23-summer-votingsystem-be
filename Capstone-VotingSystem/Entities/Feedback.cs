@@ -3,13 +3,16 @@ using System.Collections.Generic;
 
 namespace Capstone_VotingSystem.Entities
 {
-    public partial class Feedback
+    public partial class FeedBack
     {
-        public Guid FeedbackId { get; set; }
-        public string? Title { get; set; }
-        public string? Text { get; set; }
-        public string? UserName { get; set; }
+        public Guid FeedBackId { get; set; }
+        public string? Content { get; set; }
+        public DateTime? CreateDate { get; set; }
+        public bool? Status { get; set; }
+        public string? UserId { get; set; }
+        public Guid? CampaignId { get; set; }
 
-        public virtual User? UserNameNavigation { get; set; }
+        public virtual Campaign? Campaign { get; set; }
+        public virtual User? User { get; set; }
     }
 }

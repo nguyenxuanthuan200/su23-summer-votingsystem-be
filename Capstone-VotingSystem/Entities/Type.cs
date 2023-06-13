@@ -3,15 +3,16 @@ using System.Collections.Generic;
 
 namespace Capstone_VotingSystem.Entities
 {
-    public partial class QuestionType
+    public partial class Type
     {
-        public QuestionType()
+        public Type()
         {
             Questions = new HashSet<Question>();
         }
 
-        public Guid QuestionTypeId { get; set; }
-        public string? TypeName { get; set; }
+        public Guid TypeId { get; set; }
+        public string? Name { get; set; }
+        public string? Description { get; set; }
 
         public virtual ICollection<Question> Questions { get; set; }
     }
