@@ -14,6 +14,7 @@ namespace Capstone_VotingSystem.Entities
         public string? Content { get; set; }
         public bool? Status { get; set; }
         public Guid? QuestionId { get; set; }
+        public bool? Rate { get; set; }
 
         public virtual Question? Question { get; set; }
         public virtual ICollection<VotingDetail> VotingDetails { get; set; }

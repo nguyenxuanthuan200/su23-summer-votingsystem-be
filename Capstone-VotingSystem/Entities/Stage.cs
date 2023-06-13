@@ -7,6 +7,7 @@ namespace Capstone_VotingSystem.Entities
     {
         public Stage()
         {
+            Scores = new HashSet<Score>();
             Votings = new HashSet<Voting>();
         }
 
@@ -21,6 +22,7 @@ namespace Capstone_VotingSystem.Entities
 
         public virtual Campaign? Campaign { get; set; }
         public virtual Form? Form { get; set; }
+        public virtual ICollection<Score> Scores { get; set; }
         public virtual ICollection<Voting> Votings { get; set; }
     }
 }
