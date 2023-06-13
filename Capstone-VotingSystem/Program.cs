@@ -6,6 +6,8 @@ using Capstone_VotingSystem.Services.CampaignService;
 using Capstone_VotingSystem.Services.CampaignStageService;
 using Capstone_VotingSystem.Services.CandidateService;
 using Capstone_VotingSystem.Services.VoteService;
+using Capstone_VotingSystem.Services.FormService;
+using Capstone_VotingSystem.Services.QuestionService;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -24,6 +26,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<VotingSystemContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection")));
 
+//FireBase
 FirebaseApp.Create(new AppOptions()
 {
     Credential = GoogleCredential.FromFile("Config/fvssystemswp409-firebase-adminsdk-x9pg7-687b1c4ddd.json")
@@ -36,7 +39,10 @@ builder.Services.AddScoped<ICandidateService, CandidateService>();
 builder.Services.AddScoped<IActionHistoryService, ActionHistoryService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IRatioCategoryService, RatioCategoryService>();
+builder.Services.AddScoped<IFormService, FormService>();
+builder.Services.AddScoped<IQuestionService, QuestionService>();
 
+// Authen
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.RequireHttpsMetadata = false;
@@ -52,6 +58,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
+//CORS
 builder.Services.AddCors(opt =>
 {
     opt.AddPolicy("MyCors",
@@ -61,21 +68,21 @@ builder.Services.AddCors(opt =>
             .WithOrigins("*")
             .AllowAnyHeader()
             .AllowAnyMethod();
-            //.WithExposedHeaders(new string[] { "Authorization", "authorization" });
         });
 });
-//builder.Services.AddCors(opt => opt.AddDefaultPolicy(builder => builder.AllowAnyOrigin()
-//                                                                         .AllowAnyMethod()
-//                                                                         .AllowAnyHeader()));
+
+//Mapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+//Swagger
 builder.Services.AddSwaggerGen(c =>
 {
+    c.EnableAnnotations();
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "VotingSystem", Version = "v1" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
         Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
+        Type = SecuritySchemeType.Http,
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
@@ -86,12 +93,12 @@ builder.Services.AddSwaggerGen(c =>
                 new OpenApiSecurityScheme {
                 Reference = new OpenApiReference {
                     Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
+                        Id ="Bearer"
                 }
                 },
                 new string[] {}
                 }
-                });
+                }) ;
 });
 
 builder.Services.AddResponseCompression();
@@ -102,13 +109,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ShopSecondHand v1"));
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "VotingSystem v1"));
 
 }
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ShopSecondHand v1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "VotingSystem v1");
     c.RoutePrefix = string.Empty;
 });
 

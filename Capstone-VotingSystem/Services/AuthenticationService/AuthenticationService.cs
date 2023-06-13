@@ -35,12 +35,12 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
             {
                 var claims = new[]
                 {
-                    //new Claim(ClaimTypes.Role, "Admin"),
+                    new Claim(ClaimTypes.Role, "Admin"),
                     new Claim("Username", account.UserName),
                     new Claim("RoleId", roleName.RoleId.ToString()),
                     new Claim("RoleName", roleName.Name),
-                    //new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                    
+                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+
                     };
 
 
@@ -72,11 +72,11 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
             {
                 var claims = new[]
                 {
-                    //new Claim(ClaimTypes.Role, "User"),
+                    new Claim(ClaimTypes.Role, "User"),
                     new Claim("Username", account.UserName),
                     new Claim("RoleId", roleName.RoleId.ToString()),
                     new Claim("RoleName", roleName.Name),
-                   // new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                     };
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtConfig:Key"]));

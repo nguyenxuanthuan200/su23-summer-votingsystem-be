@@ -1,32 +1,50 @@
-﻿using CoreApiResponse;
+﻿using Capstone_VotingSystem.Controllers;
+using Capstone_VotingSystem.Models.RequestModels.ElementRequest;
+using Capstone_VotingSystem.Models.RequestModels.QuestionRequest;
+using Capstone_VotingSystem.Services.QuestionService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using Capstone_VotingSystem.Models.RequestModels.CampaignRequest;
-using Capstone_VotingSystem.Services.CampaignService;
 using Swashbuckle.AspNetCore.Annotations;
-using Capstone_VotingSystem.Controllers;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1/campaigns")]
+    [Route("api/v1/questions")]
     [ApiController]
-    public class CampaignController : BaseApiController
+    public class QuestionController : BaseApiController
     {
-        private readonly ICampaignService campaignService;
-        public CampaignController(ICampaignService campaignService)
+        private readonly IQuestionService questionService;
+        public QuestionController(IQuestionService questionService)
         {
-            this.campaignService = campaignService;
+            this.questionService = questionService;
         }
-        [Authorize(Roles = "User,Admin")]
-        [HttpGet]
-        [SwaggerOperation(summary: "Get all campaign")]
-        public async Task<IActionResult> GetCampaign()
+        [Authorize(Roles = "User")]
+        [HttpGet("form/{id}")]
+        [SwaggerOperation(summary: "Get list question by form id")]
+        public async Task<IActionResult> GetListQuestionForm(Guid id)
         {
             try
             {
-                var result = await campaignService.GetCampaign();
+                var result = await questionService.GetListQuestionForm(id);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+        [Authorize(Roles = "User")]
+        [HttpPost]
+        [SwaggerOperation(summary: "Create new question and element")]
+        public async Task<IActionResult> CreateQuestion(CreateQuestionRequest request)
+        {
+            try
+            {
+                var result = await questionService.CreateQuestion(request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -37,16 +55,18 @@ namespace Capstone_VotingSystem.Controller
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     "Error retrieving data from the database.");
+
+
             }
         }
         [Authorize(Roles = "User")]
-        [HttpPost]
-        [SwaggerOperation(summary: "Create new Campaign")]
-        public async Task<IActionResult> CreateCampaign(CreateCampaignRequest request)
+        [HttpPost("{questionId}")]
+        [SwaggerOperation(summary: "Create new element for question")]
+        public async Task<IActionResult> CreateElementQuestion(Guid questionId,CreateElementRequest request)
         {
             try
             {
-                var result = await campaignService.CreateCampaign(request);
+                var result = await questionService.CreateElementQuestion(questionId,request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -63,12 +83,12 @@ namespace Capstone_VotingSystem.Controller
         }
         [Authorize(Roles = "User")]
         [HttpPut("{id}")]
-        [SwaggerOperation(summary: "Update Campaign")]
-        public async Task<IActionResult> UpdateCampaign(Guid id, UpdateCampaignRequest request)
+        [SwaggerOperation(summary: "Update Question and Element")]
+        public async Task<IActionResult> UpdateCampaign(Guid id, UpdateQuestionRequest request)
         {
             try
             {
-                var result = await campaignService.UpdateCampaign(id,request);
+                var result = await questionService.UpdateQuestion(id, request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -83,28 +103,5 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User,Admin")]
-        [HttpDelete]
-        [SwaggerOperation(summary: "Delete Campaign")]
-        public async Task<IActionResult> DeleteCampaign(DeleteCampaignRequest request)
-        {
-            try
-            {
-                var result = await campaignService.DeleteCampaign(request);
-                if (result.Success == false)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
-
-
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database.");
-            }
-        }
-
     }
 }

@@ -7,7 +7,7 @@ using System.Net;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1.0/actionhistory")]
+    [Route("api/v1/actionhistory")]
     [ApiController]
     public class ActionHistoryController : BaseController
     {

@@ -5,6 +5,7 @@ using System.Net;
 using Capstone_VotingSystem.Models.RequestModels.VoteRequest;
 using Capstone_VotingSystem.Models.RequestModels.VoteDetailRequest;
 using Capstone_VotingSystem.Services.VoteService;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Capstone_VotingSystem.Controller
 {
@@ -17,6 +18,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.voteService = voteService;
         }
+        [Authorize(Roles = "User")]
         [HttpPost]
         public async Task<IActionResult> CreateVote(CreateVoteRequest request)
         {
@@ -41,6 +43,7 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
+        [Authorize(Roles = "User")]
         [HttpPost("votedetail")]
         public async Task<IActionResult> CreateVoteDetail(CreateVoteDetailRequest request)
         {

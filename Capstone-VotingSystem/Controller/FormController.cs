@@ -1,32 +1,30 @@
 ﻿using Capstone_VotingSystem.Controllers;
-using Capstone_VotingSystem.Models.RequestModels.CampaignStageRequest;
-using Capstone_VotingSystem.Services.CampaignStageService;
-using CoreApiResponse;
+using Capstone_VotingSystem.Models.RequestModels.FormRequest;
+using Capstone_VotingSystem.Services.FormService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Net;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1/campaignstage")]
+    [Route("api/v1/forms")]
     [ApiController]
-    public class CampaignStageController : BaseApiController
+    public class FormController : BaseApiController
     {
-        private readonly ICampaignStageService campaignStageService;
-        public CampaignStageController(ICampaignStageService campaignStageService)
+        private readonly IFormService formService;
+        public FormController(IFormService formService)
         {
-            this.campaignStageService = campaignStageService;
+            this.formService = formService;
         }
         [Authorize(Roles = "User,Admin")]
-        [SwaggerOperation(summary: "Get CampaignStage By Campaign")]
         [HttpGet]
-        public async Task<IActionResult> GetCampaignStage(Guid campaignId)
+        [SwaggerOperation(summary: "Get all Form")]
+        public async Task<IActionResult> GetCampaign()
         {
             try
             {
-                var result = await campaignStageService.GetCampaignStageByCampaign(campaignId);
+                var result = await formService.GetAllForm();
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -39,35 +37,14 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Admin")]
         [HttpPost]
-        [SwaggerOperation(summary: "Create new CampaignStage")]
-        public async Task<IActionResult> CreateCampaignStage(CreateCampaignStageRequest request)
+        [SwaggerOperation(summary: "Create new Form")]
+        public async Task<IActionResult> CreateForm(CreateFormRequest request)
         {
             try
             {
-                var result = await campaignStageService.CreateCampaignStage(request);
-                if (result.Success == false)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                   e.Message);
-            }
-        }
-        [Authorize(Roles = "User")]
-        [HttpPut("{id}")]
-        [SwaggerOperation(summary: "Update CampaignStage")]
-        public async Task<IActionResult> UpdateCampaignStage(Guid id,UpdateCampaignStageRequest request)
-        {
-            try
-            {
-                var result = await campaignStageService.UpdateCampaignStage(id,request);
-
+                var result = await formService.CreateForm(request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -77,9 +54,33 @@ namespace Capstone_VotingSystem.Controller
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error updating Store!");
-            }
+                    "Error retrieving data from the database.");
 
+
+            }
+        }
+        [Authorize(Roles = "User,Admin")]
+        [HttpPut("{id}")]
+        [SwaggerOperation(summary: "Update Form")]
+        public async Task<IActionResult> UpdateForm(Guid id, UpdateFormByUser request)
+        {
+            try
+            {
+                var result = await formService.UpdateForm(id, request);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
         }
     }
 }
+
