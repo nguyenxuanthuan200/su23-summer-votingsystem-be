@@ -17,7 +17,7 @@ namespace Capstone_VotingSystem.Entities
         public string? Title { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
-        public bool? Visibility { get; set; }
+        public string? Visibility { get; set; }
         public string? ImgUrl { get; set; }
         public bool? Status { get; set; }
         public Guid? UserId { get; set; }

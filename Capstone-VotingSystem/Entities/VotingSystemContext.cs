@@ -110,7 +110,10 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.UserId).HasColumnName("userId");
 
-                entity.Property(e => e.Visibility).HasColumnName("visibility");
+                entity.Property(e => e.Visibility)
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .HasColumnName("visibility");
 
                 entity.HasOne(d => d.Category)
                     .WithMany(p => p.Campaigns)
@@ -408,10 +411,6 @@ namespace Capstone_VotingSystem.Entities
                     .ValueGeneratedNever()
                     .HasColumnName("roleId");
 
-                entity.Property(e => e.Description)
-                    .HasMaxLength(200)
-                    .HasColumnName("description");
-
                 entity.Property(e => e.Name)
                     .HasMaxLength(20)
                     .HasColumnName("name");
@@ -524,6 +523,10 @@ namespace Capstone_VotingSystem.Entities
                     .IsUnicode(false)
                     .HasColumnName("userId");
 
+                entity.Property(e => e.Address)
+                    .HasMaxLength(50)
+                    .HasColumnName("address");
+
                 entity.Property(e => e.AvatarUrl)
                     .IsUnicode(false)
                     .HasColumnName("avatarURL");
@@ -537,9 +540,9 @@ namespace Capstone_VotingSystem.Entities
                     .IsUnicode(false)
                     .HasColumnName("email");
 
-                entity.Property(e => e.FirstName)
-                    .HasMaxLength(50)
-                    .HasColumnName("firstName");
+                entity.Property(e => e.FullName)
+                    .HasMaxLength(100)
+                    .HasColumnName("fullName");
 
                 entity.Property(e => e.Gender)
                     .HasMaxLength(10)
@@ -547,10 +550,6 @@ namespace Capstone_VotingSystem.Entities
                     .HasColumnName("gender");
 
                 entity.Property(e => e.GroupId).HasColumnName("groupId");
-
-                entity.Property(e => e.LastName)
-                    .HasMaxLength(50)
-                    .HasColumnName("lastName");
 
                 entity.Property(e => e.Phone)
                     .HasMaxLength(12)
