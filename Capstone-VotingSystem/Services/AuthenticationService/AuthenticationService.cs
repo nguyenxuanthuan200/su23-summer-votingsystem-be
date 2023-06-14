@@ -24,8 +24,8 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
 
         public async Task<ResponseAccount> GenerateToken(Account account)
         {
-            var user = await dbContext.Users.SingleOrDefaultAsync(p => p.UserName == account.UserName);
-            var roleName = await dbContext.Roles.SingleOrDefaultAsync(p => p.RoleId == user.RoleId);
+            //var user = await dbContext.Users.SingleOrDefaultAsync(p => p.UserId == account.UserName);
+            var roleName = await dbContext.Roles.SingleOrDefaultAsync(p => p.RoleId == account.RoleId);
 
             if (roleName == null)
             {
@@ -119,22 +119,22 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
             var uid = decoded.Uid;
             UserRecord userrecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
 
-            var check = await dbContext.Users.Where(p => p.UserName == userrecord.Email).SingleOrDefaultAsync();
+            var check = await dbContext.Users.Where(p => p.UserId == userrecord.Email).SingleOrDefaultAsync();
             var role = await dbContext.Roles.Where(p => p.Name.Equals("user")).SingleOrDefaultAsync();
             if (check == null)
             {
 
                 User user = new User();
                 {
-                    user.UserName = userrecord.Email;
-                    user.Name = userrecord.DisplayName;
-                    user.RoleId = role.RoleId;
+                    user.UserId = userrecord.Email;
+                    user.FirstName = userrecord.DisplayName;
+                    user.AvatarUrl = userrecord.PhotoUrl;
                 }
                 var claims = new[]
                    {
                     new Claim(ClaimTypes.Role, "User"),
                     new Claim("RoleId", role.RoleId.ToString()),
-                    new Claim("Username", user.UserName),
+                    new Claim("userId", user.UserId),
                     new Claim("RoleName", role.Name),
                     new Claim("Photo", userrecord.PhotoUrl),
 

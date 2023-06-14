@@ -1,9 +1,7 @@
 ﻿using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Models.ResponseModels.ActionHistoryResponse;
 using Microsoft.EntityFrameworkCore;
-using Octokit;
-using System.Drawing;
-using System.Xml.Linq;
+
 
 namespace Capstone_VotingSystem.Services.ActionHistoryService
 {
@@ -18,15 +16,15 @@ namespace Capstone_VotingSystem.Services.ActionHistoryService
 
         public async Task<IEnumerable<ActionHistoryResponse>> GetActionHistoryByUser(string username)
         {
-            var actionHistory = await dbContext.ActionHistories.Where(p => p.UserName.Equals(username)).ToListAsync();
+            var actionHistory = await dbContext.HistoryActions.Where(p => p.UserId.Equals(username)).ToListAsync();
             IEnumerable<ActionHistoryResponse> response = actionHistory.Select(x =>
             {
                 return new ActionHistoryResponse()
                 {
-                    ActionHistoryId = x.ActionHistoryId,
+                    HistoryActionId = x.HistoryActionId,
                     Description = x.Description,
-                    ActionTypeId = x.ActionTypeId,
-                    Username = x.UserName,
+                    TypeActionId = x.TypeActionId,
+                    UserId = x.UserId,
                 };
             }).ToList();
             return response;
@@ -34,15 +32,15 @@ namespace Capstone_VotingSystem.Services.ActionHistoryService
 
         public async Task<IEnumerable<ActionHistoryResponse>> GetAllActionHistory()
         {
-            var actionHistory = await dbContext.ActionHistories.ToListAsync();
+            var actionHistory = await dbContext.HistoryActions.ToListAsync();
             IEnumerable<ActionHistoryResponse> response = actionHistory.Select(x =>
             {
                 return new ActionHistoryResponse()
                 {
-                    ActionHistoryId = x.ActionHistoryId,
+                    HistoryActionId = x.HistoryActionId,
                     Description = x.Description,
-                    ActionTypeId = x.ActionTypeId,
-                    Username = x.UserName,
+                    TypeActionId = x.TypeActionId,
+                    UserId = x.UserId,
                 };
             }).ToList();
             return response;

@@ -110,10 +110,7 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.UserId).HasColumnName("userId");
 
-                entity.Property(e => e.Visibility)
-                    .HasMaxLength(10)
-                    .IsUnicode(false)
-                    .HasColumnName("visibility");
+                entity.Property(e => e.Visibility).HasColumnName("visibility");
 
                 entity.HasOne(d => d.Category)
                     .WithMany(p => p.Campaigns)
@@ -554,6 +551,11 @@ namespace Capstone_VotingSystem.Entities
                 entity.Property(e => e.LastName)
                     .HasMaxLength(50)
                     .HasColumnName("lastName");
+
+                entity.Property(e => e.Phone)
+                    .HasMaxLength(12)
+                    .IsUnicode(false)
+                    .HasColumnName("phone");
 
                 entity.Property(e => e.Status).HasColumnName("status");
 

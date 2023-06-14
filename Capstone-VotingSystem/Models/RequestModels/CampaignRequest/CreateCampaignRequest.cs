@@ -7,6 +7,6 @@
         public DateTime? EndTime { get; set; }
         public bool? Visibility { get; set; }
         public bool? Status { get; set; }
-        public string? UserName { get; set; }
+        public string? UserId { get; set; }
     }
 }

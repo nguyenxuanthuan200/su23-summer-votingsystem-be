@@ -21,7 +21,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
         public async Task<APIResponse<GetCampaignResponse>> CreateCampaign(CreateCampaignRequest request)
         {
             APIResponse<GetCampaignResponse> response = new();
-            var checkUser = await dbContext.Users.SingleOrDefaultAsync(c => c.UserName == request.UserName);
+            var checkUser = await dbContext.Users.SingleOrDefaultAsync(c => c.UserId == request.UserId);
             if (checkUser == null)
             {
                 response.ToFailedResponse("UserName không tồn tại", StatusCodes.Status400BadRequest);
@@ -35,8 +35,8 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 cam.EndTime = request.EndTime;
                 cam.Status = request.Status;
                 cam.Title = request.Title;
-                cam.Visibility = request.Visibility;
-                cam.UserName = request.UserName;
+                //cam.Visibility = request.Visibility;
+                //cam.UserId = request.UserId;
             };
             await dbContext.Campaigns.AddAsync(cam);
             await dbContext.SaveChangesAsync();
@@ -90,8 +90,8 @@ namespace Capstone_VotingSystem.Services.CampaignService
                         EndTime = x.EndTime,
                         Status = x.Status,
                         Title = x.Title,
-                        Visibility = x.Visibility,
-                        UserName = x.UserName,
+                        //Visibility = x.Visibility,
+                        //UserName = x.UserId,
                     };
                 }
                 ).ToList();
@@ -130,7 +130,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
             cam.StartTime = request.StartTime;
             cam.EndTime = request.EndTime;
             cam.Status = request.Status;
-            cam.Visibility = request.Visibility;
+            //cam.Visibility = request.Visibility;
             cam.Title = request.Title;
             //cam.CampusId = request.CampusId;
             dbContext.Campaigns.Update(cam);
