@@ -17,14 +17,14 @@ namespace Capstone_VotingSystem.Services.VoteService
         public async Task<bool> CreateVote(CreateVoteRequest request)
         {
             var user = await dbContext.Users.Where(
-              p => p.UserName == request.UserName).SingleOrDefaultAsync();
+              p => p.UserId == request.UserName).SingleOrDefaultAsync();
 
             if (user == null)
             {
                 return false;
             }
-            var camp = await dbContext.CampaignStages.Where(
-              p => p.CampaignStageId == request.CampaignStageId).SingleOrDefaultAsync();
+            var camp = await dbContext.Stages.Where(
+              p => p.CampaignId == request.CampaignStageId).SingleOrDefaultAsync();
 
             if (camp == null)
             {
@@ -33,10 +33,10 @@ namespace Capstone_VotingSystem.Services.VoteService
             var id = Guid.NewGuid();
             Voting vote = new Voting();
             {
-                vote.VotingId = id;
-                vote.Time = request.Time;
-                vote.CampaignStageId = request.CampaignStageId;
-                vote.UserName = request.UserName;
+                vote.VoringId = id;
+                vote.SendingTime = request.Time;
+                vote.StageId = request.CampaignStageId;
+                vote.UserId = request.UserName;
             }
             await dbContext.Votings.AddAsync(vote);
             await dbContext.SaveChangesAsync();
@@ -68,30 +68,30 @@ namespace Capstone_VotingSystem.Services.VoteService
         public async Task<bool> CreateVoteDetail(CreateVoteDetailRequest request)
         {
             var checkvote = await dbContext.Votings.Where(
-             p => p.VotingId == request.VotingId).SingleOrDefaultAsync();
+             p => p.VoringId == request.VotingId).SingleOrDefaultAsync();
             if (checkvote == null) return false;
 
-            var checkform = await dbContext.FormStages.Where(
-             p => p.FormStageId == request.FormStageId).SingleOrDefaultAsync();
-            if (checkform == null) return false;
+            //var checkform = await dbContext.FormStages.Where(
+            // p => p.FormStageId == request.FormStageId).SingleOrDefaultAsync();
+            //if (checkform == null) return false;
 
-            var checkratio = await dbContext.RatioCategories.Where(
-             p => p.RatioCategoryId == request.RatioCategoryId).SingleOrDefaultAsync();
-            if (checkvote == null) return false;
+            //var checkratio = await dbContext.RatioCategories.Where(
+            // p => p.RatioCategoryId == request.RatioCategoryId).SingleOrDefaultAsync();
+            //if (checkvote == null) return false;
 
-            var checkcandidate = await dbContext.CandidateProfiles.Where(
-             p => p.CandidateProfileId == request.CandidateProfileId).SingleOrDefaultAsync();
-            if (checkcandidate == null) return false;
+            //var checkcandidate = await dbContext.CandidateProfiles.Where(
+            // p => p.CandidateProfileId == request.CandidateProfileId).SingleOrDefaultAsync();
+            //if (checkcandidate == null) return false;
 
             var id = Guid.NewGuid();
             VotingDetail votedetail = new VotingDetail();
             {
                 votedetail.VotingDetailId = id;
-                votedetail.Time = request.Time;
-                votedetail.VotingId = request.VotingId;
-                votedetail.FormStageId = request.FormStageId;
-                votedetail.RatioCategoryId = request.RatioCategoryId;
-                votedetail.CandidateProfileId = request.CandidateProfileId;
+                //votedetail.Time = request.Time;
+                //votedetail.VotingId = request.VotingId;
+                //votedetail.FormStageId = request.FormStageId;
+                //votedetail.RatioCategoryId = request.RatioCategoryId;
+                //votedetail.CandidateProfileId = request.CandidateProfileId;
             }
             await dbContext.VotingDetails.AddAsync(votedetail);
             await dbContext.SaveChangesAsync();

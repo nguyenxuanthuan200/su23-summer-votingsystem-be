@@ -7,10 +7,11 @@ namespace Capstone_VotingSystem.Entities
     {
         public Candidate()
         {
+            Scores = new HashSet<Score>();
             Votings = new HashSet<Voting>();
         }
 
-        public Guid CandidateProfileId { get; set; }
+        public Guid CandidateId { get; set; }
         public string? Description { get; set; }
         public double? Score { get; set; }
         public string? UserId { get; set; }
@@ -19,6 +20,7 @@ namespace Capstone_VotingSystem.Entities
         public virtual Campaign? Campaign { get; set; }
         public virtual User? User { get; set; }
         public virtual Ratio? Ratio { get; set; }
+        public virtual ICollection<Score> Scores { get; set; }
         public virtual ICollection<Voting> Votings { get; set; }
     }
 }

@@ -7,8 +7,7 @@ namespace Capstone_VotingSystem.Entities
     {
         public Group()
         {
-            RatioGroupId1Navigations = new HashSet<Ratio>();
-            RatioGroupId2Navigations = new HashSet<Ratio>();
+            Ratios = new HashSet<Ratio>();
             Users = new HashSet<User>();
         }
 
@@ -16,8 +15,7 @@ namespace Capstone_VotingSystem.Entities
         public string? Name { get; set; }
         public string? Description { get; set; }
 
-        public virtual ICollection<Ratio> RatioGroupId1Navigations { get; set; }
-        public virtual ICollection<Ratio> RatioGroupId2Navigations { get; set; }
+        public virtual ICollection<Ratio> Ratios { get; set; }
         public virtual ICollection<User> Users { get; set; }
     }
 }
