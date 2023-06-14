@@ -127,7 +127,7 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                 User user = new User();
                 {
                     user.UserId = userrecord.Email;
-                    user.FirstName = userrecord.DisplayName;
+                    user.FullName = userrecord.DisplayName;
                     user.AvatarUrl = userrecord.PhotoUrl;
                 }
                 var claims = new[]

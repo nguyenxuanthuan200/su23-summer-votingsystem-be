@@ -19,7 +19,7 @@ namespace Capstone_VotingSystem.Controller
         }
         [Authorize(Roles = "User,Admin")]
         [HttpGet]
-        [SwaggerOperation(summary: "Get all Form")]
+        [SwaggerOperation(summary: "Get all Form have status true and visibility is public")]
         public async Task<IActionResult> GetCampaign()
         {
             try
@@ -74,6 +74,26 @@ namespace Capstone_VotingSystem.Controller
                 return Ok(result);
 
 
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        [Authorize(Roles = "User,Admin")]
+        [HttpDelete]
+        [SwaggerOperation(summary: "Delete Form")]
+        public async Task<IActionResult> DeleteForm(DeleteFormRequest request)
+        {
+            try
+            {
+                var result = await formService.DeleteForm(request);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
             }
             catch (Exception)
             {

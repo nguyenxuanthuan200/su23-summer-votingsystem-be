@@ -27,16 +27,22 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 response.ToFailedResponse("UserName không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
+            //var checkCategory = await dbContext.Categories.SingleOrDefaultAsync(c => c.CategoryId == request.CategoryId);
+            //if (checkCategory == null)
+            //{
+            //    response.ToFailedResponse("Category không tồn tại", StatusCodes.Status400BadRequest);
+            //    return response;
+            //}
             var id = Guid.NewGuid();
             Campaign cam = new Campaign();
             {
                 cam.CampaignId = id;
                 cam.StartTime = request.StartTime;
                 cam.EndTime = request.EndTime;
-                cam.Status = request.Status;
+                cam.Status = true;
                 cam.Title = request.Title;
-                //cam.Visibility = request.Visibility;
-                //cam.UserId = request.UserId;
+                cam.CategoryId = request.CategoryId;
+                cam.UserId = request.UserId;
             };
             await dbContext.Campaigns.AddAsync(cam);
             await dbContext.SaveChangesAsync();
@@ -74,7 +80,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
         public async Task<APIResponse<IEnumerable<GetCampaignResponse>>> GetCampaign()
         {
             APIResponse<IEnumerable<GetCampaignResponse>> response = new();
-            var campaign = await dbContext.Campaigns.ToListAsync();
+            var campaign = await dbContext.Campaigns.Where(p=>p.Status==true).ToListAsync();
             if (campaign == null)
             {
                 response.ToFailedResponse("Không có Campaign nào", StatusCodes.Status400BadRequest);
@@ -90,8 +96,9 @@ namespace Capstone_VotingSystem.Services.CampaignService
                         EndTime = x.EndTime,
                         Status = x.Status,
                         Title = x.Title,
-                        //Visibility = x.Visibility,
-                        //UserName = x.UserId,
+                        Visibility = x.Visibility,
+                        UserId = x.UserId,
+                        CategoryId=x.CategoryId,
                     };
                 }
                 ).ToList();
@@ -124,15 +131,22 @@ namespace Capstone_VotingSystem.Services.CampaignService
             var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == id);
             if (cam == null)
             {
-                response.ToFailedResponse("Campaign không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var category = await dbContext.Categories.SingleOrDefaultAsync(c => c.CategoryId == request.CategoryId);
+            if (cam == null)
+            {
+                response.ToFailedResponse("Category không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
             cam.StartTime = request.StartTime;
             cam.EndTime = request.EndTime;
-            cam.Status = request.Status;
-            //cam.Visibility = request.Visibility;
+            //cam.Status = request.Status;
+            cam.Visibility = request.Visibility;
             cam.Title = request.Title;
-            //cam.CampusId = request.CampusId;
+            cam.CategoryId = request.CategoryId;
+            cam.ImgUrl = request.ImgUrl;
             dbContext.Campaigns.Update(cam);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<GetCampaignResponse>(cam);

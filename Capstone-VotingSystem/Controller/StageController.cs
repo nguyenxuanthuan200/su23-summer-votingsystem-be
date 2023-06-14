@@ -1,6 +1,6 @@
 ﻿using Capstone_VotingSystem.Controllers;
-using Capstone_VotingSystem.Models.RequestModels.CampaignStageRequest;
-using Capstone_VotingSystem.Services.CampaignStageService;
+using Capstone_VotingSystem.Models.RequestModels.StageRequest;
+using Capstone_VotingSystem.Services.StageService;
 using CoreApiResponse;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -10,23 +10,23 @@ using System.Net;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1/campaignstage")]
+    [Route("api/v1/stages")]
     [ApiController]
-    public class CampaignStageController : BaseApiController
+    public class StageController : BaseApiController
     {
-        private readonly ICampaignStageService campaignStageService;
-        public CampaignStageController(ICampaignStageService campaignStageService)
+        private readonly IStageService campaignStageService;
+        public StageController(IStageService campaignStageService)
         {
             this.campaignStageService = campaignStageService;
         }
         [Authorize(Roles = "User,Admin")]
-        [SwaggerOperation(summary: "Get CampaignStage By Campaign")]
-        [HttpGet]
-        public async Task<IActionResult> GetCampaignStage(Guid campaignId)
+        [SwaggerOperation(summary: "Get Stage By Campaign")]
+        [HttpGet("campaign/{id}")]
+        public async Task<IActionResult> GetCampaignStage(Guid id)
         {
             try
             {
-                var result = await campaignStageService.GetCampaignStageByCampaign(campaignId);
+                var result = await campaignStageService.GetCampaignStageByCampaign(id);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -41,8 +41,8 @@ namespace Capstone_VotingSystem.Controller
         }
         [Authorize(Roles = "User")]
         [HttpPost]
-        [SwaggerOperation(summary: "Create new CampaignStage")]
-        public async Task<IActionResult> CreateCampaignStage(CreateCampaignStageRequest request)
+        [SwaggerOperation(summary: "Create new Stage")]
+        public async Task<IActionResult> CreateCampaignStage(CreateStageRequest request)
         {
             try
             {
@@ -61,8 +61,8 @@ namespace Capstone_VotingSystem.Controller
         }
         [Authorize(Roles = "User")]
         [HttpPut("{id}")]
-        [SwaggerOperation(summary: "Update CampaignStage")]
-        public async Task<IActionResult> UpdateCampaignStage(Guid id,UpdateCampaignStageRequest request)
+        [SwaggerOperation(summary: "Update Stage")]
+        public async Task<IActionResult> UpdateCampaignStage(Guid id,UpdateStageRequest request)
         {
             try
             {

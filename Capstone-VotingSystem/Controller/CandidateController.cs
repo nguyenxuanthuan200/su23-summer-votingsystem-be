@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Swashbuckle.AspNetCore.Annotations;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace Capstone_VotingSystem.Controller
 {
@@ -21,7 +21,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.candidateService = candidateService;
         }
-
+        [Authorize(Roles = "User,Admin")]
         [HttpGet("campaign/{id}")]
         [SwaggerOperation(summary: "Get list candidate by campaign id")]
         public async Task<IActionResult> getListCandidateCampaign(Guid id)
@@ -40,9 +40,9 @@ namespace Capstone_VotingSystem.Controller
                 return BadRequest();
             }
         }
-
+        [Authorize(Roles = "User,Admin")]
         [HttpPost("account")]
-        [SwaggerOperation(summary: "Add account Candidate to Campagin with some info of Candidate")]
+        [SwaggerOperation(summary: "Create account Candidate to Campagin with some info of Candidate")]
         public async Task<IActionResult> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request)
         {
             try
@@ -61,13 +61,14 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
+        [Authorize(Roles = "User")]
         [HttpPost]
         [SwaggerOperation(summary: "Add Candidate to Campagin with some info of Candidate")]
         public async Task<IActionResult> CreateCandidateCampaign(CreateCandidateCampaignRequest request)
         {
             try
             {
-                APIResponse<GetCandidateCampaignResponse> response = await candidateService.CreateCandidateCampaign(request);
+                var response = await candidateService.CreateCandidateCampaign(request);
                 if (response.Success == false)
                 {
                     return BadRequest(response);

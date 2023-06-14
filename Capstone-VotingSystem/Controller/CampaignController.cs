@@ -57,8 +57,6 @@ namespace Capstone_VotingSystem.Controller
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     "Error retrieving data from the database.");
-
-
             }
         }
         [Authorize(Roles = "User")]
@@ -96,8 +94,6 @@ namespace Capstone_VotingSystem.Controller
                     return BadRequest(result);
                 }
                 return Ok(result);
-
-
             }
             catch (Exception)
             {

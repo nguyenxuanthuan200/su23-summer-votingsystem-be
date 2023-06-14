@@ -7,17 +7,19 @@ namespace Capstone_VotingSystem.Entities
     {
         public User()
         {
+            Campaigns = new HashSet<Campaign>();
             Candidates = new HashSet<Candidate>();
             FeedBacks = new HashSet<FeedBack>();
+            Forms = new HashSet<Form>();
             HistoryActions = new HashSet<HistoryAction>();
             Votings = new HashSet<Voting>();
         }
 
         public string UserId { get; set; } = null!;
-        public string? Address { get; set; }
         public string? FullName { get; set; }
         public string? Phone { get; set; }
         public string? Gender { get; set; }
+        public string? Address { get; set; }
         public DateTime? Dob { get; set; }
         public string? Email { get; set; }
         public string? AvatarUrl { get; set; }
@@ -26,8 +28,10 @@ namespace Capstone_VotingSystem.Entities
 
         public virtual Group? Group { get; set; }
         public virtual Account UserNavigation { get; set; } = null!;
+        public virtual ICollection<Campaign> Campaigns { get; set; }
         public virtual ICollection<Candidate> Candidates { get; set; }
         public virtual ICollection<FeedBack> FeedBacks { get; set; }
+        public virtual ICollection<Form> Forms { get; set; }
         public virtual ICollection<HistoryAction> HistoryActions { get; set; }
         public virtual ICollection<Voting> Votings { get; set; }
     }

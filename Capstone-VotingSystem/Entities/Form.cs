@@ -16,8 +16,10 @@ namespace Capstone_VotingSystem.Entities
         public string? Visibility { get; set; }
         public bool? Status { get; set; }
         public Guid? CategoryId { get; set; }
+        public string? UserId { get; set; }
 
         public virtual Category? Category { get; set; }
+        public virtual User? User { get; set; }
         public virtual ICollection<Question> Questions { get; set; }
         public virtual ICollection<Stage> Stages { get; set; }
     }

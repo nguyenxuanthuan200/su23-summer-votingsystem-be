@@ -42,7 +42,7 @@ namespace Capstone_VotingSystem.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=DESKTOP-NNLOED3;Initial Catalog=VotingSystem;User ID=sa;Password=123456");
+                optionsBuilder.UseSqlServer("Data Source=sql8003.site4now.net;Initial Catalog=db_a9a782_votingsystem;Persist Security Info=True;User ID=db_a9a782_votingsystem_admin;Password=votingsystem123");
             }
         }
 
@@ -108,7 +108,10 @@ namespace Capstone_VotingSystem.Entities
                     .HasMaxLength(200)
                     .HasColumnName("title");
 
-                entity.Property(e => e.UserId).HasColumnName("userId");
+                entity.Property(e => e.UserId)
+                    .HasMaxLength(36)
+                    .IsUnicode(false)
+                    .HasColumnName("userId");
 
                 entity.Property(e => e.Visibility)
                     .HasMaxLength(10)
@@ -119,6 +122,11 @@ namespace Capstone_VotingSystem.Entities
                     .WithMany(p => p.Campaigns)
                     .HasForeignKey(d => d.CategoryId)
                     .HasConstraintName("FK_Campaign_Category");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Campaigns)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_Campaign_User");
             });
 
             modelBuilder.Entity<Candidate>(entity =>
@@ -135,7 +143,7 @@ namespace Capstone_VotingSystem.Entities
                     .HasMaxLength(200)
                     .HasColumnName("description");
 
-                entity.Property(e => e.Score).HasColumnName("score");
+                entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.Property(e => e.UserId)
                     .HasMaxLength(36)
@@ -184,7 +192,9 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.QuestionId).HasColumnName("questionId");
 
-                entity.Property(e => e.Rate).HasColumnName("rate");
+                entity.Property(e => e.Rate)
+                    .HasColumnType("decimal(10, 0)")
+                    .HasColumnName("rate");
 
                 entity.Property(e => e.Status).HasColumnName("status");
 
@@ -246,6 +256,11 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.Status).HasColumnName("status");
 
+                entity.Property(e => e.UserId)
+                    .HasMaxLength(36)
+                    .IsUnicode(false)
+                    .HasColumnName("userId");
+
                 entity.Property(e => e.Visibility)
                     .HasMaxLength(10)
                     .IsUnicode(false)
@@ -255,6 +270,11 @@ namespace Capstone_VotingSystem.Entities
                     .WithMany(p => p.Forms)
                     .HasForeignKey(d => d.CategoryId)
                     .HasConstraintName("FK_Form_Category");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Forms)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_Form_User");
             });
 
             modelBuilder.Entity<Group>(entity =>

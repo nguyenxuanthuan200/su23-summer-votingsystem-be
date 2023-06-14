@@ -3,7 +3,7 @@ using Capstone_VotingSystem.Services.ActionHistoryService;
 using Capstone_VotingSystem.Services.RateCategoryService;
 using Capstone_VotingSystem.Services.AuthenticationService;
 using Capstone_VotingSystem.Services.CampaignService;
-using Capstone_VotingSystem.Services.CampaignStageService;
+using Capstone_VotingSystem.Services.StageService;
 using Capstone_VotingSystem.Services.CandidateService;
 using Capstone_VotingSystem.Services.VoteService;
 using Capstone_VotingSystem.Services.FormService;
@@ -24,7 +24,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<VotingSystemContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("LocallinhConnection")));
+builder.Services.AddDbContext<VotingSystemContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection")));
 
 //FireBase
 FirebaseApp.Create(new AppOptions()
@@ -34,7 +34,7 @@ FirebaseApp.Create(new AppOptions()
 
 builder.Services.AddScoped<ICampaignService, CampaignService>();
 builder.Services.AddScoped<IVoteService, VoteService>();
-builder.Services.AddScoped<ICampaignStageService, CampaignStageService>();
+builder.Services.AddScoped<IStageService, StageService>();
 builder.Services.AddScoped<ICandidateService, CandidateService>();
 builder.Services.AddScoped<IActionHistoryService, ActionHistoryService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();

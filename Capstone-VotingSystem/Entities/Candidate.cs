@@ -13,7 +13,7 @@ namespace Capstone_VotingSystem.Entities
 
         public Guid CandidateId { get; set; }
         public string? Description { get; set; }
-        public double? Score { get; set; }
+        public bool? Status { get; set; }
         public string? UserId { get; set; }
         public Guid? CampaignId { get; set; }
 
