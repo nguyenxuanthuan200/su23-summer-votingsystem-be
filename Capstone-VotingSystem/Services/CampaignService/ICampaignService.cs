@@ -8,6 +8,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
     {
         Task<APIResponse<IEnumerable<GetCampaignResponse>>> GetCampaign();
         Task<APIResponse<GetCampaignResponse>> UpdateCampaign(Guid id,UpdateCampaignRequest request);
+        Task<APIResponse<GetCampaignResponse>> UpdateVisibilityCampaign(Guid id, string request,string us);
         Task<APIResponse<GetCampaignResponse>> CreateCampaign(CreateCampaignRequest request);
         Task<APIResponse<GetCampaignResponse>> GetCampaignById(Guid id);
         Task<APIResponse<GetCampaignResponse>> DeleteCampaign(DeleteCampaignRequest request);

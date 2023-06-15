@@ -24,11 +24,30 @@ namespace Capstone_VotingSystem.Controller
         [Authorize(Roles = "User,Admin")]
         [HttpGet("campaign/{id}")]
         [SwaggerOperation(summary: "Get list candidate by campaign id")]
-        public async Task<IActionResult> getListCandidateCampaign(Guid id)
+        public async Task<IActionResult> GetListCandidateCampaign(Guid id)
         {
             try
             {
                 var result = await candidateService.GetListCandidateCampaign(id);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        [SwaggerOperation(summary: "Get All Candidate with role admin")]
+        public async Task<IActionResult> GetAllCandidate()
+        {
+            try
+            {
+                var result = await candidateService.GetAllCandidate();
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -79,6 +98,26 @@ namespace Capstone_VotingSystem.Controller
             {
                 return BadRequest(ex);
 
+            }
+        }
+        [Authorize(Roles = "User")]
+        [HttpDelete]
+        [SwaggerOperation(summary: "Delete Candidate trong Campaign")]
+        public async Task<IActionResult> DeleteCandidate(Guid candidateId, Guid campaignId, string userId)
+        {
+            try
+            {
+                var result = await candidateService.DeleteCandidateCampaign(candidateId, campaignId, userId);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
             }
         }
     }

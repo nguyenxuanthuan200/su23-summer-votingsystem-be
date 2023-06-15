@@ -31,14 +31,21 @@ namespace Capstone_VotingSystem.Services.CampaignService
             //if (checkCategory == null)
             //{
             //    response.ToFailedResponse("Category không tồn tại", StatusCodes.Status400BadRequest);
-            //    return response;
+            //    return
+            //    response;
             //}
+            if (!request.Visibility.Equals("public") && !request.Visibility.Equals("private"))
+            {
+                response.ToFailedResponse("Visibility không đúng định dạng!! (public or private)", StatusCodes.Status400BadRequest);
+                return response;
+            }
             var id = Guid.NewGuid();
             Campaign cam = new Campaign();
             {
                 cam.CampaignId = id;
                 cam.StartTime = request.StartTime;
                 cam.EndTime = request.EndTime;
+                cam.Visibility = request.Visibility;
                 cam.Status = true;
                 cam.Title = request.Title;
                 cam.CategoryId = request.CategoryId;
@@ -80,7 +87,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
         public async Task<APIResponse<IEnumerable<GetCampaignResponse>>> GetCampaign()
         {
             APIResponse<IEnumerable<GetCampaignResponse>> response = new();
-            var campaign = await dbContext.Campaigns.Where(p=>p.Status==true).ToListAsync();
+            var campaign = await dbContext.Campaigns.Where(p => p.Status == true&&p.Visibility.Equals("public")).ToListAsync();
             if (campaign == null)
             {
                 response.ToFailedResponse("Không có Campaign nào", StatusCodes.Status400BadRequest);
@@ -98,7 +105,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                         Title = x.Title,
                         Visibility = x.Visibility,
                         UserId = x.UserId,
-                        CategoryId=x.CategoryId,
+                        CategoryId = x.CategoryId,
                     };
                 }
                 ).ToList();
@@ -143,10 +150,39 @@ namespace Capstone_VotingSystem.Services.CampaignService
             cam.StartTime = request.StartTime;
             cam.EndTime = request.EndTime;
             //cam.Status = request.Status;
-            cam.Visibility = request.Visibility;
+            //cam.Visibility = request.Visibility;
             cam.Title = request.Title;
             cam.CategoryId = request.CategoryId;
             cam.ImgUrl = request.ImgUrl;
+            dbContext.Campaigns.Update(cam);
+            await dbContext.SaveChangesAsync();
+            var map = _mapper.Map<GetCampaignResponse>(cam);
+            response.ToSuccessResponse("Cập nhật thành công", StatusCodes.Status200OK);
+            response.Data = map;
+            return response;
+        }
+
+        public async Task<APIResponse<GetCampaignResponse>> UpdateVisibilityCampaign(Guid id, string request,string us)
+        {
+            APIResponse<GetCampaignResponse> response = new();
+            var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == id);
+            if (cam == null)
+            {
+                response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var cam1 = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == id&&c.UserId.Equals(us));
+            if (cam1 == null)
+            {
+                response.ToFailedResponse("User này không phải người tạo ra Campaign này", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            if (!request.Equals("public") && !request.Equals("private"))
+            {
+                response.ToFailedResponse("Visibility không đúng định dạng!! (public or private)", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            cam.Visibility = request;
             dbContext.Campaigns.Update(cam);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<GetCampaignResponse>(cam);

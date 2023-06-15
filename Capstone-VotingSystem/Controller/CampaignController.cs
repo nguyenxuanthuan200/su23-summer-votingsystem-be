@@ -81,6 +81,27 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
+        [HttpPut]
+        [SwaggerOperation(summary: "Update Visibility Campaign")]
+        public async Task<IActionResult> UpdateVisibilityCampaign(Guid id,string visibility,string userId)
+        {
+            try
+            {
+                var result = await campaignService.UpdateVisibilityCampaign(id, visibility, userId);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
         [Authorize(Roles = "User,Admin")]
         [HttpDelete]
         [SwaggerOperation(summary: "Delete Campaign")]
