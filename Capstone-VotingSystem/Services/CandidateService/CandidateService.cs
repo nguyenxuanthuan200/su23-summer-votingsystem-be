@@ -192,10 +192,10 @@ namespace Capstone_VotingSystem.Services.CandidateService
             return response;
         }
 
-        public async Task<APIResponse<string>> DeleteCandidateCampaign(Guid candidateId, Guid campaignId, string userId)
+        public async Task<APIResponse<string>> DeleteCandidateCampaign(Guid candidateId,DeleteCandidateRequest request)
         {
             APIResponse<string> response = new();
-            var deleteCandidate = await dbContext.Candidates.Where(p =>p.Status==true&& p.CandidateId.Equals(candidateId)&&p.CampaignId==campaignId&&p.UserId.Equals(userId)).SingleOrDefaultAsync();
+            var deleteCandidate = await dbContext.Candidates.Where(p =>p.Status==true&& p.CandidateId.Equals(candidateId)&&p.CampaignId==request.campaignId&&p.UserId.Equals(request.userId)).SingleOrDefaultAsync();
             if (deleteCandidate == null)
             {
                 response.ToFailedResponse("Không có Candidate nào phù hợp trong Campaign hoặc đã bị xóa", StatusCodes.Status400BadRequest);
@@ -205,6 +205,29 @@ namespace Capstone_VotingSystem.Services.CandidateService
             dbContext.Candidates.Update(deleteCandidate);
             await dbContext.SaveChangesAsync();
             response.ToSuccessResponse("Xóa Candidate thành công", StatusCodes.Status200OK);
+            return response;
+        }
+
+        public async Task<APIResponse<GetCandidateDetailResponse>> GetCandidateById(Guid candidateId)
+        {
+            APIResponse<GetCandidateDetailResponse> response = new();
+            var checkcandi = await dbContext.Candidates.Where(p => p.CandidateId == candidateId&&p.Status==true).SingleOrDefaultAsync();
+            if (checkcandi == null)
+            {
+                response.ToFailedResponse("Candidate không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var checkuser = await dbContext.Users.Where(p => p.UserId == checkcandi.UserId && p.Status == true).SingleOrDefaultAsync();
+            if (checkuser == null)
+            {
+                response.ToFailedResponse("Candidate không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var map = _mapper.Map<GetCandidateDetailResponse>(checkuser);
+            map.CandidateId = checkcandi.CandidateId;
+            map.Description = checkcandi.Description;
+            response.ToSuccessResponse("Xem chi tiết Candidate Thành công!!", StatusCodes.Status200OK);
+            response.Data = map;
             return response;
         }
 

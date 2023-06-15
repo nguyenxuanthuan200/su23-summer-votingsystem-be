@@ -56,7 +56,7 @@ namespace Capstone_VotingSystem.Services.FormService
             return response;
         }
 
-        public async Task<APIResponse<string>> DeleteForm(DeleteFormRequest request)
+        public async Task<APIResponse<string>> DeleteForm(Guid formId,DeleteFormRequest request)
         {
             APIResponse<String> response = new();
             var cam = await dbContext.Users.SingleOrDefaultAsync(c => c.UserId == request.UserId && c.Status == true);
@@ -65,13 +65,13 @@ namespace Capstone_VotingSystem.Services.FormService
                 response.ToFailedResponse("User không tồn tại hoặc đã bị xóa ", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var checkform = await dbContext.Forms.SingleOrDefaultAsync(c => c.FormId == request.FormId && c.Status == true);
+            var checkform = await dbContext.Forms.SingleOrDefaultAsync(c => c.FormId == formId && c.Status == true);
             if (checkform == null)
             {
                 response.ToFailedResponse("Form không tồn tại hoặc bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var checkus = await dbContext.Forms.SingleOrDefaultAsync(c => c.FormId == request.FormId && c.UserId == request.UserId);
+            var checkus = await dbContext.Forms.SingleOrDefaultAsync(c => c.FormId == formId && c.UserId == request.UserId);
             if (checkus == null)
             {
                 response.ToFailedResponse("UserName này không phải người tạo Form", StatusCodes.Status400BadRequest);
@@ -81,7 +81,6 @@ namespace Capstone_VotingSystem.Services.FormService
             dbContext.Forms.Update(checkform);
             await dbContext.SaveChangesAsync();
             response.ToSuccessResponse("Xóa thành công", StatusCodes.Status200OK);
-            //response.Data = map;
             return response;
         }
 
@@ -108,6 +107,21 @@ namespace Capstone_VotingSystem.Services.FormService
                 ).ToList();
             response.Data = result;
             response.ToSuccessResponse(response.Data, "Lấy danh sách thành công", StatusCodes.Status200OK);
+            return response;
+        }
+
+        public async Task<APIResponse<GetFormResponse>> GetFormById(Guid formId)
+        {
+            APIResponse<GetFormResponse> response = new();
+            var form = await dbContext.Forms.SingleOrDefaultAsync(c => c.FormId ==formId && c.Status == true);
+            if (form == null)
+            {
+                response.ToFailedResponse("Form không tồn tại hoặc đã bị xóa ", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var map = _mapper.Map<GetFormResponse>(form);
+            response.ToSuccessResponse("Yêu cầu thành công", StatusCodes.Status200OK);
+            response.Data = map;
             return response;
         }
 

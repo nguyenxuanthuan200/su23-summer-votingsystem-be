@@ -6,6 +6,7 @@ using Capstone_VotingSystem.Services.CampaignService;
 using Capstone_VotingSystem.Services.StageService;
 using Capstone_VotingSystem.Services.CandidateService;
 using Capstone_VotingSystem.Services.VoteService;
+using Capstone_VotingSystem.Services.CategoryService;
 using Capstone_VotingSystem.Services.FormService;
 using Capstone_VotingSystem.Services.QuestionService;
 using FirebaseAdmin;
@@ -41,6 +42,7 @@ builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IRatioCategoryService, RatioCategoryService>();
 builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 // Authen
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>

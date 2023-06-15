@@ -11,6 +11,6 @@ namespace Capstone_VotingSystem.Services.CampaignService
         Task<APIResponse<GetCampaignResponse>> UpdateVisibilityCampaign(Guid id, string request,string us);
         Task<APIResponse<GetCampaignResponse>> CreateCampaign(CreateCampaignRequest request);
         Task<APIResponse<GetCampaignResponse>> GetCampaignById(Guid id);
-        Task<APIResponse<GetCampaignResponse>> DeleteCampaign(DeleteCampaignRequest request);
+        Task<APIResponse<GetCampaignResponse>> DeleteCampaign(Guid CampaignId,DeleteCampaignRequest request);
     }
 }

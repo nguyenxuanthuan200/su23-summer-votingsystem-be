@@ -103,13 +103,13 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [Authorize(Roles = "User,Admin")]
-        [HttpDelete]
+        [HttpDelete("{campaignId}")]
         [SwaggerOperation(summary: "Delete Campaign")]
-        public async Task<IActionResult> DeleteCampaign(DeleteCampaignRequest request)
+        public async Task<IActionResult> DeleteCampaign(Guid campaignId, DeleteCampaignRequest request)
         {
             try
             {
-                var result = await campaignService.DeleteCampaign(request);
+                var result = await campaignService.DeleteCampaign(campaignId,request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);

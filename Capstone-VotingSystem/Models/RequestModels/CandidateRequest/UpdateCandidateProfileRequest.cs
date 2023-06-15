@@ -1,6 +1,6 @@
 ﻿namespace Capstone_VotingSystem.Models.RequestModels.CandidateRequest
 {
-    public class UpdateCandidateProfileRequesst
+    public class UpdateCandidateProfileRequest
     {
         public string? NickName { get; set; }
         public DateTime? Dob { get; set; }

@@ -59,11 +59,10 @@ namespace Capstone_VotingSystem.Services.CampaignService
             return response;
         }
 
-        public async Task<APIResponse<GetCampaignResponse>> DeleteCampaign(DeleteCampaignRequest request)
+        public async Task<APIResponse<GetCampaignResponse>> DeleteCampaign(Guid CampaignId,DeleteCampaignRequest request)
         {
             APIResponse<GetCampaignResponse> response = new();
-            var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == request.CampaignId);
-
+            var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == CampaignId);
             if (cam == null)
             {
                 response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);

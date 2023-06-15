@@ -2,7 +2,7 @@
 {
     public class DeleteFormRequest
     {
-        public Guid FormId { get; set; }
+        //public Guid FormId { get; set; }
         public string UserId { get; set; }
     }
 }

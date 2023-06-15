@@ -22,6 +22,25 @@ namespace Capstone_VotingSystem.Controller
             this.candidateService = candidateService;
         }
         [Authorize(Roles = "User,Admin")]
+        [HttpGet("{id}")]
+        [SwaggerOperation(summary: "Get candidate by id")]
+        public async Task<IActionResult> GetCandidateById(Guid id)
+        {
+            try
+            {
+                var result = await candidateService.GetCandidateById(id);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+        [Authorize(Roles = "User,Admin")]
         [HttpGet("campaign/{id}")]
         [SwaggerOperation(summary: "Get list candidate by campaign id")]
         public async Task<IActionResult> GetListCandidateCampaign(Guid id)
@@ -101,13 +120,13 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [Authorize(Roles = "User")]
-        [HttpDelete]
+        [HttpDelete("{candidateId}")]
         [SwaggerOperation(summary: "Delete Candidate trong Campaign")]
-        public async Task<IActionResult> DeleteCandidate(Guid candidateId, Guid campaignId, string userId)
+        public async Task<IActionResult> DeleteCandidate(Guid candidateId, DeleteCandidateRequest request)
         {
             try
             {
-                var result = await candidateService.DeleteCandidateCampaign(candidateId, campaignId, userId);
+                var result = await candidateService.DeleteCandidateCampaign(candidateId, request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
