@@ -16,6 +16,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Capstone_VotingSystem.Helpers;
+using Capstone_VotingSystem.Services.CloudinaryService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<VotingSystemContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection")));
+
+//Cloudinary connect
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
 //FireBase
 FirebaseApp.Create(new AppOptions()
@@ -43,6 +48,7 @@ builder.Services.AddScoped<IRatioCategoryService, RatioCategoryService>();
 builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
 // Authen
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -100,7 +106,7 @@ builder.Services.AddSwaggerGen(c =>
                 },
                 new string[] {}
                 }
-                }) ;
+                });
 });
 
 builder.Services.AddResponseCompression();
