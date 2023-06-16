@@ -6,5 +6,7 @@
         public string? Description { get; set; }
         public Guid? TypeActionId { get; set; }
         public string? UserId { get; set; }
+
+        public string? ActionTypeName { get; set; }
     }
 }
