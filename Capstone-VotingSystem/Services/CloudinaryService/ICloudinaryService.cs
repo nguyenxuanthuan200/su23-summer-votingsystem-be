@@ -6,7 +6,7 @@ namespace Capstone_VotingSystem.Services.CloudinaryService
 {
     public interface ICloudinaryService
     {
-        Task<ImageUploadResponse> AddImageAsync(IFormFile file, string folderName);
-        public Task<DeletionResult> DeleteImage(string publicId);
+        public Task<APIResponse<ImageUploadResponse>> AddImageUserAsync(IFormFile file, string folderName, string? userId);
+        public Task<APIResponse<ImageCampaignResponse>> AddImageCampaignAsync(IFormFile file, string folderName, Guid? campaignId);
     }
 }

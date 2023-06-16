@@ -3,6 +3,7 @@ using CoreApiResponse;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
 namespace Capstone_VotingSystem.Controller
@@ -17,35 +18,24 @@ namespace Capstone_VotingSystem.Controller
         {
             this.actionHistory = actionHistoryRepositories;
         }
-        //[Authorize(Roles = "Admin")]
-        [HttpGet]
-        public async Task<IActionResult> GetActionHistory()
+        [Authorize(Roles = "User")]
+        [HttpGet("{userId}")]
+        [SwaggerOperation(summary: "Get Action History by UserId")]
+        public async Task<IActionResult> GetActionHistoryByUser(string? userId)
         {
             try
             {
-                var result = await actionHistory.GetAllActionHistory();
-                if (result == null)
-                    return CustomResult("Not Found", HttpStatusCode.NotFound);
-                return CustomResult("Success", result, HttpStatusCode.OK);
+                var result = await actionHistory.GetActionHistoryByUser(userId);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
             }
             catch (Exception)
             {
-                return CustomResult("Fail", HttpStatusCode.InternalServerError);
-            }
-        }
-        [HttpGet("{username}")]
-        public async Task<IActionResult> GetActionHistoryByUser(string? username)
-        {
-            try
-            {
-                var result = await actionHistory.GetActionHistoryByUser(username);
-                if (result == null)
-                    return CustomResult("Not Found", HttpStatusCode.NotFound);
-                return CustomResult("Success", result, HttpStatusCode.OK);
-            }
-            catch (Exception)
-            {
-                return CustomResult("Fail", HttpStatusCode.InternalServerError);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
             }
         }
     }
