@@ -6,7 +6,7 @@
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         //public bool? Status { get; set; }
-        //public string? Visibility { get; set; }
+        public string? Visibility { get; set; }
         public string? ImgUrl { get; set; }
         public Guid? CategoryId { get; set; }
     }
