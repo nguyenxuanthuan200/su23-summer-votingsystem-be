@@ -155,6 +155,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 stage.Title = item.Title;
                 stage.Description = item.Description;
                 stage.Content = item.Content;
+                stage.CampaignId = item.CampaignId;
                 stage.StartTime = item.StartTime;
                 stage.EndTime = item.EndTime;
                 stage.FormId = item.FormId;

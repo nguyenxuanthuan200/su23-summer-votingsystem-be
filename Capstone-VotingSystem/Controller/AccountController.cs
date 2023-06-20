@@ -1,7 +1,9 @@
 ﻿using Capstone_VotingSystem.Controllers;
 using Capstone_VotingSystem.Services.AccountService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Capstone_VotingSystem.Controller
 {
@@ -15,7 +17,9 @@ namespace Capstone_VotingSystem.Controller
         {
             this.account = accountService;
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet]
+        [SwaggerOperation(summary: "Get All Account by Role is Admin")]
         public async Task<IActionResult> GetAllAccount()
         {
             try
