@@ -58,6 +58,26 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [Authorize(Roles = "User,Admin")]
+        [HttpGet("user/{id}")]
+        [SwaggerOperation(summary: "Get Form By User Id")]
+        public async Task<IActionResult> GetFormByUserId(string id)
+        {
+            try
+            {
+                var result = await formService.GetFormByUserId(id);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        [Authorize(Roles = "User,Admin")]
         [HttpPost]
         [SwaggerOperation(summary: "Create new Form")]
         public async Task<IActionResult> CreateForm(CreateFormRequest request)

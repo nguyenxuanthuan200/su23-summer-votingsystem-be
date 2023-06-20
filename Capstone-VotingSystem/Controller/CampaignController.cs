@@ -19,7 +19,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.campaignService = campaignService;
         }
-        [Authorize(Roles = "User,Admin")]
+        //[Authorize(Roles = "User,Admin")]
         [HttpGet]
         [SwaggerOperation(summary: "Get all campaign")]
         public async Task<IActionResult> GetCampaign()

@@ -88,30 +88,40 @@ namespace Capstone_VotingSystem.Services.CampaignService
         {
             APIResponse<IEnumerable<GetCampaignAndStageResponse>> response = new();
             var campaign = await dbContext.Campaigns.Where(p => p.Status == true).ToListAsync();
+           
             List<GetCampaignAndStageResponse> listCamn = new List<GetCampaignAndStageResponse>();
             foreach (var item in campaign)
             {
                 var map = _mapper.Map<GetCampaignAndStageResponse>(item);
-                var element = await dbContext.Stages.Where(p => p.CampaignId == item.CampaignId).ToListAsync();
-                List<GetStageResponse> listStage = element.Select(
-               x =>
-               {
-                   return new GetStageResponse()
-                   {
-                       StageId = x.StageId,
-                       Content = x.Content,
-                       Title = x.Title,
-                       Description = x.Description,
-                       StartTime = x.StartTime,
-                       EndTime = x.EndTime,
-                       CampaignId = x.CampaignId,
-                       FormId = x.FormId,
-                   };
-               }
-               ).ToList();
-                map.Stage = listStage;
+                var stage = await dbContext.Stages.Where(p => p.CampaignId == item.CampaignId).ToListAsync();
 
-                listCamn.Add(map);
+                //if (element.Exists(image => string.IsNullOrEmpty(item.Title)))
+                //{
+                //    response.ToFailedResponse("Không có Campaign nào", StatusCodes.Status400BadRequest);
+                //    return response;
+                //}
+                if (stage.Count != 0)
+                {
+                    List<GetStageResponse> listStage = stage.Select(
+                   x =>
+                   {
+                       return new GetStageResponse()
+                       {
+                           StageId = x.StageId,
+                           Content = x.Content,
+                           Title = x.Title,
+                           Description = x.Description,
+                           StartTime = x.StartTime,
+                           EndTime = x.EndTime,
+                           CampaignId = x.CampaignId,
+                           FormId = x.FormId,
+                       };
+                   }
+                   ).ToList();
+                    map.Stage = listStage;
+
+                    listCamn.Add(map);
+                }
             }
             response.Data = listCamn;
             if (response.Data == null)
@@ -134,10 +144,12 @@ namespace Capstone_VotingSystem.Services.CampaignService
             }
             var map = _mapper.Map<GetCampaignAndStageResponse>(getById);
 
-            var campaign = await dbContext.Stages.Where(p => p.CampaignId == getById.CampaignId).ToListAsync();
-            List<GetStageResponse> listStage = new List<GetStageResponse>();
-            foreach (var item in campaign)
+            var liststage = await dbContext.Stages.Where(p => p.CampaignId == getById.CampaignId).ToListAsync();
+          
+            List<GetStageResponse> listStagee = new List<GetStageResponse>();
+            foreach (var item in liststage)
             {
+                
                 GetStageResponse stage = new GetStageResponse();
                 stage.CampaignId = item.CampaignId;
                 stage.Title = item.Title;
@@ -146,9 +158,9 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 stage.StartTime = item.StartTime;
                 stage.EndTime = item.EndTime;
                 stage.FormId = item.FormId;
-                listStage.Add(stage);
+                listStagee.Add(stage);
             }
-            map.Stage = listStage;
+            map.Stage = listStagee;
             response.Data = map;
             if (response.Data == null)
             {
