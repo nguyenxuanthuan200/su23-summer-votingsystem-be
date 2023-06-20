@@ -153,6 +153,8 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                     account.UserName = userrecord.Email;
                     account.Token = new JwtSecurityTokenHandler().WriteToken(token);
                     account.Status = userrecord.EmailVerified;
+                    account.RoleId = role.RoleId;
+                    account.CreateAt = DateTime.UtcNow;
                 }
                 await dbContext.Users.AddAsync(user);
                 await dbContext.Accounts.AddAsync(account);
