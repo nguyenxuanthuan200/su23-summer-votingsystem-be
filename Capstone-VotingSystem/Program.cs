@@ -18,6 +18,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using Capstone_VotingSystem.Helpers;
 using Capstone_VotingSystem.Services.CloudinaryService;
+using Capstone_VotingSystem.Services.AccountService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +50,7 @@ builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 // Authen
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
