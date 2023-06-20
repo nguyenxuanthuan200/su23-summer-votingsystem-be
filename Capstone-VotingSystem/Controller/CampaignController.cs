@@ -40,13 +40,33 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [Authorize(Roles = "User,Admin")]
-        [HttpGet("{Id}")]
+        [HttpGet("{id}")]
         [SwaggerOperation(summary: "Get Campaign by Id")]
-        public async Task<IActionResult> GetCampaignById(Guid Id)
+        public async Task<IActionResult> GetCampaignById(Guid id)
         {
             try
             {
-                var result = await campaignService.GetCampaignById(Id);
+                var result = await campaignService.GetCampaignById(id);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        [Authorize(Roles = "User,Admin")]
+        [HttpGet("user/{Id}")]
+        [SwaggerOperation(summary: "Get Campaign by User Id")]
+        public async Task<IActionResult> GetCampaignByUserId(string Id)
+        {
+            try
+            {
+                var result = await campaignService.GetCampaignByUserId(Id);
                 if (result.Success == false)
                 {
                     return BadRequest(result);

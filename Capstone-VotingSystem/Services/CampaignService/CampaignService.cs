@@ -60,7 +60,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
             return response;
         }
 
-        public async Task<APIResponse<string>> DeleteCampaign(Guid CampaignId,DeleteCampaignRequest request)
+        public async Task<APIResponse<string>> DeleteCampaign(Guid CampaignId, DeleteCampaignRequest request)
         {
             APIResponse<string> response = new();
             var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == CampaignId);
@@ -138,14 +138,14 @@ namespace Capstone_VotingSystem.Services.CampaignService
             List<GetStageResponse> listStage = new List<GetStageResponse>();
             foreach (var item in campaign)
             {
-                GetStageResponse stage=new GetStageResponse();
+                GetStageResponse stage = new GetStageResponse();
                 stage.CampaignId = item.CampaignId;
-                stage.Title=item.Title;
-                stage.Description=item.Description;
-                stage.Content=item.Content;
-                stage.StartTime=item.StartTime;
-                stage.EndTime=item.EndTime;
-                stage.FormId=item.FormId;
+                stage.Title = item.Title;
+                stage.Description = item.Description;
+                stage.Content = item.Content;
+                stage.StartTime = item.StartTime;
+                stage.EndTime = item.EndTime;
+                stage.FormId = item.FormId;
                 listStage.Add(stage);
             }
             map.Stage = listStage;
@@ -158,6 +158,71 @@ namespace Capstone_VotingSystem.Services.CampaignService
             response.ToSuccessResponse(response.Data, "Lấy chi tiết Campaign thành công", StatusCodes.Status200OK);
             return response;
         }
+
+        public async Task<APIResponse<IEnumerable<GetCampaignResponse>>> GetCampaignByUserId(string uid)
+        {
+            APIResponse<IEnumerable<GetCampaignResponse>> response = new();
+            var checkUser = await dbContext.Users.Where(p => p.UserId == uid && p.Status == true)
+               .SingleOrDefaultAsync();
+            if (checkUser == null)
+            {
+                response.ToFailedResponse("User không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var getById = await dbContext.Campaigns.Where(p => p.UserId == uid && p.Status == true)
+                .ToListAsync();
+            if (getById == null)
+            {
+                response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            IEnumerable<GetCampaignResponse> result = getById.Select(
+               x =>
+               {
+                   return new GetCampaignResponse()
+                   {
+                       CategoryId = x.CategoryId,
+                       Title = x.Title,
+                       StartTime = x.StartTime,
+                       EndTime = x.EndTime,
+                       Visibility = x.Visibility,
+                       ImgUrl = x.ImgUrl,
+                       Status = x.Status,
+                       UserId = x.UserId,
+                       CampaignId = x.CampaignId,
+                   };
+               }
+               ).ToList();
+            response.Data = result;
+            response.ToSuccessResponse(response.Data, "Lấy danh sách thành công", StatusCodes.Status200OK);
+            return response;
+            //var map = _mapper.Map<GetCampaignAndStageResponse>(getById);
+
+            //var campaign = await dbContext.Stages.Where(p => p.CampaignId == getById.CampaignId).ToListAsync();
+            //List<GetStageResponse> listStage = new List<GetStageResponse>();
+            //foreach (var item in campaign)
+            //{
+            //    GetStageResponse stage = new GetStageResponse();
+            //    stage.CampaignId = item.CampaignId;
+            //    stage.Title = item.Title;
+            //    stage.Description = item.Description;
+            //    stage.Content = item.Content;
+            //    stage.StartTime = item.StartTime;
+            //    stage.EndTime = item.EndTime;
+            //    stage.FormId = item.FormId;
+            //    listStage.Add(stage);
+            //}
+            //map.Stage = listStage;
+            //response.Data = map;
+            //if (response.Data == null)
+            //{
+            //    response.ToFailedResponse("Không có Campaign nào", StatusCodes.Status400BadRequest);
+            //    return response;
+            //}
+            //response.ToSuccessResponse(response.Data, "Lấy chi tiết Campaign thành công", StatusCodes.Status200OK);
+            //return response;
+        }
+
         public async Task<APIResponse<GetCampaignResponse>> UpdateCampaign(Guid id, UpdateCampaignRequest request)
         {
             APIResponse<GetCampaignResponse> response = new();
@@ -188,7 +253,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
             return response;
         }
 
-        public async Task<APIResponse<GetCampaignResponse>> UpdateVisibilityCampaign(Guid id, string request,string us)
+        public async Task<APIResponse<GetCampaignResponse>> UpdateVisibilityCampaign(Guid id, string request, string us)
         {
             APIResponse<GetCampaignResponse> response = new();
             var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == id);
@@ -197,7 +262,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var cam1 = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == id&&c.UserId.Equals(us));
+            var cam1 = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == id && c.UserId.Equals(us));
             if (cam1 == null)
             {
                 response.ToFailedResponse("User này không phải người tạo ra Campaign này", StatusCodes.Status400BadRequest);
