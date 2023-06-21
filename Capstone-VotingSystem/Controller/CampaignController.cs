@@ -60,13 +60,13 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [Authorize(Roles = "User,Admin")]
-        [HttpGet("user/{Id}")]
+        [HttpGet("user/{id}")]
         [SwaggerOperation(summary: "Get Campaign by User Id")]
-        public async Task<IActionResult> GetCampaignByUserId(string Id)
+        public async Task<IActionResult> GetCampaignByUserId(string id)
         {
             try
             {
-                var result = await campaignService.GetCampaignByUserId(Id);
+                var result = await campaignService.GetCampaignByUserId(id);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -143,13 +143,13 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [Authorize(Roles = "User,Admin")]
-        [HttpDelete("{campaignId}")]
+        [HttpDelete("{id}")]
         [SwaggerOperation(summary: "Delete Campaign")]
-        public async Task<IActionResult> DeleteCampaign(Guid campaignId, DeleteCampaignRequest request)
+        public async Task<IActionResult> DeleteCampaign(Guid id, DeleteCampaignRequest request)
         {
             try
             {
-                var result = await campaignService.DeleteCampaign(campaignId,request);
+                var result = await campaignService.DeleteCampaign(id, request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);

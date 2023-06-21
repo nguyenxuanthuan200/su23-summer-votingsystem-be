@@ -1,5 +1,5 @@
 ﻿using Capstone_VotingSystem.Controllers;
-using Capstone_VotingSystem.Services.AccountService;
+using Capstone_VotingSystem.Services.FeedbackService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,55 +7,59 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1/account")]
+    [Route("api/v1/feedbacks")]
     [ApiController]
-    public class AccountController : BaseApiController
+    public class FeedbackController : BaseApiController
     {
-        private readonly IAccountService account;
+        private readonly IFeedbackService _feedback;
 
-        public AccountController(IAccountService accountService)
+        public FeedbackController(IFeedbackService feedbackService)
         {
-            this.account = accountService;
+            this._feedback = feedbackService;
         }
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        [SwaggerOperation(summary: "Get All Account by Role is Admin")]
-        public async Task<IActionResult> GetAllAccount()
+        [SwaggerOperation(summary: "Get All FeedBack")]
+        public async Task<IActionResult> GetAllFeedback()
         {
             try
             {
-                var result = await account.GetAllAcount();
+                var result = await _feedback.GetAllFeedback();
                 if (result.Success == false)
                 {
                     return BadRequest(result.Message);
                 }
                 return Ok(result);
+
             }
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database.");
+                     "Error retrieving data from the database.");
             }
         }
         [Authorize(Roles = "Admin")]
-        [HttpDelete("{id}")]
-        [SwaggerOperation(summary: "Ban Account")]
-        public async Task<IActionResult> BanAccount(string id)
+        [HttpGet("{id}")]
+        [SwaggerOperation(summary: "Get Feedback By Id")]
+        public async Task<IActionResult> GetFeedBack(Guid? id)
         {
             try
             {
-                var result = await account.BanAccount(id);
+                var result = await _feedback.GetByFeedBackId(id);
                 if (result.Success == false)
                 {
-                    return BadRequest(result);
+                    return BadRequest(result.Message);
                 }
                 return Ok(result);
+
             }
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database.");
+                     "Error retrieving data from the database.");
             }
         }
+
+
     }
 }

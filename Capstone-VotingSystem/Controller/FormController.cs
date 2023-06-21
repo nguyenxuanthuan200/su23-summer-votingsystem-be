@@ -122,13 +122,13 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [Authorize(Roles = "User,Admin")]
-        [HttpDelete("{formId}")]
+        [HttpDelete("{id}")]
         [SwaggerOperation(summary: "Delete Form")]
-        public async Task<IActionResult> DeleteForm(Guid formId,DeleteFormRequest request)
+        public async Task<IActionResult> DeleteForm(Guid id,DeleteFormRequest request)
         {
             try
             {
-                var result = await formService.DeleteForm(formId,request);
+                var result = await formService.DeleteForm(id,request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);

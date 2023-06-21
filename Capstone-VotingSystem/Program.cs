@@ -11,6 +11,7 @@ using Capstone_VotingSystem.Services.FormService;
 using Capstone_VotingSystem.Services.QuestionService;
 using Capstone_VotingSystem.Services.TypeService;
 using Capstone_VotingSystem.Services.GroupService;
+using Capstone_VotingSystem.Services.FeedbackService;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -55,6 +56,7 @@ builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITypeService, TypeService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 
 // Authen
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>

@@ -6,5 +6,6 @@ namespace Capstone_VotingSystem.Services.AccountService
     public interface IAccountService
     {
         public Task<APIResponse<IEnumerable<AccountResponse>>> GetAllAcount();
+        public Task<APIResponse<string>> BanAccount(string id);
     }
 }
