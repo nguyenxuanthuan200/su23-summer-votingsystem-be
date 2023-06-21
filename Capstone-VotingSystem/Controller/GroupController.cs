@@ -1,6 +1,6 @@
 ﻿using Capstone_VotingSystem.Controllers;
-using Capstone_VotingSystem.Models.RequestModels.TypeRequest;
-using Capstone_VotingSystem.Services.TypeService;
+using Capstone_VotingSystem.Models.RequestModels.Group;
+using Capstone_VotingSystem.Services.GroupService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,23 +8,23 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1/types")]
+    [Route("api/v1/groups")]
     [ApiController]
-    public class TypeController : BaseApiController
+    public class GroupController : BaseApiController
     {
-        private readonly ITypeService typeService;
-        public TypeController(ITypeService typeService)
+        private readonly IGroupService groupService;
+        public GroupController(IGroupService groupService)
         {
-            this.typeService = typeService;
+            this.groupService = groupService;
         }
         [Authorize(Roles = "User,Admin")]
         [HttpGet]
-        [SwaggerOperation(summary: "Get all type (role user and admin)")]
-        public async Task<IActionResult> GetType()
+        [SwaggerOperation(summary: "Get all Group (role user and admin)")]
+        public async Task<IActionResult> GetGroup()
         {
             try
             {
-                var result = await typeService.GetListType();
+                var result = await groupService.GetListGroup();
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -39,12 +39,12 @@ namespace Capstone_VotingSystem.Controller
         }
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        [SwaggerOperation(summary: "Create new Type (role admin)")]
-        public async Task<IActionResult> CreateType(CreateTypeRequest request)
+        [SwaggerOperation(summary: "Create new Group (role admin)")]
+        public async Task<IActionResult> CreateGroup(CreateGroupRequest request)
         {
             try
             {
-                var result = await typeService.CreateType(request);
+                var result = await groupService.CreateGroup(request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -59,12 +59,12 @@ namespace Capstone_VotingSystem.Controller
         }
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        [SwaggerOperation(summary: "Update Type (role admin)")]
-        public async Task<IActionResult> UpdateType(Guid id, UpdateTypeRequest request)
+        [SwaggerOperation(summary: "Update Group (role admin)")]
+        public async Task<IActionResult> UpdateGroup(Guid id, UpdateGroupRequest request)
         {
             try
             {
-                var result = await typeService.UpdateType(id, request);
+                var result = await groupService.UpdateGroup(id, request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
