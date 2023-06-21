@@ -8,5 +8,8 @@
         public bool? Status { get; set; }
         //public string? Token { get; set; }
         public Guid? RoleId { get; set; }
+
+        public string? RoleName { get; set; }
+
     }
 }

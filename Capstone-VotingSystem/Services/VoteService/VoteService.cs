@@ -1,15 +1,11 @@
 ﻿using AutoMapper;
 using Capstone_VotingSystem.Core.CoreModel;
 using Capstone_VotingSystem.Entities;
-using Capstone_VotingSystem.Models.RequestModels.VoteDetailRequest;
 using Capstone_VotingSystem.Models.RequestModels.VoteRequest;
 using Capstone_VotingSystem.Models.RequestModels.VotingDetailRequest;
-using Capstone_VotingSystem.Models.ResponseModels.ElementResponse;
 using Capstone_VotingSystem.Models.ResponseModels.VotingDetailResponse;
 using Capstone_VotingSystem.Models.ResponseModels.VotingResponse;
 using Microsoft.EntityFrameworkCore;
-using Octokit.Internal;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Capstone_VotingSystem.Services.VoteService
 {
@@ -85,45 +81,45 @@ namespace Capstone_VotingSystem.Services.VoteService
             return response;
         }
 
-        public async Task<APIResponse<CreateVoteResponse>> CreateVotingDetail(Guid? votingId, CreateVotingDetailRequest request)
-        {
-            APIResponse<CreateVoteResponse> response = new();
-            var checkVoting = await dbContext.Votings.SingleOrDefaultAsync(p => p.VoringId == votingId);
-            if (checkVoting == null)
-            {
-                response.ToFailedResponse("không tìm thấy votingId", StatusCodes.Status404NotFound);
-                return response;
-            }
-            var id = Guid.NewGuid();
-            VotingDetail votingDetail = new VotingDetail();
-            {
-                votingDetail.VotingDetailId = id;
-                votingDetail.CreateTime = DateTime.Now;
-                votingDetail.ElementId = request.ElementId;
-                votingDetail.VotingId = votingId;
-            }
-            await dbContext.AddAsync(votingDetail);
-            await dbContext.SaveChangesAsync();
-            var map = _mapper.Map<CreateVoteResponse>(checkVoting);
-            map.Status = checkVoting.Status;
-            var votingDetailList = await dbContext.VotingDetails.Where(p => p.VotingDetailId == votingId).ToListAsync();
-            List<CreateVoteDetailResponse> listeVoteDetail = votingDetailList.Select(
-           x =>
-           {
-               return new CreateVoteDetailResponse()
-               {
-                   VotingDetailId = x.VotingDetailId,
-                   CreateTime = DateTime.Now,
-                   ElementId = x.ElementId,
-                   VotingId = x.VotingId,
-               };
-           }
-           ).ToList();
-            map.VoteDetails = listeVoteDetail;
-            response.Data = map;
-            response.ToSuccessResponse(response.Data, "Thêm thành công chi tiết", StatusCodes.Status200OK);
-            return response;
+        //public async Task<APIResponse<CreateVoteResponse>> CreateVotingDetail(Guid? votingId, CreateVotingDetailRequest request)
+        //{
+        //    APIResponse<CreateVoteResponse> response = new();
+        //    var checkVoting = await dbContext.Votings.SingleOrDefaultAsync(p => p.VoringId == votingId);
+        //    if (checkVoting == null)
+        //    {
+        //        response.ToFailedResponse("không tìm thấy votingId", StatusCodes.Status404NotFound);
+        //        return response;
+        //    }
+        //    var id = Guid.NewGuid();
+        //    VotingDetail votingDetail = new VotingDetail();
+        //    {
+        //        votingDetail.VotingDetailId = id;
+        //        votingDetail.CreateTime = DateTime.Now;
+        //        votingDetail.ElementId = request.ElementId;
+        //        votingDetail.VotingId = votingId;
+        //    }
+        //    await dbContext.AddAsync(votingDetail);
+        //    await dbContext.SaveChangesAsync();
+        //    var map = _mapper.Map<CreateVoteResponse>(checkVoting);
+        //    map.Status = checkVoting.Status;
+        //    var votingDetailList = await dbContext.VotingDetails.Where(p => p.VotingDetailId == votingId).ToListAsync();
+        //    List<CreateVoteDetailResponse> listeVoteDetail = votingDetailList.Select(
+        //   x =>
+        //   {
+        //       return new CreateVoteDetailResponse()
+        //       {
+        //           VotingDetailId = x.VotingDetailId,
+        //           CreateTime = DateTime.Now,
+        //           ElementId = x.ElementId,
+        //           VotingId = x.VotingId,
+        //       };
+        //   }
+        //   ).ToList();
+        //    map.VoteDetails = listeVoteDetail;
+        //    response.Data = map;
+        //    response.ToSuccessResponse(response.Data, "Thêm thành công chi tiết", StatusCodes.Status200OK);
+        //    return response;
 
-        }
+        //}
     }
 }
