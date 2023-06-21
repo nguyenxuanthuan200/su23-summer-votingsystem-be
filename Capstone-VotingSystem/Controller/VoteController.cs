@@ -40,27 +40,6 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        //[Authorize(Roles = "User")]
-        //[HttpPost("votingdetail")]
-        //[SwaggerOperation(summary: "Create new VotingDetail for Voting")]
-        //public async Task<IActionResult> CreateVotingDetail(Guid votingId, CreateVotingDetailRequest request)
-        //{
-        //    try
-        //    {
-        //        var result = await voteService.CreateVotingDetail(votingId, request);
-        //        if (result.Success == false)
-        //        {
-        //            return BadRequest(result);
-        //        }
-        //        return Ok(result);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return StatusCode(StatusCodes.Status500InternalServerError,
-        //            "Error retrieving data from the database.");
 
-
-        //    }
-        //}
     }
 }
