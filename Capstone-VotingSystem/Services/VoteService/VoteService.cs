@@ -80,46 +80,5 @@ namespace Capstone_VotingSystem.Services.VoteService
             response.Data = map;
             return response;
         }
-
-        //public async Task<APIResponse<CreateVoteResponse>> CreateVotingDetail(Guid? votingId, CreateVotingDetailRequest request)
-        //{
-        //    APIResponse<CreateVoteResponse> response = new();
-        //    var checkVoting = await dbContext.Votings.SingleOrDefaultAsync(p => p.VoringId == votingId);
-        //    if (checkVoting == null)
-        //    {
-        //        response.ToFailedResponse("không tìm thấy votingId", StatusCodes.Status404NotFound);
-        //        return response;
-        //    }
-        //    var id = Guid.NewGuid();
-        //    VotingDetail votingDetail = new VotingDetail();
-        //    {
-        //        votingDetail.VotingDetailId = id;
-        //        votingDetail.CreateTime = DateTime.Now;
-        //        votingDetail.ElementId = request.ElementId;
-        //        votingDetail.VotingId = votingId;
-        //    }
-        //    await dbContext.AddAsync(votingDetail);
-        //    await dbContext.SaveChangesAsync();
-        //    var map = _mapper.Map<CreateVoteResponse>(checkVoting);
-        //    map.Status = checkVoting.Status;
-        //    var votingDetailList = await dbContext.VotingDetails.Where(p => p.VotingDetailId == votingId).ToListAsync();
-        //    List<CreateVoteDetailResponse> listeVoteDetail = votingDetailList.Select(
-        //   x =>
-        //   {
-        //       return new CreateVoteDetailResponse()
-        //       {
-        //           VotingDetailId = x.VotingDetailId,
-        //           CreateTime = DateTime.Now,
-        //           ElementId = x.ElementId,
-        //           VotingId = x.VotingId,
-        //       };
-        //   }
-        //   ).ToList();
-        //    map.VoteDetails = listeVoteDetail;
-        //    response.Data = map;
-        //    response.ToSuccessResponse(response.Data, "Thêm thành công chi tiết", StatusCodes.Status200OK);
-        //    return response;
-
-        //}
     }
 }
