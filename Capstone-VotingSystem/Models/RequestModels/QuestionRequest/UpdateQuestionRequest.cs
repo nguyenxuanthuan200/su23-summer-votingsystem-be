@@ -4,8 +4,9 @@ namespace Capstone_VotingSystem.Models.RequestModels.QuestionRequest
 {
     public class UpdateQuestionRequest
     {
-        public string? QuestionName { get; set; }
-        public Guid? QuestionTypeId { get; set; }
+        public string? Title { get; set; }
+        public string? Content { get; set; }
+        public Guid? TypeId { get; set; }
         public List<UpdateElementRequest> Element { get; set; }
     }
 }

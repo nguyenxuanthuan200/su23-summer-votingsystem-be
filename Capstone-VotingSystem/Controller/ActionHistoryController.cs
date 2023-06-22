@@ -1,15 +1,15 @@
-﻿using Capstone_VotingSystem.Services.ActionHistoryService;
-using CoreApiResponse;
+﻿using Capstone_VotingSystem.Controllers;
+using Capstone_VotingSystem.Services.ActionHistoryService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1/actionhistory")]
+    [Route("api/v1/action-histories")]
     [ApiController]
-    public class ActionHistoryController : BaseController
+    public class ActionHistoryController : BaseApiController
     {
         private readonly IActionHistoryService actionHistory;
 
@@ -17,35 +17,24 @@ namespace Capstone_VotingSystem.Controller
         {
             this.actionHistory = actionHistoryRepositories;
         }
-        //[Authorize(Roles = "Admin")]
-        [HttpGet]
-        public async Task<IActionResult> GetActionHistory()
+        [Authorize(Roles = "User")]
+        [HttpGet("user/{id}")]
+        [SwaggerOperation(summary: "Get Action History by UserId")]
+        public async Task<IActionResult> GetActionHistoryByUser(string? id)
         {
             try
             {
-                var result = await actionHistory.GetAllActionHistory();
-                if (result == null)
-                    return CustomResult("Not Found", HttpStatusCode.NotFound);
-                return CustomResult("Success", result, HttpStatusCode.OK);
+                var result = await actionHistory.GetActionHistoryByUser(id);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
             }
             catch (Exception)
             {
-                return CustomResult("Fail", HttpStatusCode.InternalServerError);
-            }
-        }
-        [HttpGet("{username}")]
-        public async Task<IActionResult> GetActionHistoryByUser(string? username)
-        {
-            try
-            {
-                var result = await actionHistory.GetActionHistoryByUser(username);
-                if (result == null)
-                    return CustomResult("Not Found", HttpStatusCode.NotFound);
-                return CustomResult("Success", result, HttpStatusCode.OK);
-            }
-            catch (Exception)
-            {
-                return CustomResult("Fail", HttpStatusCode.InternalServerError);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
             }
         }
     }

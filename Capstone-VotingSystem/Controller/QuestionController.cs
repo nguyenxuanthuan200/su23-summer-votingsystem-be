@@ -60,7 +60,7 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [Authorize(Roles = "User")]
-        [HttpPost("{questionId}")]
+        [HttpPost("element/{Id}")]
         [SwaggerOperation(summary: "Create new element for question")]
         public async Task<IActionResult> CreateElementQuestion(Guid questionId,CreateElementRequest request)
         {
@@ -84,7 +84,7 @@ namespace Capstone_VotingSystem.Controller
         [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Question and Element")]
-        public async Task<IActionResult> UpdateCampaign(Guid id, UpdateQuestionRequest request)
+        public async Task<IActionResult> UpdateQuestion(Guid id, UpdateQuestionRequest request)
         {
             try
             {

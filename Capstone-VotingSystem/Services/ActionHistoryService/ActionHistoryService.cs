@@ -1,9 +1,16 @@
-﻿using Capstone_VotingSystem.Entities;
+﻿using Capstone_VotingSystem.Core.CoreModel;
+using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Models.ResponseModels.ActionHistoryResponse;
+using Capstone_VotingSystem.Models.ResponseModels.CampaignResponse;
+using Capstone_VotingSystem.Models.ResponseModels.CandidateResponse;
+using Capstone_VotingSystem.Models.ResponseModels.ElementResponse;
+using Capstone_VotingSystem.Models.ResponseModels.QuestionResponse;
+using Microsoft.Data.SqlClient.Server;
 using Microsoft.EntityFrameworkCore;
 using Octokit;
-using System.Drawing;
+using System.Linq;
 using System.Xml.Linq;
+
 
 namespace Capstone_VotingSystem.Services.ActionHistoryService
 {
@@ -15,36 +22,36 @@ namespace Capstone_VotingSystem.Services.ActionHistoryService
         {
             this.dbContext = votingSystemContext;
         }
-
-        public async Task<IEnumerable<ActionHistoryResponse>> GetActionHistoryByUser(string username)
+        public async Task<APIResponse<IEnumerable<ActionHistoryResponse>>> GetActionHistoryByUser(string? userId)
         {
-            var actionHistory = await dbContext.ActionHistories.Where(p => p.UserName.Equals(username)).ToListAsync();
-            IEnumerable<ActionHistoryResponse> response = actionHistory.Select(x =>
+            APIResponse<IEnumerable<ActionHistoryResponse>> response = new();
+            var checkUserId = await dbContext.Users.Where(x => x.UserId.Equals(userId)).SingleOrDefaultAsync();
+            if (checkUserId == null)
             {
-                return new ActionHistoryResponse()
-                {
-                    ActionHistoryId = x.ActionHistoryId,
-                    Description = x.Description,
-                    ActionTypeId = x.ActionTypeId,
-                    Username = x.UserName,
-                };
-            }).ToList();
-            return response;
-        }
-
-        public async Task<IEnumerable<ActionHistoryResponse>> GetAllActionHistory()
-        {
-            var actionHistory = await dbContext.ActionHistories.ToListAsync();
-            IEnumerable<ActionHistoryResponse> response = actionHistory.Select(x =>
+                response.ToFailedResponse("không tồn tại user", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var historyList = await dbContext.HistoryActions.Where(p => p.UserId == userId).ToListAsync();
+            List<ActionHistoryResponse> result = new List<ActionHistoryResponse>();
+            foreach (var item in historyList)
             {
-                return new ActionHistoryResponse()
+                var checkTypeAction = await dbContext.TypeActions.SingleOrDefaultAsync(p => p.TypeActionId == item.TypeActionId);
+                var actions = new ActionHistoryResponse();
                 {
-                    ActionHistoryId = x.ActionHistoryId,
-                    Description = x.Description,
-                    ActionTypeId = x.ActionTypeId,
-                    Username = x.UserName,
-                };
-            }).ToList();
+                    actions.HistoryActionId = item.HistoryActionId;
+                    actions.Description = item.Description;
+                    actions.UserId = item.UserId;
+                    actions.TypeActionId = item.TypeActionId;
+                    actions.ActionTypeName = checkTypeAction.Name;
+                }
+                result.Add(actions);
+            }
+            if (result.Count ==0)
+            {
+                response.ToFailedResponse("Không có History nào của User", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            response.ToSuccessResponse(response.Data = result, "Lấy danh sách thành công", StatusCodes.Status200OK);
             return response;
         }
     }

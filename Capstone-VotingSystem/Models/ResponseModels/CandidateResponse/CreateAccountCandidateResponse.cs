@@ -2,9 +2,8 @@
 {
     public class CreateAccountCandidateResponse
     {
-        public string UserName { get; set; } = null!;
-        public string? Gender { get; set; }
+        public string UserId { get; set; } = null!;
         public string? Address { get; set; }
-        public string? Name { get; set; }
+        public string? FullName { get; set; }
     }
 }

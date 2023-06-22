@@ -19,7 +19,7 @@ namespace Capstone_VotingSystem.Controller
             this.authentiaction = authenticationService;
         }
         [HttpPost("firebase")]
-        public async Task<IActionResult> login(string idtoken)
+        public async Task<IActionResult> LoginFirebase(string idtoken)
         {
             var result = await authentiaction.LoginFirebase(idtoken);
             return CustomResult("Success", result, HttpStatusCode.OK);

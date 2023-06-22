@@ -2,10 +2,8 @@
 {
     public class CreateCandidateCampaignRequest
     {
-        public string? NickName { get; set; }
-        public DateTime? Dob { get; set; }
-        public string? Image { get; set; }
-        public string UserName { get; set; }
+        public string? Description { get; set; }
+        public string UserId { get; set; }
         public Guid CampaignId { get; set; }
     }
 }

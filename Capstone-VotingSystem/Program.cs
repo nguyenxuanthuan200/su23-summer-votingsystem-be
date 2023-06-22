@@ -3,11 +3,15 @@ using Capstone_VotingSystem.Services.ActionHistoryService;
 using Capstone_VotingSystem.Services.RateCategoryService;
 using Capstone_VotingSystem.Services.AuthenticationService;
 using Capstone_VotingSystem.Services.CampaignService;
-using Capstone_VotingSystem.Services.CampaignStageService;
+using Capstone_VotingSystem.Services.StageService;
 using Capstone_VotingSystem.Services.CandidateService;
 using Capstone_VotingSystem.Services.VoteService;
+using Capstone_VotingSystem.Services.CategoryService;
 using Capstone_VotingSystem.Services.FormService;
 using Capstone_VotingSystem.Services.QuestionService;
+using Capstone_VotingSystem.Services.TypeService;
+using Capstone_VotingSystem.Services.GroupService;
+using Capstone_VotingSystem.Services.FeedbackService;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,6 +19,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Capstone_VotingSystem.Helpers;
+using Capstone_VotingSystem.Services.CloudinaryService;
+using Capstone_VotingSystem.Services.AccountService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +33,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<VotingSystemContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection")));
 
+//Cloudinary connect
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+
 //FireBase
 FirebaseApp.Create(new AppOptions()
 {
@@ -34,13 +44,19 @@ FirebaseApp.Create(new AppOptions()
 
 builder.Services.AddScoped<ICampaignService, CampaignService>();
 builder.Services.AddScoped<IVoteService, VoteService>();
-builder.Services.AddScoped<ICampaignStageService, CampaignStageService>();
+builder.Services.AddScoped<IStageService, StageService>();
 builder.Services.AddScoped<ICandidateService, CandidateService>();
 builder.Services.AddScoped<IActionHistoryService, ActionHistoryService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IRatioCategoryService, RatioCategoryService>();
 builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<ITypeService, TypeService>();
+builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 
 // Authen
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -98,7 +114,7 @@ builder.Services.AddSwaggerGen(c =>
                 },
                 new string[] {}
                 }
-                }) ;
+                });
 });
 
 builder.Services.AddResponseCompression();

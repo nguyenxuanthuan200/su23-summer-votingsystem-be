@@ -2,6 +2,7 @@
 {
     public class CreateElementRequest
     {
-        public string Text { get; set; }
+        public string? Content { get; set; }
+        public decimal? Rate { get; set; }
     }
 }

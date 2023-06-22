@@ -6,10 +6,12 @@ namespace Capstone_VotingSystem.Entities
     public partial class Notification
     {
         public Guid NotificationId { get; set; }
-        public string? Titile { get; set; }
-        public string? Text { get; set; }
-        public string? UserName { get; set; }
+        public string? Title { get; set; }
+        public string? Message { get; set; }
+        public DateTime? CreateDate { get; set; }
+        public bool? Status { get; set; }
+        public string? Username { get; set; }
 
-        public virtual User? UserNameNavigation { get; set; }
+        public virtual Account? UsernameNavigation { get; set; }
     }
 }
