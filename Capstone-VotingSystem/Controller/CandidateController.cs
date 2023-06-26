@@ -40,7 +40,7 @@ namespace Capstone_VotingSystem.Controller
                 return BadRequest();
             }
         }
-        [Authorize(Roles = "User,Admin")]
+        //[Authorize(Roles = "User,Admin")]
         [HttpGet("campaign/{id}")]
         [SwaggerOperation(summary: "Get list candidate by campaign id")]
         public async Task<IActionResult> GetListCandidateCampaign(Guid id)

@@ -19,7 +19,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.campaignService = campaignService;
         }
-        [Authorize(Roles = "User,Admin")]
+        //[Authorize(Roles = "User,Admin")]
         [HttpGet]
         [SwaggerOperation(summary: "Get all campaign")]
         public async Task<IActionResult> GetCampaign()
@@ -39,7 +39,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User,Admin")]
+        //[Authorize(Roles = "User,Admin")]
         [HttpGet("{id}")]
         [SwaggerOperation(summary: "Get Campaign by Id")]
         public async Task<IActionResult> GetCampaignById(Guid id)
@@ -121,6 +121,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
+        [Authorize(Roles = "User,Admin")]
         [HttpPut]
         [SwaggerOperation(summary: "Update Visibility Campaign")]
         public async Task<IActionResult> UpdateVisibilityCampaign(Guid id,string visibility,string userId)
