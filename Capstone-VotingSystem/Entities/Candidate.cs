@@ -18,6 +18,7 @@ namespace Capstone_VotingSystem.Entities
         public bool? Status { get; set; }
         public string? UserId { get; set; }
         public Guid? CampaignId { get; set; }
+        public Guid? GroupCandidateId { get; set; }
 
         public virtual Campaign? Campaign { get; set; }
         public virtual User? User { get; set; }

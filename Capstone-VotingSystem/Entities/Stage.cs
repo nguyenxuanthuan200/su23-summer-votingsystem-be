@@ -21,6 +21,7 @@ namespace Capstone_VotingSystem.Entities
         public bool? Status { get; set; }
         public Guid? CampaignId { get; set; }
         public Guid? FormId { get; set; }
+        public string? Available { get; set; }
 
         public virtual Campaign? Campaign { get; set; }
         public virtual Form? Form { get; set; }

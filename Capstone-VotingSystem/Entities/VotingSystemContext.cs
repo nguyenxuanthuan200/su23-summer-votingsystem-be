@@ -43,7 +43,7 @@ namespace Capstone_VotingSystem.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=DESKTOP-NNLOED3;Initial Catalog=VotingSystem;User ID=sa;Password=123456");
+                optionsBuilder.UseSqlServer("Data Source=sql8003.site4now.net;Initial Catalog=db_a9a782_votingsystem;Persist Security Info=True;User ID=db_a9a782_votingsystem_admin;Password=votingsystem123");
             }
         }
 
@@ -165,6 +165,8 @@ namespace Capstone_VotingSystem.Entities
                 entity.Property(e => e.Description)
                     .HasMaxLength(200)
                     .HasColumnName("description");
+
+                entity.Property(e => e.GroupCandidateId).HasColumnName("groupCandidateId");
 
                 entity.Property(e => e.Status).HasColumnName("status");
 
@@ -429,7 +431,7 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.CampaignId).HasColumnName("campaignId");
 
-                entity.Property(e => e.CandidateId).HasColumnName("candidateId");
+                entity.Property(e => e.GroupCandidateId).HasColumnName("groupCandidateId");
 
                 entity.Property(e => e.GroupId).HasColumnName("groupId");
 
@@ -442,10 +444,10 @@ namespace Capstone_VotingSystem.Entities
                     .HasForeignKey(d => d.CampaignId)
                     .HasConstraintName("FK_Ratio_Campaign");
 
-                entity.HasOne(d => d.Candidate)
+                entity.HasOne(d => d.GroupCandidate)
                     .WithMany(p => p.Ratios)
-                    .HasForeignKey(d => d.CandidateId)
-                    .HasConstraintName("FK_Ratio_Candidate1");
+                    .HasForeignKey(d => d.GroupCandidateId)
+                    .HasConstraintName("FK_Ratio_Candidate");
 
                 entity.HasOne(d => d.Group)
                     .WithMany(p => p.Ratios)
@@ -498,6 +500,11 @@ namespace Capstone_VotingSystem.Entities
                 entity.Property(e => e.StageId)
                     .ValueGeneratedNever()
                     .HasColumnName("stageId");
+
+                entity.Property(e => e.Available)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("available");
 
                 entity.Property(e => e.CampaignId).HasColumnName("campaignId");
 
@@ -683,11 +690,9 @@ namespace Capstone_VotingSystem.Entities
                     .ValueGeneratedNever()
                     .HasColumnName("votingDetailId");
 
-                entity.Property(e => e.CreateTime)
-                    .HasColumnType("datetime")
-                    .HasColumnName("createTime");
-
                 entity.Property(e => e.ElementId).HasColumnName("elementId");
+
+                entity.Property(e => e.Time).HasColumnType("datetime");
 
                 entity.Property(e => e.VotingId).HasColumnName("votingId");
 

@@ -43,7 +43,7 @@ namespace Capstone_VotingSystem.Services.VoteService
             var id = Guid.NewGuid();
             Voting vote = new Voting();
             {
-                vote.VoringId = id;
+                vote.VotingId = id;
                 vote.UserId = request.UserId;
                 vote.StageId = request.StageId;
                 vote.RatioGroupId = request.RatioGroupId;
@@ -63,9 +63,9 @@ namespace Capstone_VotingSystem.Services.VoteService
                     VotingDetail votingDetail = new VotingDetail();
                     {
                         votingDetail.VotingDetailId = ide;
-                        votingDetail.CreateTime = DateTime.Now;
+                        votingDetail.Time = DateTime.Now;
                         votingDetail.ElementId = i.ElementId;
-                        votingDetail.VotingId = vote.VoringId;
+                        votingDetail.VotingId = vote.VotingId;
                     }
                     await dbContext.VotingDetails.AddAsync(votingDetail);
                     await dbContext.SaveChangesAsync();

@@ -21,6 +21,7 @@ using Capstone_VotingSystem.Services.CloudinaryService;
 using Capstone_VotingSystem.Services.AccountService;
 using Capstone_VotingSystem.Services.FeedbackService;
 using Capstone_VotingSystem.Services.NotificationService;
+using Capstone_VotingSystem.Services.ActionTypeService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +56,7 @@ builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IActionTypeService, ActiontypeService>();
 
 // Authen
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
