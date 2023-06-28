@@ -6,7 +6,7 @@ namespace Capstone_VotingSystem.Entities
     public partial class VotingDetail
     {
         public Guid VotingDetailId { get; set; }
-        public DateTime? CreateTime { get; set; }
+        public DateTime? Time { get; set; }
         public Guid? ElementId { get; set; }
         public Guid? VotingId { get; set; }
 

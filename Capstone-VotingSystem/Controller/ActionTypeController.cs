@@ -1,5 +1,6 @@
 ﻿using Capstone_VotingSystem.Controllers;
-using Capstone_VotingSystem.Services.AccountService;
+using Capstone_VotingSystem.Models.RequestModels.TypeActionRequest;
+using Capstone_VotingSystem.Services.ActionTypeService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,27 +8,27 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1/account")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class AccountController : BaseApiController
+    public class ActionTypeController : BaseApiController
     {
-        private readonly IAccountService account;
+        private readonly IActionTypeService _actionType;
 
-        public AccountController(IAccountService accountService)
+        public ActionTypeController(IActionTypeService actionTypeService)
         {
-            this.account = accountService;
+            this._actionType = actionTypeService;
         }
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "User")]
         [HttpGet]
-        [SwaggerOperation(summary: "Get All Account by Role is Admin")]
-        public async Task<IActionResult> GetAllAccount()
+        [SwaggerOperation(summary: "Get All ActionType")]
+        public async Task<IActionResult> GetActionHistoryByUser()
         {
             try
             {
-                var result = await account.GetAllAcount();
+                var result = await _actionType.GetAll();
                 if (result.Success == false)
                 {
-                    return BadRequest(result.Message);
+                    return BadRequest(result);
                 }
                 return Ok(result);
             }
@@ -37,17 +38,16 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [HttpDelete("{id}")]
-        [SwaggerOperation(summary: "Ban Account")]
-        public async Task<IActionResult> BanAccount(string id)
+        [HttpPost]
+        [SwaggerOperation(summary: "Create New ActionType")]
+        public async Task<IActionResult> CreateActionType(ActionTypeRequest request)
         {
             try
             {
-                var result = await account.BanAccount(id);
+                var result = await _actionType.CreateTypeAction(request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
-
                 }
                 return Ok(result);
             }
@@ -58,4 +58,5 @@ namespace Capstone_VotingSystem.Controller
             }
         }
     }
+
 }

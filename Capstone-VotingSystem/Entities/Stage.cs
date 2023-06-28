@@ -17,8 +17,11 @@ namespace Capstone_VotingSystem.Entities
         public string? Content { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
+        public int? LimitVote { get; set; }
+        public bool? Status { get; set; }
         public Guid? CampaignId { get; set; }
         public Guid? FormId { get; set; }
+        public string? Available { get; set; }
 
         public virtual Campaign? Campaign { get; set; }
         public virtual Form? Form { get; set; }

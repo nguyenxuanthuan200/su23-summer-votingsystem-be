@@ -40,6 +40,5 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-
     }
 }

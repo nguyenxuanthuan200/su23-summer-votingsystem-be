@@ -1,14 +1,12 @@
-﻿namespace Capstone_VotingSystem.Models.RequestModels.FeedbackRequest
+﻿namespace Capstone_VotingSystem.Models.ResponseModels.FeedbackResponse
 {
-    public class FeedbackRequest
+    public class FeedbackResponse
     {
-        //public Guid FeedBackId { get; set; }
+        public Guid FeedBackId { get; set; }
         public string? Content { get; set; }
         public DateTime? CreateDate { get; set; }
         public bool? Status { get; set; }
         public string? UserId { get; set; }
         public Guid? CampaignId { get; set; }
     }
-
 }
-
