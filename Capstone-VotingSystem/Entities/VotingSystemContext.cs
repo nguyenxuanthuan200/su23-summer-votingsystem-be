@@ -7,6 +7,7 @@ namespace Capstone_VotingSystem.Entities
 {
     public partial class VotingSystemContext : DbContext
     {
+        
         public VotingSystemContext()
         {
         }

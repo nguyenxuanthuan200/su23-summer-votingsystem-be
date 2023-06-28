@@ -40,7 +40,7 @@ namespace Capstone_VotingSystem.Controller
                 return BadRequest();
             }
         }
-        [Authorize(Roles = "User,Admin")]
+        //[Authorize(Roles = "User,Admin")]
         [HttpGet("campaign/{id}")]
         [SwaggerOperation(summary: "Get list candidate by campaign id")]
         public async Task<IActionResult> GetListCandidateCampaign(Guid id)
@@ -120,13 +120,13 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [Authorize(Roles = "User")]
-        [HttpDelete("{candidateId}")]
+        [HttpDelete("{id}")]
         [SwaggerOperation(summary: "Delete Candidate trong Campaign")]
-        public async Task<IActionResult> DeleteCandidate(Guid candidateId, DeleteCandidateRequest request)
+        public async Task<IActionResult> DeleteCandidate(Guid id, DeleteCandidateRequest request)
         {
             try
             {
-                var result = await candidateService.DeleteCandidateCampaign(candidateId, request);
+                var result = await candidateService.DeleteCandidateCampaign(id, request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);

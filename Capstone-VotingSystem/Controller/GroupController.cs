@@ -1,32 +1,30 @@
 ﻿using Capstone_VotingSystem.Controllers;
-using Capstone_VotingSystem.Models.RequestModels.StageRequest;
-using Capstone_VotingSystem.Services.StageService;
-using CoreApiResponse;
+using Capstone_VotingSystem.Models.RequestModels.Group;
+using Capstone_VotingSystem.Services.GroupService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Net;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1/stages")]
+    [Route("api/v1/groups")]
     [ApiController]
-    public class StageController : BaseApiController
+    public class GroupController : BaseApiController
     {
-        private readonly IStageService campaignStageService;
-        public StageController(IStageService campaignStageService)
+        private readonly IGroupService groupService;
+        public GroupController(IGroupService groupService)
         {
-            this.campaignStageService = campaignStageService;
+            this.groupService = groupService;
         }
-        //[Authorize(Roles = "User,Admin")]
-        [SwaggerOperation(summary: "Get Stage By Campaign")]
-        [HttpGet("campaign/{id}")]
-        public async Task<IActionResult> GetCampaignStage(Guid id)
+        [Authorize(Roles = "User,Admin")]
+        [HttpGet]
+        [SwaggerOperation(summary: "Get all Group (role user and admin)")]
+        public async Task<IActionResult> GetGroup()
         {
             try
             {
-                var result = await campaignStageService.GetCampaignStageByCampaign(id);
+                var result = await groupService.GetListGroup();
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -39,35 +37,14 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        [SwaggerOperation(summary: "Create new Stage")]
-        public async Task<IActionResult> CreateCampaignStage(CreateStageRequest request)
+        [SwaggerOperation(summary: "Create new Group (role admin)")]
+        public async Task<IActionResult> CreateGroup(CreateGroupRequest request)
         {
             try
             {
-                var result = await campaignStageService.CreateCampaignStage(request);
-                if (result.Success == false)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                   e.Message);
-            }
-        }
-        [Authorize(Roles = "User")]
-        [HttpPut("{id}")]
-        [SwaggerOperation(summary: "Update Stage")]
-        public async Task<IActionResult> UpdateCampaignStage(Guid id,UpdateStageRequest request)
-        {
-            try
-            {
-                var result = await campaignStageService.UpdateCampaignStage(id,request);
-
+                var result = await groupService.CreateGroup(request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -77,9 +54,30 @@ namespace Capstone_VotingSystem.Controller
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error updating Store!");
+                    "Error retrieving data from the database.");
             }
+        }
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}")]
+        [SwaggerOperation(summary: "Update Group (role admin)")]
+        public async Task<IActionResult> UpdateGroup(Guid id, UpdateGroupRequest request)
+        {
+            try
+            {
+                var result = await groupService.UpdateGroup(id, request);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
 
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
         }
     }
 }

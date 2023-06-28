@@ -8,4 +8,6 @@ namespace Capstone_VotingSystem.Services.FeedbackService
         public Task<APIResponse<IEnumerable<FeedbackResponse>>> GetAllFeedback();
         public Task<APIResponse<IEnumerable<FeedbackResponse>>> GetByFeedBackId(Guid? feedbackid);
     }
+
 }
+

@@ -1,53 +1,33 @@
-﻿using Capstone_VotingSystem.Controllers;
-using Capstone_VotingSystem.Services.AccountService;
-using Microsoft.AspNetCore.Authorization;
+﻿using Capstone_VotingSystem.Models.RequestModels.SearchRequest;
+using Capstone_VotingSystem.Services.SearchService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1/account")]
+    [Route("api/v1/searchController")]
     [ApiController]
-    public class AccountController : BaseApiController
+    public class SearchController : ControllerBase
     {
-        private readonly IAccountService account;
+        private readonly ISearchService searchService;
+        public SearchController(ISearchService searchService)
+        {
+            {
+                this.searchService = searchService;
+            }
+        }
 
-        public AccountController(IAccountService accountService)
-        {
-            this.account = accountService;
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpGet]
-        [SwaggerOperation(summary: "Get All Account by Role is Admin")]
-        public async Task<IActionResult> GetAllAccount()
+        [HttpGet("campaign")]
+        public async Task<IActionResult> SearchFilterCampaign([FromQuery] SearchCampaignRequest payload)
         {
             try
             {
-                var result = await account.GetAllAcount();
-                if (result.Success == false)
-                {
-                    return BadRequest(result.Message);
-                }
-                return Ok(result);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database.");
-            }
-        }
-        [HttpDelete("{id}")]
-        [SwaggerOperation(summary: "Ban Account")]
-        public async Task<IActionResult> BanAccount(string id)
-        {
-            try
-            {
-                var result = await account.BanAccount(id);
+
+                var result = await searchService.SearchFilterCampaign(payload);
+
                 if (result.Success == false)
                 {
                     return BadRequest(result);
-
                 }
                 return Ok(result);
             }
@@ -55,6 +35,28 @@ namespace Capstone_VotingSystem.Controller
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     "Error retrieving data from the database.");
+
+            }
+        }
+        [HttpGet("candidate")]
+        public async Task<IActionResult> SearchFilterCandidate([FromQuery] SearchCandidateRequest payload)
+        {
+            try
+            {
+
+                var result = await searchService.SearchFilterCandidate(payload);
+
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+
             }
         }
     }
