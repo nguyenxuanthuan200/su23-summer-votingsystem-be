@@ -14,10 +14,11 @@ namespace Capstone_VotingSystem.Entities
         public decimal? Percent { get; set; }
         public Guid? GroupId { get; set; }
         public Guid? CampaignId { get; set; }
+        public Guid? CandidateId { get; set; }
 
         public virtual Campaign? Campaign { get; set; }
+        public virtual Candidate? Candidate { get; set; }
         public virtual Group? Group { get; set; }
-        public virtual Candidate RatioGroup { get; set; } = null!;
         public virtual ICollection<Voting> Votings { get; set; }
     }
 }

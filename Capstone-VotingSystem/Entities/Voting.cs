@@ -10,8 +10,9 @@ namespace Capstone_VotingSystem.Entities
             VotingDetails = new HashSet<VotingDetail>();
         }
 
-        public Guid VoringId { get; set; }
+        public Guid VotingId { get; set; }
         public DateTime? SendingTime { get; set; }
+        public string? Visibility { get; set; }
         public bool? Status { get; set; }
         public Guid? RatioGroupId { get; set; }
         public string? UserId { get; set; }

@@ -20,6 +20,7 @@ using Capstone_VotingSystem.Helpers;
 using Capstone_VotingSystem.Services.CloudinaryService;
 using Capstone_VotingSystem.Services.AccountService;
 using Capstone_VotingSystem.Services.FeedbackService;
+using Capstone_VotingSystem.Services.NotificationService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +54,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // Authen
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
