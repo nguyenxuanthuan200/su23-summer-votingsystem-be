@@ -4,16 +4,28 @@ using Microsoft.EntityFrameworkCore;
 using Capstone_VotingSystem.Models.RequestModels.CampaignRequest;
 using AutoMapper;
 using Capstone_VotingSystem.Core.CoreModel;
+using CloudinaryDotNet;
+using Microsoft.Extensions.Options;
+using Capstone_VotingSystem.Helpers;
+using CloudinaryDotNet.Actions;
 
 namespace Capstone_VotingSystem.Services.CampaignService
 {
     public class CampaignService : ICampaignService
     {
+        private readonly Cloudinary _cloudinary;
         private readonly VotingSystemContext dbContext;
         private readonly IMapper _mapper;
 
-        public CampaignService(VotingSystemContext dbContext, IMapper mapper)
+        public CampaignService(VotingSystemContext dbContext, IMapper mapper, IOptions<CloudinarySettings> config)
         {
+            var acc = new CloudinaryDotNet.Account(
+            config.Value.CloundName,
+            config.Value.ApiKey,
+            config.Value.ApiSecret
+            );
+
+            _cloudinary = new Cloudinary(acc);
             this.dbContext = dbContext;
             _mapper = mapper;
         }
@@ -39,6 +51,18 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 response.ToFailedResponse("Visibility không đúng định dạng!! (public or private)", StatusCodes.Status400BadRequest);
                 return response;
             }
+            var uploadResult = new ImageUploadResult();
+            if (request.ImageFile.Length > 0)
+            {
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(request.ImageFile.FileName, request.ImageFile.OpenReadStream()),
+                    Transformation = new Transformation().Crop("fill").Gravity("face"),
+                };
+
+                uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+            }
             var id = Guid.NewGuid();
             Campaign cam = new Campaign();
             {
@@ -48,6 +72,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 cam.Visibility = request.Visibility;
                 cam.Status = true;
                 cam.Title = request.Title;
+                cam.ImgUrl = uploadResult.SecureUrl.AbsoluteUri;
                 cam.CategoryId = request.CategoryId;
                 cam.UserId = request.UserId;
             };
@@ -59,7 +84,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
             return response;
         }
 
-        public async Task<APIResponse<GetCampaignResponse>> DeleteCampaign(Guid CampaignId,DeleteCampaignRequest request)
+        public async Task<APIResponse<GetCampaignResponse>> DeleteCampaign(Guid CampaignId, DeleteCampaignRequest request)
         {
             APIResponse<GetCampaignResponse> response = new();
             var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == CampaignId);
@@ -86,7 +111,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
         public async Task<APIResponse<IEnumerable<GetCampaignResponse>>> GetCampaign()
         {
             APIResponse<IEnumerable<GetCampaignResponse>> response = new();
-            var campaign = await dbContext.Campaigns.Where(p => p.Status == true&&p.Visibility.Equals("public")).ToListAsync();
+            var campaign = await dbContext.Campaigns.Where(p => p.Status == true && p.Visibility.Equals("public")).ToListAsync();
             if (campaign == null)
             {
                 response.ToFailedResponse("Không có Campaign nào", StatusCodes.Status400BadRequest);
@@ -103,6 +128,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                         Status = x.Status,
                         Title = x.Title,
                         Visibility = x.Visibility,
+                        ImgUrl = x.ImgUrl,
                         UserId = x.UserId,
                         CategoryId = x.CategoryId,
                     };
@@ -146,13 +172,27 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 response.ToFailedResponse("Category không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
+            var uploadResult = new ImageUploadResult();
+            if (request.ImageFile.Length > 0)
+            {
+                var uploadParams = new ImageUploadParams()
+                {
+                    //PublicId = "existing_public_id",
+                    //Overwrite = true,
+                    File = new FileDescription(request.ImageFile.FileName, request.ImageFile.OpenReadStream()),
+                    Transformation = new Transformation().Crop("fill").Gravity("face"),
+                };
+
+                uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+            }
             cam.StartTime = request.StartTime;
             cam.EndTime = request.EndTime;
             //cam.Status = request.Status;
             //cam.Visibility = request.Visibility;
             cam.Title = request.Title;
             cam.CategoryId = request.CategoryId;
-            cam.ImgUrl = request.ImgUrl;
+            cam.ImgUrl = uploadResult.SecureUrl.AbsoluteUri;
             dbContext.Campaigns.Update(cam);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<GetCampaignResponse>(cam);
@@ -161,7 +201,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
             return response;
         }
 
-        public async Task<APIResponse<GetCampaignResponse>> UpdateVisibilityCampaign(Guid id, string request,string us)
+        public async Task<APIResponse<GetCampaignResponse>> UpdateVisibilityCampaign(Guid id, string request, string us)
         {
             APIResponse<GetCampaignResponse> response = new();
             var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == id);
@@ -170,7 +210,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var cam1 = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == id&&c.UserId.Equals(us));
+            var cam1 = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == id && c.UserId.Equals(us));
             if (cam1 == null)
             {
                 response.ToFailedResponse("User này không phải người tạo ra Campaign này", StatusCodes.Status400BadRequest);
