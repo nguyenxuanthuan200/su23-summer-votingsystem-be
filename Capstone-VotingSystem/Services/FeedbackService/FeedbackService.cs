@@ -12,9 +12,6 @@ namespace Capstone_VotingSystem.Services.FeedbackService
         {
             this.dbContext = votingSystemContext;
         }
-
-        public VotingSystemContext dbContext { get; }
-
         public async Task<APIResponse<IEnumerable<FeedbackResponse>>> GetAllFeedback()
         {
             APIResponse<IEnumerable<FeedbackResponse>> response = new();

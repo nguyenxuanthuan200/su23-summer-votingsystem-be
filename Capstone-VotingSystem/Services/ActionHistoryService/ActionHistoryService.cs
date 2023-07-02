@@ -7,9 +7,6 @@ using Capstone_VotingSystem.Models.ResponseModels.ElementResponse;
 using Capstone_VotingSystem.Models.ResponseModels.QuestionResponse;
 using Microsoft.Data.SqlClient.Server;
 using Microsoft.EntityFrameworkCore;
-using Octokit;
-using System.Linq;
-using System.Xml.Linq;
 
 
 namespace Capstone_VotingSystem.Services.ActionHistoryService
@@ -22,7 +19,35 @@ namespace Capstone_VotingSystem.Services.ActionHistoryService
         {
             this.dbContext = votingSystemContext;
         }
-        async Task<APIResponse<IEnumerable<ActionHistoryResponse>>> IActionHistoryService.GetActionHistoryByUser(string? userId)
+            await dbContext.HistoryActions.AddAsync(actionHistory);
+            await dbContext.SaveChangesAsync();
+            var map = _mapper.Map<CreateActionHistoryResponse>(actionHistory);
+            response.ToSuccessResponse("Cập nhật thành công", StatusCodes.Status200OK);
+            response.Data = map;
+            return response;
+        }
+
+        public async Task<APIResponse<UpdateActionHistoryResponse>> UpdateActionHistory(UpdateActionHistoryRequest request, Guid? id)
+        {
+            APIResponse<UpdateActionHistoryResponse> response = new();
+            var checkAction = await dbContext.HistoryActions.SingleOrDefaultAsync(p => p.HistoryActionId == id);
+            if (checkAction == null)
+            {
+                response.ToFailedResponse("không tìm thấy action History", StatusCodes.Status404NotFound);
+                return response;
+            }
+            checkAction.Description = request.Description;
+            checkAction.TypeActionId = request.TypeActionId;
+            checkAction.Time = DateTime.UtcNow;
+            dbContext.HistoryActions.Update(checkAction);
+            await dbContext.SaveChangesAsync();
+            var map = _mapper.Map<UpdateActionHistoryResponse>(checkAction);
+            response.ToSuccessResponse("Cập nhật thành công", StatusCodes.Status200OK);
+            response.Data = map;
+            return response;
+        }
+
+        public async Task<APIResponse<IEnumerable<ActionHistoryResponse>>> GetActionHistoryByUser(string? userId)
         {
             APIResponse<IEnumerable<ActionHistoryResponse>> response = new();
             var checkUserId = await dbContext.Users.Where(x => x.UserId == userId).SingleOrDefaultAsync();
