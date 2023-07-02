@@ -59,7 +59,7 @@ namespace Capstone_VotingSystem.Controller
         [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Activity")]
-        public async Task<IActionResult> UpdateCampaign(Guid id, UpdateActivityRequest request)
+        public async Task<IActionResult> UpdateActivity(Guid id, UpdateActivityRequest request)
         {
             try
             {
@@ -81,7 +81,7 @@ namespace Capstone_VotingSystem.Controller
         [Authorize(Roles = "User")]
         [HttpDelete("{id}")]
         [SwaggerOperation(summary: "Delete Activity")]
-        public async Task<IActionResult> DeleteCampaign(Guid id, DeleteActivityRequest request)
+        public async Task<IActionResult> DeleteActivity(Guid id, DeleteActivityRequest request)
         {
             try
             {

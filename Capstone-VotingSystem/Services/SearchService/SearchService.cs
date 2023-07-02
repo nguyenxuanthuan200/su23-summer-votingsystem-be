@@ -6,6 +6,7 @@ using Capstone_VotingSystem.Models.ResponseModels.CampaignResponse;
 using Capstone_VotingSystem.Models.ResponseModels.CandidateResponse;
 using Capstone_VotingSystem.Models.ResponseModels.SearchReponse;
 using Capstone_VotingSystem.Models.ResponseModels.StageResponse;
+using Capstone_VotingSystem.Services.StageService;
 using Microsoft.EntityFrameworkCore;
 using PagedList;
 
@@ -15,11 +16,13 @@ namespace Capstone_VotingSystem.Services.SearchService
     {
         private readonly VotingSystemContext dbContext;
         private readonly IMapper _mapper;
+        private readonly IStageService stageService;
 
-        public SearchService(VotingSystemContext dbContext, IMapper mapper)
+        public SearchService(VotingSystemContext dbContext, IMapper mapper, IStageService stageService)
         {
             this.dbContext = dbContext;
             _mapper = mapper;
+            this.stageService = stageService;
         }
         public async Task<APIResponse<PagedListCampaignResponse>> SearchFilterCampaign(SearchCampaignRequest request)
         {
@@ -27,7 +30,7 @@ namespace Capstone_VotingSystem.Services.SearchService
             PagedListCampaignResponse paged = new();
             List<GetCampaignAndStageResponse> listCamn = new List<GetCampaignAndStageResponse>();
             var listCampaign = dbContext.Campaigns.AsQueryable();
-           
+
             listCampaign = listCampaign.Where(p => p.Status == true && p.Visibility == "public");
             //check keyword
             if (!string.IsNullOrEmpty(request.Keyword))
@@ -37,37 +40,38 @@ namespace Capstone_VotingSystem.Services.SearchService
             foreach (var item in listCampaign)
             {
                 var map = _mapper.Map<GetCampaignAndStageResponse>(item);
-                var stage = await dbContext.Stages.Where(p => p.CampaignId == item.CampaignId).ToListAsync();
-                if (stage.Count != 0)
-                {
-                    List<GetStageResponse> listStage = stage.Select(
-                   x =>
-                   {
-                       return new GetStageResponse()
-                       {
-                           StageId = x.StageId,
-                           Content = x.Content,
-                           Title = x.Title,
-                           Description = x.Description,
-                           StartTime = x.StartTime,
-                           EndTime = x.EndTime,
-                           CampaignId = x.CampaignId,
-                           FormId = x.FormId,
-                       };
-                   }
-                   ).ToList();
-                    map.Stage = listStage;
+                //var stage = await dbContext.Stages.Where(p => p.CampaignId == item.CampaignId).ToListAsync();
+               // var stage = await GetStageByCampaign(item.CampaignId);
+                //if (stage != null)
+                //{
+                //    List<GetStageResponse> listStage = stage.Select(
+                //   x =>
+                //   {
+                //       return new GetStageResponse()
+                //       {
+                //           StageId = x.StageId,
+                //           Content = x.Content,
+                //           Title = x.Title,
+                //           Description = x.Description,
+                //           StartTime = x.StartTime,
+                //           EndTime = x.EndTime,
+                //           CampaignId = x.CampaignId,
+                //           FormId = x.FormId,
+                //       };
+                //   }
+                //   ).ToList();
+               // map.Stage = stage;
 
-                    listCamn.Add(map);
-                }
+                listCamn.Add(map);
+                //}
             }
             paged.Total = listCamn.Count();
             listCamn = listCamn.ToPagedList((int)request.Page, (int)request.PageSize).ToList();
             paged.Campaign = listCamn;
 
-            
+
             response.Data = paged;
-            if (listCamn.Count()==0)
+            if (listCamn.Count() == 0)
             {
                 response.ToFailedResponse("Không có Campaign nào", StatusCodes.Status400BadRequest);
                 return response;
@@ -76,25 +80,52 @@ namespace Capstone_VotingSystem.Services.SearchService
             return response;
 
         }
+        private async Task<List<GetStageResponse>> GetStageByCampaign(Guid campaignId)
+        {
+            List<GetStageResponse> response = new();
+            var campaignstage = await dbContext.Stages.Where(p => p.CampaignId == campaignId).ToListAsync();
+            if (campaignstage == null)
+            {
+                return null;
+            }
+            IEnumerable<GetStageResponse> result = campaignstage.Select(
+                x =>
+                {
+                    return new GetStageResponse()
+                    {
+                        StageId = x.StageId,
+                        CampaignId = x.CampaignId,
+                        Description = x.Description,
+                        Title = x.Title,
+                        StartTime = x.StartTime,
+                        EndTime = x.StartTime,
+                        Content = x.Content,
+                        FormId = x.FormId,
 
+                    };
+                }
+                ).ToList();
+            return response;
+
+        }
         public async Task<APIResponse<PagedListCandidateResponse>> SearchFilterCandidate(SearchCandidateRequest request)
         {
             APIResponse<PagedListCandidateResponse> response = new();
             PagedListCandidateResponse paged = new();
             List<GetListCandidateCampaignResponse> listCandi = new List<GetListCandidateCampaignResponse>();
-            if (request.CampaignId==null || request.CampaignId==Guid.Empty)
+            if (request.CampaignId == null || request.CampaignId == Guid.Empty)
             {
                 response.ToFailedResponse("CampaignId không hợp lệ", StatusCodes.Status400BadRequest);
                 return response;
             }
             //danh sach candidate thuoc campaign
-            var listCandidate =  dbContext.Candidates.Where(p => p.Status == true && p.CampaignId == request.CampaignId).AsQueryable();
+            var listCandidate = dbContext.Candidates.Where(p => p.Status == true && p.CampaignId == request.CampaignId).AsQueryable();
 
             if (string.IsNullOrEmpty(request.Keyword))
             {
-               foreach(var i in listCandidate)
+                foreach (var i in listCandidate)
                 {
-                    var us = await dbContext.Users.Where(p => p.UserId == i.UserId && p.Status==true).SingleOrDefaultAsync();
+                    var us = await dbContext.Users.Where(p => p.UserId == i.UserId && p.Status == true).SingleOrDefaultAsync();
                     var mapp = _mapper.Map<GetListCandidateCampaignResponse>(us);
                     mapp.CandidateId = i.CandidateId;
                     mapp.Description = i.Description;
@@ -108,17 +139,17 @@ namespace Capstone_VotingSystem.Services.SearchService
             //}
             if (!string.IsNullOrEmpty(request.Keyword))
             {
-                var user = await dbContext.Users.Where(p => p.FullName.Contains(request.Keyword) &&p.Status==true).ToListAsync();
+                var user = await dbContext.Users.Where(p => p.FullName.Contains(request.Keyword) && p.Status == true).ToListAsync();
                 //listCandidate = listCandidate.Where(p => p.Title.Contains(request.Keyword));
                 foreach (var item in user)
                 {
-                    var checkCandidate= await dbContext.Candidates.Where(p=>p.UserId==item.UserId && p.CampaignId==request.CampaignId && p.Status==true).SingleOrDefaultAsync();
+                    var checkCandidate = await dbContext.Candidates.Where(p => p.UserId == item.UserId && p.CampaignId == request.CampaignId && p.Status == true).SingleOrDefaultAsync();
                     if (checkCandidate != null)
                     {
                         var map = _mapper.Map<GetListCandidateCampaignResponse>(item);
-                        map.CandidateId=checkCandidate.CandidateId;
-                        map.Description=checkCandidate.Description;
-                        map.CampaignId=checkCandidate.CampaignId;
+                        map.CandidateId = checkCandidate.CandidateId;
+                        map.Description = checkCandidate.Description;
+                        map.CampaignId = checkCandidate.CampaignId;
                         listCandi.Add(map);
                     }
                 }

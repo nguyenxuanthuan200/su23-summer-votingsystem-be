@@ -1,8 +1,7 @@
-﻿namespace Capstone_VotingSystem.Models.ResponseModels.RatioResponse
+﻿namespace Capstone_VotingSystem.Models.RequestModels.RatioRequest
 {
-    public class RatioResponse
+    public class UpdateRatioRequest
     {
-        public Guid RatioGroupId { get; set; }
         public decimal? Percent { get; set; }
         public Guid? GroupId { get; set; }
         public Guid? CampaignId { get; set; }

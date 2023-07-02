@@ -1,4 +1,4 @@
-﻿namespace Capstone_VotingSystem.Models.RequestModels.Group
+﻿namespace Capstone_VotingSystem.Models.RequestModels.GroupRequest
 {
     public class UpdateGroupRequest
     {

@@ -1,6 +1,6 @@
 using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Services.ActionHistoryService;
-using Capstone_VotingSystem.Services.RateCategoryService;
+using Capstone_VotingSystem.Services.RatioService;
 using Capstone_VotingSystem.Services.AuthenticationService;
 using Capstone_VotingSystem.Services.CampaignService;
 using Capstone_VotingSystem.Services.StageService;
@@ -52,7 +52,7 @@ builder.Services.AddScoped<IStageService, StageService>();
 builder.Services.AddScoped<ICandidateService, CandidateService>();
 builder.Services.AddScoped<IActionHistoryService, ActionHistoryService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<IRatioCategoryService, RatioCategoryService>();
+builder.Services.AddScoped<IRatioService, RatioService>();
 builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();

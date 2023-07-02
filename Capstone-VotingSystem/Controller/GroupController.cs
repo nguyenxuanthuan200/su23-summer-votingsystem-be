@@ -1,5 +1,5 @@
 ﻿using Capstone_VotingSystem.Controllers;
-using Capstone_VotingSystem.Models.RequestModels.Group;
+using Capstone_VotingSystem.Models.RequestModels.GroupRequest;
 using Capstone_VotingSystem.Services.GroupService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Capstone_VotingSystem.Core.CoreModel;
 using Capstone_VotingSystem.Entities;
-using Capstone_VotingSystem.Models.RequestModels.Group;
+using Capstone_VotingSystem.Models.RequestModels.GroupRequest;
 using Capstone_VotingSystem.Models.ResponseModels.GroupResponse;
 using Microsoft.EntityFrameworkCore;
 
