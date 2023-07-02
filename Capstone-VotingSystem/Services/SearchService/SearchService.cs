@@ -27,6 +27,7 @@ namespace Capstone_VotingSystem.Services.SearchService
             PagedListCampaignResponse paged = new();
             List<GetCampaignAndStageResponse> listCamn = new List<GetCampaignAndStageResponse>();
             var listCampaign = dbContext.Campaigns.AsQueryable();
+           
             listCampaign = listCampaign.Where(p => p.Status == true && p.Visibility == "public");
             //check keyword
             if (!string.IsNullOrEmpty(request.Keyword))

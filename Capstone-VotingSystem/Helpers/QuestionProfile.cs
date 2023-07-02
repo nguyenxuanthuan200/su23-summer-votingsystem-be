@@ -6,6 +6,7 @@ namespace Capstone_VotingSystem.Helpers
         public QuestionProfile()
         {
             CreateMap<Entities.Question, Models.ResponseModels.QuestionResponse.GetQuestionResponse>().ReverseMap();
+            CreateMap<Entities.Question, Models.ResponseModels.QuestionResponse.GetQuestionNoElementResponse>().ReverseMap();
         }
     }
 }

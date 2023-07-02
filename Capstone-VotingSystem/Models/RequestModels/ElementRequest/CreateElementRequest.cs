@@ -2,7 +2,7 @@
 {
     public class CreateElementRequest
     {
-        public string? Content { get; set; }
+        public string? Answer { get; set; }
         public decimal? Rate { get; set; }
     }
 }

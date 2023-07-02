@@ -33,7 +33,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
             Element ele = new Element();
             {
                 ele.ElementId = id;
-                ele.Content = request.Content;
+                ele.Content = request.Answer;
                 ele.Status = true;
                 ele.QuestionId = questionId;
                 ele.Rate = request.Rate;
@@ -49,7 +49,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
                return new GetElementResponse()
                {
                    ElementId = x.ElementId,
-                   Content = x.Content,
+                   Answer = x.Content,
                    QuestionId = x.QuestionId,
                    Rate = x.Rate,
                };
@@ -99,7 +99,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
                     Element ele = new Element();
                     {
                         ele.ElementId = ide;
-                        ele.Content = i.Content;
+                        ele.Content = i.Answer;
                         ele.Status = true;
                         ele.QuestionId = ques.QuestionId;
                         ele.Rate = i.Rate;
@@ -107,11 +107,47 @@ namespace Capstone_VotingSystem.Services.QuestionService
                     await dbContext.Elements.AddAsync(ele);
                     await dbContext.SaveChangesAsync();
                     var map1 = _mapper.Map<GetElementResponse>(ele);
+                    map1.Answer = ele.Content;
                     listelement.Add(map1);
                 }
                 map.Element = listelement;
             }
 
+            map.TypeName = checktype.Name;
+            response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
+            response.Data = map;
+            return response;
+        }
+
+        public async Task<APIResponse<GetQuestionNoElementResponse>> CreateQuestionNoElement(CreateQuestionWithNoElementRequest request)
+        {
+            APIResponse<GetQuestionNoElementResponse> response = new();
+            var checkform = await dbContext.Forms.SingleOrDefaultAsync(c => c.FormId == request.FormId);
+            if (checkform == null)
+            {
+                response.ToFailedResponse("Form không tồn tại", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var checktype = await dbContext.Types.SingleOrDefaultAsync(c => c.TypeId == request.TypeId);
+            if (checktype == null)
+            {
+                response.ToFailedResponse("Type của question không tồn tại", StatusCodes.Status400BadRequest);
+                return response;
+            }
+
+            var id = Guid.NewGuid();
+            Question ques = new Question();
+            {
+                ques.QuestionId = id;
+                ques.Title = request.Title;
+                ques.FormId = request.FormId;
+                ques.Content = request.Content;
+                ques.TypeId = request.TypeId;
+            }
+            await dbContext.Questions.AddAsync(ques);
+            await dbContext.SaveChangesAsync();
+            var map = _mapper.Map<GetQuestionNoElementResponse>(ques);
+            
             map.TypeName = checktype.Name;
             response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
             response.Data = map;
@@ -139,7 +175,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
                    return new GetElementResponse()
                    {
                        ElementId = x.ElementId,
-                       Content = x.Content,
+                       Answer = x.Content,
                        QuestionId = x.QuestionId,
                        Rate = x.Rate,
                    };
@@ -193,7 +229,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 }
                 else
                 {
-                    element.Content = item.Content;
+                    element.Content = item.Answer;
                     element.Rate = item.Rate;
                     dbContext.Elements.Update(element);
                     await dbContext.SaveChangesAsync();
@@ -210,7 +246,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
                return new GetElementResponse()
                {
                    ElementId = x.ElementId,
-                   Content = x.Content,
+                   Answer = x.Content,
                    QuestionId = x.QuestionId,
                    Rate = x.Rate,
                };

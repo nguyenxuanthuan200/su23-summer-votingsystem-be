@@ -13,6 +13,7 @@ using Capstone_VotingSystem.Services.TypeService;
 using Capstone_VotingSystem.Services.GroupService;
 using Capstone_VotingSystem.Services.FeedbackService;
 using Capstone_VotingSystem.Services.SearchService;
+using Capstone_VotingSystem.Services.ActivityService;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -23,7 +24,6 @@ using System.Text;
 using Capstone_VotingSystem.Helpers;
 using Capstone_VotingSystem.Services.CloudinaryService;
 using Capstone_VotingSystem.Services.AccountService;
-using Capstone_VotingSystem.Services.FeedbackService;
 using Capstone_VotingSystem.Services.NotificationService;
 using Capstone_VotingSystem.Services.ActionTypeService;
 
@@ -64,6 +64,7 @@ builder.Services.AddScoped<IActionTypeService, ActiontypeService>();
 builder.Services.AddScoped<ITypeService, TypeService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
+builder.Services.AddScoped<IActivityService, ActivityService>();
 
 
 // Authen

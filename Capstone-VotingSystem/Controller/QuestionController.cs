@@ -38,13 +38,35 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [Authorize(Roles = "User")]
-        [HttpPost]
+        [HttpPost("elements")]
         [SwaggerOperation(summary: "Create new question and element")]
         public async Task<IActionResult> CreateQuestion(CreateQuestionRequest request)
         {
             try
             {
                 var result = await questionService.CreateQuestion(request);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+
+
+            }
+        }
+        [Authorize(Roles = "User")]
+        [HttpPost]
+        [SwaggerOperation(summary: "Create new question with no element")]
+        public async Task<IActionResult> CreateQuestionNoElement(CreateQuestionWithNoElementRequest request)
+        {
+            try
+            {
+                var result = await questionService.CreateQuestionNoElement(request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
