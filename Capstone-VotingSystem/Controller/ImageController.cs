@@ -16,13 +16,13 @@ namespace Capstone_VotingSystem.Controller
         {
             _cloudinary = cloudinaryService;
         }
-        [HttpPut("userId")]
-        public async Task<IActionResult> AddUserImage(IFormFile formFile, string? userId)
+        [HttpPut("userid")]
+        public async Task<IActionResult> AddUserImage(IFormFile formFile, string? userid)
         {
             try
             {
                 var folderName = "user";
-                var result = await _cloudinary.AddImageUserAsync(formFile, folderName, userId);
+                var result = await _cloudinary.AddImageUserAsync(formFile, folderName, userid);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -30,13 +30,13 @@ namespace Capstone_VotingSystem.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPut("campaignId")]
-        public async Task<IActionResult> AddCampaignImage(IFormFile formFile, Guid? campaignId)
+        [HttpPut("campaignid")]
+        public async Task<IActionResult> AddCampaignImage(IFormFile formFile, Guid? campaignid)
         {
             try
             {
                 var folderName = "campaign";
-                var result = await _cloudinary.AddImageCampaignAsync(formFile, folderName, campaignId);
+                var result = await _cloudinary.AddImageCampaignAsync(formFile, folderName, campaignid);
                 return Ok(result);
             }
             catch (Exception ex)

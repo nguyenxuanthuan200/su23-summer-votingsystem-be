@@ -73,7 +73,7 @@ namespace Capstone_VotingSystem.Services.ActionHistoryService
         public async Task<APIResponse<IEnumerable<ActionHistoryResponse>>> GetActionHistoryByUser(string? userId)
         {
             APIResponse<IEnumerable<ActionHistoryResponse>> response = new();
-            var checkUserId = await dbContext.Users.Where(x => x.UserId == userId).SingleOrDefaultAsync();
+            var checkUserId = await dbContext.Users.Where(x => x.UserId.Equals(userId)).SingleOrDefaultAsync();
             if (checkUserId == null)
             {
                 response.ToFailedResponse("không tồn tại user", StatusCodes.Status404NotFound);
@@ -94,9 +94,9 @@ namespace Capstone_VotingSystem.Services.ActionHistoryService
                 }
                 result.Add(actions);
             }
-            if (result == null)
+            if (result.Count ==0)
             {
-                response.ToFailedResponse("Không có Candidate nào trong Campaign", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Không có History nào của User", StatusCodes.Status400BadRequest);
                 return response;
             }
             response.ToSuccessResponse(response.Data = result, "Lấy danh sách thành công", StatusCodes.Status200OK);

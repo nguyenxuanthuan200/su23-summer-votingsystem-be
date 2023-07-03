@@ -8,7 +8,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1/[controller]")]
+    [Route("api/v1/categories")]
     [ApiController]
     public class CategoryController : BaseApiController
     {
@@ -57,13 +57,13 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [Authorize(Roles = "Admin")]
-        [HttpPut("{categoryId}")]
+        [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Category")]
-        public async Task<IActionResult> UpdateCategory(Guid categoryId, UpdateCategoryRequest request)
+        public async Task<IActionResult> UpdateCategory(Guid id, UpdateCategoryRequest request)
         {
             try
             {
-                var result = await categoryService.UpdateCategory(categoryId, request);
+                var result = await categoryService.UpdateCategory(id, request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);

@@ -8,6 +8,7 @@ namespace Capstone_VotingSystem.Services.FormService
     {
         Task<APIResponse<IEnumerable<GetFormResponse>>> GetAllForm();
         Task<APIResponse<GetFormResponse>> GetFormById(Guid formId);
+        Task<APIResponse<IEnumerable<GetFormResponse>>> GetFormByUserId(string id);
         Task<APIResponse<GetFormResponse>> CreateForm(CreateFormRequest request);
         Task<APIResponse<GetFormResponse>> UpdateForm(Guid id,UpdateFormByUser request);
         Task<APIResponse<string>> DeleteForm(Guid formId,DeleteFormRequest request);

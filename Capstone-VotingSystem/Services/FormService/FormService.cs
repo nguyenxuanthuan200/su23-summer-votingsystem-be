@@ -101,6 +101,7 @@ namespace Capstone_VotingSystem.Services.FormService
                         FormId = x.FormId,
                         Name = x.Name,
                         UserId = x.UserId,
+                        Visibility = x.Visibility,
                         CategoryId = x.CategoryId,
                     };
                 }
@@ -122,6 +123,41 @@ namespace Capstone_VotingSystem.Services.FormService
             var map = _mapper.Map<GetFormResponse>(form);
             response.ToSuccessResponse("Yêu cầu thành công", StatusCodes.Status200OK);
             response.Data = map;
+            return response;
+        }
+
+        public async Task<APIResponse<IEnumerable<GetFormResponse>>> GetFormByUserId(string id)
+        {
+            APIResponse<IEnumerable<GetFormResponse>> response = new();
+            var checkUser = await dbContext.Users.Where(p => p.UserId == id && p.Status == true)
+               .SingleOrDefaultAsync();
+            if (checkUser == null)
+            {
+                response.ToFailedResponse("User không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var getById = await dbContext.Forms.Where(p => p.UserId == id && p.Status == true)
+                .ToListAsync();
+            if (getById == null)
+            {
+                response.ToFailedResponse("Form không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            IEnumerable<GetFormResponse> result = getById.Select(
+               x =>
+               {
+                   return new GetFormResponse()
+                   {
+                       CategoryId = x.CategoryId,
+                       FormId = x.FormId,
+                       Name = x.Name,
+                       UserId = x.UserId,
+                       Visibility = x.Visibility,
+                   };
+               }
+               ).ToList();
+            response.Data = result;
+            response.ToSuccessResponse(response.Data, "Lấy danh sách thành công", StatusCodes.Status200OK);
             return response;
         }
 

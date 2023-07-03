@@ -11,4 +11,6 @@ namespace Capstone_VotingSystem.Services.FeedbackService
         public Task<APIResponse<FeedbackResponse>> CreateFeedback(FeedbackRequest feedback);
         public Task<APIResponse<string>> DeleteFeedback(Guid? feedbackid, DeleteFeedbackRequest feedback);
     }
+
 }
+

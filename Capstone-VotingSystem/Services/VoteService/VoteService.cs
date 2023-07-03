@@ -71,11 +71,9 @@ namespace Capstone_VotingSystem.Services.VoteService
                     await dbContext.SaveChangesAsync();
                     var map1 = _mapper.Map<CreateVoteDetailResponse>(votingDetail);
                     listVotingDetail.Add(map1);
-
                 }
                 map.VoteDetails = listVotingDetail;
             }
-
             response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
             response.Data = map;
             return response;

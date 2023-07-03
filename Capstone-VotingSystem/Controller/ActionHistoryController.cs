@@ -1,17 +1,16 @@
-﻿using Capstone_VotingSystem.Models.RequestModels.ActionHistoryRequest;
+﻿using Capstone_VotingSystem.Controllers;
+using Capstone_VotingSystem.Models.RequestModels.ActionHistoryRequest;
 using Capstone_VotingSystem.Services.ActionHistoryService;
-using CoreApiResponse;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Net;
 
 namespace Capstone_VotingSystem.Controller
 {
     [Route("api/v1/actionhistories")]
     [ApiController]
-    public class ActionHistoryController : BaseController
+    public class ActionHistoryController : BaseApiController
     {
         private readonly IActionHistoryService actionHistory;
 

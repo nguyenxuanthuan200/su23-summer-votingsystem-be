@@ -7,4 +7,6 @@
         public string? UserId { get; set; }
         public Guid? CampaignId { get; set; }
     }
+
 }
+
