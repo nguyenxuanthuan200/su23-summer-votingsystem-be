@@ -65,6 +65,24 @@ namespace Capstone_VotingSystem.Services.ActionTypeService
             response.ToSuccessResponse(response.Data = result, "Lấy danh sách Type thành công", StatusCodes.Status200OK);
             return response;
         }
+
+        public async Task<APIResponse<ActionTypeResponse>> UpdateTypeAction(Guid? id, ActionTypeRequest request)
+        {
+            APIResponse<ActionTypeResponse> response = new();
+            var typecheck = await dbContext.TypeActions.SingleOrDefaultAsync(c => c.TypeActionId == id);
+            if (typecheck == null)
+            {
+                response.ToFailedResponse("Type không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            typecheck.Name = request.Name;
+            dbContext.TypeActions.Update(typecheck);
+            await dbContext.SaveChangesAsync();
+            var map = _mapper.Map<ActionTypeResponse>(typecheck);
+            response.ToSuccessResponse("Cập nhật thành công", StatusCodes.Status200OK);
+            response.Data = map;
+            return response;
+        }
     }
 
 }
