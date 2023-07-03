@@ -9,5 +9,6 @@
         //public bool? Status { get; set; }
         public string? UserId { get; set; }
         public Guid? CategoryId { get; set; }
+        public IFormFile ImageFile { get; set; }
     }
 }

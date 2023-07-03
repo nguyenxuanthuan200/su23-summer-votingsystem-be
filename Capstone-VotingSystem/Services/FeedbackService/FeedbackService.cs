@@ -1,19 +1,84 @@
-﻿using Capstone_VotingSystem.Core.CoreModel;
+﻿using AutoMapper;
+using Capstone_VotingSystem.Core.CoreModel;
 using Capstone_VotingSystem.Entities;
+using Capstone_VotingSystem.Models.RequestModels.FeedbackRequest;
 using Capstone_VotingSystem.Models.ResponseModels.AccountResponse;
 using Capstone_VotingSystem.Models.ResponseModels.FeedbackResponse;
 using Microsoft.EntityFrameworkCore;
+using Octokit.Internal;
 
 namespace Capstone_VotingSystem.Services.FeedbackService
 {
     public class FeedbackService : IFeedbackService
     {
-        public FeedbackService(VotingSystemContext votingSystemContext)
+        private readonly VotingSystemContext dbContext;
+        private readonly IMapper _mapper;
+
+        public FeedbackService(VotingSystemContext votingSystemContext, IMapper mapper)
         {
             this.dbContext = votingSystemContext;
+            this._mapper = mapper;
+        }
+        public async Task<APIResponse<FeedbackResponse>> CreateFeedback(FeedbackRequest request)
+        {
+            APIResponse<FeedbackResponse> response = new();
+            var checkUser = await dbContext.Users.SingleOrDefaultAsync(p => p.UserId == request.UserId);
+            if (checkUser == null)
+            {
+                response.ToFailedResponse("không tìm thấy user", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var checkCampaign = await dbContext.Campaigns.SingleOrDefaultAsync(p => p.CampaignId == request.CampaignId);
+            if (checkCampaign == null)
+            {
+                response.ToFailedResponse("không tìm thấy campaign", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var id = Guid.NewGuid();
+            FeedBack feedBack = new FeedBack();
+            {
+                feedBack.FeedBackId = id;
+                feedBack.CampaignId = request.CampaignId;
+                feedBack.UserId = request.UserId;
+                feedBack.Status = true;
+                feedBack.CreateDate = DateTime.Now;
+                feedBack.Content = request.Content;
+            }
+            await dbContext.FeedBacks.AddAsync(feedBack);
+            await dbContext.SaveChangesAsync();
+            var map = _mapper.Map<FeedbackResponse>(feedBack);
+            response.ToSuccessResponse("tạo thành công", StatusCodes.Status200OK);
+            response.Data = map;
+            return response;
         }
 
-        public VotingSystemContext dbContext { get; }
+        public async Task<APIResponse<string>> DeleteFeedback(Guid? feedbackid, DeleteFeedbackRequest request)
+        {
+            APIResponse<String> response = new();
+            var user = await dbContext.Users.SingleOrDefaultAsync(c => c.UserId == request.UserId && c.Status == true);
+            if (user == null)
+            {
+                response.ToFailedResponse("User không tồn tại hoặc đã bị xóa ", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var cam = await dbContext.Campaigns.SingleOrDefaultAsync(c => c.CampaignId == request.CampaignId && c.Status == true);
+            if (cam == null)
+            {
+                response.ToFailedResponse("campaign không tồn tại hoặc đã bị xóa ", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var checkFeedback = await dbContext.FeedBacks.SingleOrDefaultAsync(c => c.FeedBackId == feedbackid && c.Status == true);
+            if (checkFeedback == null)
+            {
+                response.ToFailedResponse("feedback không tồn tại hoặc đã bị xóa ", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            checkFeedback.Status = false;
+            dbContext.FeedBacks.Update(checkFeedback);
+            await dbContext.SaveChangesAsync();
+            response.ToSuccessResponse("Xóa thành công", StatusCodes.Status200OK);
+            return response;
+        }
 
         public async Task<APIResponse<IEnumerable<FeedbackResponse>>> GetAllFeedback()
         {

@@ -82,7 +82,7 @@ namespace Capstone_VotingSystem.Controller
         [Authorize(Roles = "User")]
         [HttpPost]
         [SwaggerOperation(summary: "Create new Campaign")]
-        public async Task<IActionResult> CreateCampaign(CreateCampaignRequest request)
+        public async Task<IActionResult> CreateCampaign([FromForm] CreateCampaignRequest request)
         {
             try
             {
@@ -102,11 +102,11 @@ namespace Capstone_VotingSystem.Controller
         [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Campaign")]
-        public async Task<IActionResult> UpdateCampaign(Guid id, UpdateCampaignRequest request)
+        public async Task<IActionResult> UpdateCampaign(Guid id, [FromForm] UpdateCampaignRequest request)
         {
             try
             {
-                var result = await campaignService.UpdateCampaign(id,request);
+                var result = await campaignService.UpdateCampaign(id, request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -124,7 +124,7 @@ namespace Capstone_VotingSystem.Controller
         [Authorize(Roles = "User,Admin")]
         [HttpPut]
         [SwaggerOperation(summary: "Update Visibility Campaign")]
-        public async Task<IActionResult> UpdateVisibilityCampaign(Guid id,string visibility,string userId)
+        public async Task<IActionResult> UpdateVisibilityCampaign(Guid id, string visibility, string userId)
         {
             try
             {

@@ -8,5 +8,6 @@ namespace Capstone_VotingSystem.Services.ActionTypeService
     {
         public Task<APIResponse<IEnumerable<ActionTypeResponse>>> GetAll();
         public Task<APIResponse<ActionTypeResponse>> CreateTypeAction(ActionTypeRequest request);
+        public Task<APIResponse<ActionTypeResponse>> UpdateTypeAction(Guid? id, ActionTypeRequest request);
     }
 }
