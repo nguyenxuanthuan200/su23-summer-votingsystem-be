@@ -19,8 +19,8 @@ namespace Capstone_VotingSystem.Services.AccountService
         public async Task<APIResponse<string>> BanAccount(string id)
         {
             APIResponse<string> response = new();
-            var account = await dbContext.Accounts.Where(p =>p.UserName==id&& p.Status == true).SingleOrDefaultAsync();
-            if(account==null)
+            var account = await dbContext.Accounts.Where(p => p.UserName == id && p.Status == true).SingleOrDefaultAsync();
+            if (account == null)
             {
                 response.ToFailedResponse("account không tồn tại hoặc đã bị ban", StatusCodes.Status400BadRequest);
                 return response;
@@ -30,7 +30,7 @@ namespace Capstone_VotingSystem.Services.AccountService
             {
                 response.ToFailedResponse("account không tồn tại hoặc đã bị ban", StatusCodes.Status400BadRequest);
                 return response;
-            }           
+            }
             account.Status = false;
             user.Status = false;
             dbContext.Accounts.Update(account);
@@ -47,18 +47,33 @@ namespace Capstone_VotingSystem.Services.AccountService
             var account = await dbContext.Accounts.Where(p => p.Status == true).ToListAsync();
             if (account == null)
             {
-                response.ToFailedResponse("không thấy", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("không thấy tài khoản", StatusCodes.Status400BadRequest);
                 return response;
             }
-            IEnumerable<AccountResponse> result = account.Select(
-                x =>
+            var users = await dbContext.Users.Where(p => p.Status == true).ToListAsync();
+            if (users == null)
+            {
+                response.ToFailedResponse("Không tìm thấy thông tin người dùng", StatusCodes.Status404NotFound);
+                return response;
+            }
+
+            IEnumerable<AccountResponse> result = account.Join(users, a => a.UserName, u => u.UserId, (a, u) =>
                 {
                     return new AccountResponse()
                     {
-                        UserName = x.UserName,
-                        CreateAt = DateTime.Now,
-                        RoleId = x.RoleId,
-
+                        UserName = a.UserName,
+                        CreateAt = a.CreateAt,
+                        RoleId = a.RoleId,
+                        Status = a.Status,
+                        FullName = u.FullName,
+                        Phone = u.Phone,
+                        AvatarUrl = u.AvatarUrl,
+                        StatusUser = u.Status,
+                        Address = u.Address,
+                        Dob = u.Dob,
+                        Email = u.Email,
+                        Gender = u.Gender,
+                        GroupId = u.GroupId,
                     };
                 }
                 ).ToList();
@@ -85,14 +100,14 @@ namespace Capstone_VotingSystem.Services.AccountService
             List<AccountResponse> result = new List<AccountResponse>();
             foreach (var item in acc)
             {
-                var roleName = await dbContext.Roles.SingleOrDefaultAsync(p => p.RoleId == checkUserName.RoleId);
+                //var roleName = await dbContext.Roles.SingleOrDefaultAsync(p => p.RoleId == checkUserName.RoleId);
                 var actions = new AccountResponse();
                 {
                     actions.UserName = item.UserName;
                     actions.CreateAt = item.CreateAt;
                     actions.Status = item.Status;
                     actions.RoleId = item.RoleId;
-                    actions.RoleName = roleName.Name;
+                    //actions.RoleName = roleName.Name;
                 }
                 result.Add(actions);
             }
