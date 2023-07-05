@@ -112,7 +112,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
         public async Task<APIResponse<IEnumerable<GetCampaignAndStageResponse>>> GetCampaign()
         {
             APIResponse<IEnumerable<GetCampaignAndStageResponse>> response = new();
-            var campaign = await dbContext.Campaigns.Where(p => p.Status == true).ToListAsync();
+            var campaign = await dbContext.Campaigns.Where(p => p.Status == true && p.Visibility == "public").ToListAsync();
 
             List<GetCampaignAndStageResponse> listCamn = new List<GetCampaignAndStageResponse>();
             foreach (var item in campaign)
@@ -176,6 +176,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
             {
 
                 GetStageResponse stage = new GetStageResponse();
+                stage.StageId=item.StageId;
                 stage.CampaignId = item.CampaignId;
                 stage.Title = item.Title;
                 stage.Description = item.Description;
