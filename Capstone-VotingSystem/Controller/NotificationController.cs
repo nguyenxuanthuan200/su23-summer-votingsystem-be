@@ -17,13 +17,13 @@ namespace Capstone_VotingSystem.Controller
         {
             this._notification = notificationService;
         }
-        [HttpGet("{id}")]
-        [SwaggerOperation(summary: "Get Notification by Id")]
-        public async Task<IActionResult> getNotificationById(Guid? id)
+        [HttpGet("{username}")]
+        [SwaggerOperation(summary: "Get Notification by username")]
+        public async Task<IActionResult> getNotificationById(string? username)
         {
             try
             {
-                var result = await _notification.GetNotificationId(id);
+                var result = await _notification.GetNotificationId(username);
                 if (result.Success == false)
                 {
                     return BadRequest(result);

@@ -50,13 +50,13 @@ namespace Capstone_VotingSystem.Services.NotificationService
 
         }
 
-        public async Task<APIResponse<IEnumerable<NotificationResponse>>> GetNotificationId(Guid? id)
+        public async Task<APIResponse<IEnumerable<NotificationResponse>>> GetNotificationId(string? username)
         {
             APIResponse<IEnumerable<NotificationResponse>> response = new();
-            var checkId = await dbContext.Notifications.Where(p => p.NotificationId == id).SingleOrDefaultAsync();
+            var checkId = await dbContext.Accounts.Where(p => p.UserName == username).SingleOrDefaultAsync();
             if (checkId == null)
             {
-                response.ToFailedResponse("Không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("tài khoản Không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
             var checkStatus = await dbContext.Notifications.Where(p => p.Status == true).ToListAsync();
@@ -73,7 +73,7 @@ namespace Capstone_VotingSystem.Services.NotificationService
                          NotificationId = x.NotificationId,
                          Title = x.Title,
                          Message = x.Message,
-                         CreateDate = DateTime.UtcNow,
+                         CreateDate = x.CreateDate,
                          Status = x.Status,
                          Username = x.Username,
                      };
