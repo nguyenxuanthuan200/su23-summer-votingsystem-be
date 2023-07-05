@@ -112,16 +112,16 @@ namespace Capstone_VotingSystem.Services.FeedbackService
             return response;
         }
 
-        public async Task<APIResponse<IEnumerable<FeedbackResponse>>> GetByFeedBackId(Guid? feedbackid)
+        public async Task<APIResponse<IEnumerable<FeedbackResponse>>> GetByFeedBackId(Guid? campaignid)
         {
             APIResponse<IEnumerable<FeedbackResponse>> response = new();
-            var checkFeedback = await dbContext.FeedBacks.SingleOrDefaultAsync(p => p.FeedBackId == feedbackid);
+            var checkFeedback = await dbContext.Campaigns.SingleOrDefaultAsync(p => p.CampaignId == campaignid);
             if (checkFeedback == null)
             {
                 response.ToFailedResponse("không tìm thấy feedback", StatusCodes.Status404NotFound);
                 return response;
             }
-            var feedback = await dbContext.FeedBacks.Where(p => p.FeedBackId == feedbackid).ToListAsync();
+            var feedback = await dbContext.FeedBacks.Where(p => p.CampaignId == campaignid).ToListAsync();
             IEnumerable<FeedbackResponse> result = feedback.Select(
                 x =>
                 {

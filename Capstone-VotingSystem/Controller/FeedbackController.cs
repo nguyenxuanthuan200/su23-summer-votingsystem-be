@@ -41,7 +41,7 @@ namespace Capstone_VotingSystem.Controller
         }
         [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
-        [SwaggerOperation(summary: "Get Feedback By Id")]
+        [SwaggerOperation(summary: "Get Feedback By CampaignId")]
         public async Task<IActionResult> GetFeedBack(Guid? id)
         {
             try

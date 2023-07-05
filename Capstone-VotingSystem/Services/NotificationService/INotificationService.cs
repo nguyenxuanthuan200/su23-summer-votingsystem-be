@@ -6,7 +6,7 @@ namespace Capstone_VotingSystem.Services.NotificationService
 {
     public interface INotificationService
     {
-        public Task<APIResponse<IEnumerable<NotificationResponse>>> GetNotificationId(Guid? id);
+        public Task<APIResponse<IEnumerable<NotificationResponse>>> GetNotificationId(string? username);
         public Task<APIResponse<NotificationResponse>> CreateNotification(NotificationRequest request);
         public Task<APIResponse<NotificationResponse>> UpdateNotification(Guid? id, NotificationRequest request);
     }
