@@ -17,9 +17,9 @@ namespace Capstone_VotingSystem.Controller
         {
             this.account = accountService;
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "User,Admin")]
         [HttpGet]
-        [SwaggerOperation(summary: "Get All Account by Role is Admin")]
+        [SwaggerOperation(summary: "Get All Account by Role is Admin and User")]
         public async Task<IActionResult> GetAllAccount()
         {
             try
