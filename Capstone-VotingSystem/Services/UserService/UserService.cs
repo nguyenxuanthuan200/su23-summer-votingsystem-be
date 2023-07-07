@@ -38,6 +38,12 @@ namespace Capstone_VotingSystem.Services.UserService
                 response.ToFailedResponse("không tìm thấy người dùng", StatusCodes.Status404NotFound);
                 return response;
             }
+            var checkStatus = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync();
+            if (checkStatus == null)
+            {
+                response.ToFailedResponse("người dùng không tồn tại hoặc bị xóa", StatusCodes.Status404NotFound);
+                return response;
+            }
             var uploadResult = new ImageUploadResult();
             if (request.ImageFile.Length > 0)
             {
