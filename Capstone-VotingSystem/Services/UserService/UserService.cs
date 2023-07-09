@@ -32,18 +32,13 @@ namespace Capstone_VotingSystem.Services.UserService
         public async Task<APIResponse<UpdateUserResponse>> UpdateUser(string? userId, UpdateUserRequest request)
         {
             APIResponse<UpdateUserResponse> response = new();
-            var checkUser = await dbContext.Users.Where(p => p.UserId == userId).SingleOrDefaultAsync();
+            var checkUser = await dbContext.Users.Where(p => p.UserId == userId && p.Status == true).SingleOrDefaultAsync();
             if (checkUser == null)
             {
                 response.ToFailedResponse("không tìm thấy người dùng", StatusCodes.Status404NotFound);
                 return response;
             }
-            var checkStatus = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync();
-            if (checkStatus == null)
-            {
-                response.ToFailedResponse("người dùng không tồn tại hoặc bị xóa", StatusCodes.Status404NotFound);
-                return response;
-            }
+
             var uploadResult = new ImageUploadResult();
             if (request.ImageFile.Length > 0)
             {
