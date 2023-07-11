@@ -2,7 +2,7 @@
 {
     public class CreateVoteLikeRequest
     {
-       // public DateTime? SendingTime { get; set; }
+        public DateTime? SendingTime { get; set; }
        // public Guid? RatioGroupId { get; set; }
         public string? UserId { get; set; }
         public Guid? CandidateId { get; set; }
