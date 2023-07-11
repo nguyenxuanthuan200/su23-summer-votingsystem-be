@@ -2,7 +2,7 @@
 {
     public class GetScoreByCampaginRequest
     {
-        public Guid CampaginId { get; set; }
+        public Guid CampaignId { get; set; }
         public string UserId { get; set; }
     }
 }

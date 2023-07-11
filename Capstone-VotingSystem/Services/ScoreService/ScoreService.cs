@@ -20,7 +20,7 @@ namespace Capstone_VotingSystem.Services.ScoreService
         public async Task<APIResponse<GetScoreResponse>> GetScore(GetScoreByCampaginRequest request)
         {
             APIResponse<GetScoreResponse> response = new();
-            var checkCampagin = await dbContext.Campaigns.Where(p => p.CampaignId == request.CampaginId && p.Status == true && p.UserId == request.UserId).SingleOrDefaultAsync();
+            var checkCampagin = await dbContext.Campaigns.Where(p => p.CampaignId == request.CampaignId && p.Status == true && p.UserId == request.UserId).SingleOrDefaultAsync();
             if (checkCampagin == null)
             {
                 response.ToFailedResponse("Campaign không tồn tại hoặc bạn không đủ quyền truy cập", StatusCodes.Status404NotFound);
@@ -41,9 +41,9 @@ namespace Capstone_VotingSystem.Services.ScoreService
             List<ListCandidateScoreResponse> ListCandidateInStage = new();
             scorerp.CampaignId = checkCampagin.CampaignId;
 
-            var StageInCampagin = await dbContext.Stages.Where(p => p.CampaignId == request.CampaginId && p.Status == true).ToListAsync();
+            var StageInCampagin = await dbContext.Stages.Where(p => p.CampaignId == request.CampaignId && p.Status == true).ToListAsync();
 
-            var CandidateInCampaign = await dbContext.Candidates.Where(p => p.CampaignId == request.CampaginId && p.Status == true).ToListAsync();
+            var CandidateInCampaign = await dbContext.Candidates.Where(p => p.CampaignId == request.CampaignId && p.Status == true).ToListAsync();
 
             foreach (var candidate in CandidateInCampaign)
             {
