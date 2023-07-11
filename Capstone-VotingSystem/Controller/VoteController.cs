@@ -11,7 +11,7 @@ using Capstone_VotingSystem.Models.RequestModels.VotingDetailRequest;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1/vote")]
+    [Route("api/v1/votes")]
     [ApiController]
     public class VoteController : BaseApiController
     {
@@ -22,12 +22,32 @@ namespace Capstone_VotingSystem.Controller
         }
         [Authorize(Roles = "User")]
         [HttpPost]
-        [SwaggerOperation(summary: "Create new vote ")]
+        [SwaggerOperation(summary: "Create new vote have form ")]
         public async Task<IActionResult> CreateVote(CreateVoteRequest request)
         {
             try
             {
                 var result = await voteService.CreateVote(request);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        [Authorize(Roles = "User")]
+        [HttpPost("like")]
+        [SwaggerOperation(summary: "Create new vote Like ")]
+        public async Task<IActionResult> CreateVoteLike(CreateVoteLikeRequest request)
+        {
+            try
+            {
+                var result = await voteService.CreateVoteLike(request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
