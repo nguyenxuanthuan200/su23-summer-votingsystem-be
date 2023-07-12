@@ -17,7 +17,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this._user = userService;
         }
-        //[Authorize(Roles = "Admin,User")]
+        [Authorize(Roles = "Admin,User")]
         [HttpPut]
         [SwaggerOperation(summary: "Update persional profile by userId")]
         public async Task<IActionResult> UpdateUser(string? id, [FromForm] UpdateUserRequest request)
