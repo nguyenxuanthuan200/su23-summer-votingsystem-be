@@ -6,6 +6,7 @@ namespace Capstone_VotingSystem.Helpers
         public FormProfile()
         {
             CreateMap<Entities.Form, Models.ResponseModels.FormResponse.GetFormResponse>().ReverseMap();
+            CreateMap<Entities.Form, Models.ResponseModels.FormResponse.GetListQuestionFormResponse>().ReverseMap();
         }
     }
 }
