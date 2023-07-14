@@ -11,7 +11,8 @@ namespace Capstone_VotingSystem.Helpers
             CreateMap<Entities.Candidate, Models.ResponseModels.CandidateResponse.CreateAccountCandidateResponse>().ReverseMap();
             CreateMap<Entities.Candidate, Models.ResponseModels.CandidateResponse.CreateCandidateCampaignResponse>().ReverseMap();
             CreateMap<Entities.Candidate, Models.ResponseModels.CandidateResponse.GetCandidateDetailResponse>().ReverseMap();
-            
+            CreateMap<Entities.Candidate, Models.ResponseModels.CandidateResponse.GetListCandidateStageResponse>().ReverseMap();
+
         }
     }
 }

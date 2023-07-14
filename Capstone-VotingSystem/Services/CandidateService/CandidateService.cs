@@ -26,7 +26,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 response.ToFailedResponse("UserName đã tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var checkcam = await dbContext.Campaigns.Where(p => p.CampaignId == request.CampaignId && p.Status!=false).SingleOrDefaultAsync();
+            var checkcam = await dbContext.Campaigns.Where(p => p.CampaignId == request.CampaignId && p.Status != false).SingleOrDefaultAsync();
             if (checkcam == null)
             {
                 response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
@@ -37,7 +37,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
             {
                 acc.UserName = request.UserName;
                 acc.Password = request.Password;
-                acc.CreateAt= DateTime.Now;
+                acc.CreateAt = DateTime.Now;
                 acc.Status = true;
                 acc.RoleId = role.RoleId;
             };
@@ -47,7 +47,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 response.ToFailedResponse("Group không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
-            
+
             User us = new User();
             {
                 us.UserId = request.UserName;
@@ -90,7 +90,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa!!!!", StatusCodes.Status404NotFound);
                 return response;
             }
-            var check3 = await dbContext.Candidates.Where(p => p.CampaignId == request.CampaignId && p.UserId==request.UserId).SingleOrDefaultAsync();
+            var check3 = await dbContext.Candidates.Where(p => p.CampaignId == request.CampaignId && p.UserId == request.UserId).SingleOrDefaultAsync();
             if (check3 != null)
             {
                 response.ToFailedResponse("Candidate đã được thêm vào trước đó rồi!!!!", StatusCodes.Status400BadRequest);
@@ -115,7 +115,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
 
         }
 
- 
+
         public async Task<APIResponse<IEnumerable<GetListCandidateCampaignResponse>>> GetListCandidateCampaign(Guid campaignId)
         {
             APIResponse<IEnumerable<GetListCandidateCampaignResponse>> response = new();
@@ -179,9 +179,9 @@ namespace Capstone_VotingSystem.Services.CandidateService
                     candidate.Email = checkuser.Email;
                     candidate.AvatarUrl = checkuser.AvatarUrl;
                 }
-                var checkcam = await dbContext.Campaigns.Where(p => p.Status == true&&p.CampaignId==item.CampaignId).SingleOrDefaultAsync();
-                if(checkcam!=null)
-                result.Add(candidate);
+                var checkcam = await dbContext.Campaigns.Where(p => p.Status == true && p.CampaignId == item.CampaignId).SingleOrDefaultAsync();
+                if (checkcam != null)
+                    result.Add(candidate);
             }
             if (result == null)
             {
@@ -192,10 +192,10 @@ namespace Capstone_VotingSystem.Services.CandidateService
             return response;
         }
 
-        public async Task<APIResponse<string>> DeleteCandidateCampaign(Guid candidateId,DeleteCandidateRequest request)
+        public async Task<APIResponse<string>> DeleteCandidateCampaign(Guid candidateId, DeleteCandidateRequest request)
         {
             APIResponse<string> response = new();
-            var deleteCandidate = await dbContext.Candidates.Where(p =>p.Status==true&& p.CandidateId.Equals(candidateId)&&p.CampaignId==request.campaignId&&p.UserId.Equals(request.userId)).SingleOrDefaultAsync();
+            var deleteCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CandidateId.Equals(candidateId) && p.CampaignId == request.campaignId && p.UserId.Equals(request.userId)).SingleOrDefaultAsync();
             if (deleteCandidate == null)
             {
                 response.ToFailedResponse("Không có Candidate nào phù hợp trong Campaign hoặc đã bị xóa", StatusCodes.Status400BadRequest);
@@ -211,7 +211,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
         public async Task<APIResponse<GetCandidateDetailResponse>> GetCandidateById(Guid candidateId)
         {
             APIResponse<GetCandidateDetailResponse> response = new();
-            var checkcandi = await dbContext.Candidates.Where(p => p.CandidateId == candidateId&&p.Status==true).SingleOrDefaultAsync();
+            var checkcandi = await dbContext.Candidates.Where(p => p.CandidateId == candidateId && p.Status == true).SingleOrDefaultAsync();
             if (checkcandi == null)
             {
                 response.ToFailedResponse("Candidate không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
@@ -258,5 +258,65 @@ namespace Capstone_VotingSystem.Services.CandidateService
         //    //return map;
         //    return null;
         //}
+
+        public async Task<APIResponse<GetListCandidateStageResponse>> getListcandidatStage(Guid stageId)
+        {
+            APIResponse<GetListCandidateStageResponse> response = new APIResponse<GetListCandidateStageResponse>();
+            var checkStage = await dbContext.Stages.Where(p => p.StageId == stageId && p.Status == true).SingleOrDefaultAsync();
+            if (checkStage == null)
+            {
+                response.ToFailedResponse("Stage không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var checkcam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.CampaignId == checkStage.CampaignId);
+            if (checkcam == null)
+            {
+                response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == checkcam.UserId);
+            if (checkCandidate == null)
+            {
+                response.ToFailedResponse("ứng cử viên không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var stage = new GetListCandidateStageResponse()
+            {
+                StageId = stageId,
+                CampaignId = checkStage.CampaignId,
+                FormId = checkStage.FormId,
+            };
+
+            var listCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CampaignId == checkcam.CampaignId).ToListAsync();
+            List<ListCandidateStageResponse> result = new List<ListCandidateStageResponse>();
+            foreach (var item in listCandidate)
+            {
+                var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
+                var candidate = new ListCandidateStageResponse();
+                {
+                    candidate.CandidateId = item.CandidateId;
+                    candidate.Description = item.Description;
+                    candidate.UserId = item.UserId;
+                    candidate.GroupId = checkuser.GroupId;
+                    candidate.FullName = checkuser.FullName;
+                    candidate.Phone = checkuser.Phone;
+                    candidate.Gender = checkuser.Gender;
+                    candidate.Dob = checkuser.Dob;
+                    candidate.Email = checkuser.Email;
+                    candidate.AvatarUrl = checkuser.AvatarUrl;
+                }
+                result.Add(candidate);
+            }
+            stage.Candidate = result;
+            response.Data = stage;
+
+            if (response.Data == null)
+            {
+                response.ToFailedResponse("Không có ứng cử viên nào", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            response.ToSuccessResponse(response.Data, "Lấy danh sách thành công", StatusCodes.Status200OK);
+            return response;
+        }
     }
 }
