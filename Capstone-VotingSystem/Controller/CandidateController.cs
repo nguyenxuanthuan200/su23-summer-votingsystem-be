@@ -139,5 +139,23 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
+        [HttpGet("stageid")]
+        [SwaggerOperation(summary: "Get All Candidate with role user")]
+        public async Task<IActionResult> GetListCandidateByStage(Guid stageid)
+        {
+            try
+            {
+                var result = await candidateService.getListcandidatStage(stageid);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
     }
 }

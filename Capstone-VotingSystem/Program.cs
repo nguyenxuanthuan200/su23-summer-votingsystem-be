@@ -27,6 +27,7 @@ using Capstone_VotingSystem.Services.CloudinaryService;
 using Capstone_VotingSystem.Services.AccountService;
 using Capstone_VotingSystem.Services.NotificationService;
 using Capstone_VotingSystem.Services.ActionTypeService;
+using Capstone_VotingSystem.Services.UserService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,7 +67,9 @@ builder.Services.AddScoped<ITypeService, TypeService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<IActivityService, ActivityService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IScoreService, ScoreService>();
+
 
 
 // Authen
