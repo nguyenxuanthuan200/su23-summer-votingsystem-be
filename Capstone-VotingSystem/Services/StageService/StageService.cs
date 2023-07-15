@@ -40,6 +40,7 @@ namespace Capstone_VotingSystem.Services.StageService
                 stage.FormId = request.FormId;
                 stage.StartTime = request.StartTime;
                 stage.EndTime = request.EndTime;
+                stage.Status = true;
             };
             await dbContext.Stages.AddAsync(stage);
             await dbContext.SaveChangesAsync();

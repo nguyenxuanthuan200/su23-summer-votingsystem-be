@@ -78,39 +78,50 @@ namespace Capstone_VotingSystem.Services.CandidateService
         public async Task<APIResponse<CreateCandidateCampaignResponse>> CreateCandidateCampaign(CreateCandidateCampaignRequest request)
         {
             APIResponse<CreateCandidateCampaignResponse> response = new();
-            var checkuser = await dbContext.Users.Where(p => p.UserId == request.UserId).SingleOrDefaultAsync();
-            if (checkuser == null)
-            {
-                response.ToFailedResponse("UserName không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
-                return response;
-            }
+            
             var check2 = await dbContext.Campaigns.Where(p => p.CampaignId == request.CampaignId).SingleOrDefaultAsync();
             if (check2 == null)
             {
                 response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa!!!!", StatusCodes.Status404NotFound);
                 return response;
             }
-            var check3 = await dbContext.Candidates.Where(p => p.CampaignId == request.CampaignId && p.UserId == request.UserId).SingleOrDefaultAsync();
-            if (check3 != null)
-            {
-                response.ToFailedResponse("Candidate đã được thêm vào trước đó rồi!!!!", StatusCodes.Status400BadRequest);
-                return response;
-            }
-            var id = Guid.NewGuid();
-            Candidate can = new Candidate();
-            {
-                can.CandidateId = id;
-                can.UserId = request.UserId;
-                can.Status = true;
-                can.Description = request.Description;
-                can.CampaignId = request.CampaignId;
-            }
 
-            await dbContext.Candidates.AddAsync(can);
-            await dbContext.SaveChangesAsync();
-            var map = _mapper.Map<CreateCandidateCampaignResponse>(can);
+            if (request.ListUser != null)
+            {
+                List<ListUserRequest> listUser = new List<ListUserRequest>();
+                foreach (var i in request.ListUser)
+                {
+                    var checkuser = await dbContext.Users.Where(p => p.UserId == i.UserId && p.Status==true).SingleOrDefaultAsync();
+                    if (checkuser == null)
+                    {
+                        response.ToFailedResponse("UserName "+i.UserId+"không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
+                        return response;
+                    }
+                    var check3 = await dbContext.Candidates.Where(p => p.CampaignId == request.CampaignId && p.UserId == i.UserId).SingleOrDefaultAsync();
+                    if (check3 != null)
+                    {
+                        response.ToFailedResponse("Candidate "+check3.UserId+" đã được thêm vào trước đó rồi!!!!", StatusCodes.Status400BadRequest);
+                        return response;
+                    }
+                    var id = Guid.NewGuid();
+                    Candidate can = new Candidate();
+                    {
+                        can.CandidateId = id;
+                        can.UserId = i.UserId;
+                        can.Status = true;
+                        can.Description = i.Description;
+                        can.CampaignId = request.CampaignId;
+                    }
+                    await dbContext.Candidates.AddAsync(can);
+                    await dbContext.SaveChangesAsync();
+                }
+            }
+           
+
+           
+            //var map = _mapper.Map<CreateCandidateCampaignResponse>(can);
             response.ToSuccessResponse("Thêm Candidate Thành công!!", StatusCodes.Status200OK);
-            response.Data = map;
+           // response.Data = map;
             return response;
 
         }

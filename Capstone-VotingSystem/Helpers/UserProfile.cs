@@ -9,6 +9,7 @@ namespace Capstone_VotingSystem.Helpers
             CreateMap<Entities.User, Models.ResponseModels.CandidateResponse.GetCandidateDetailResponse>().ReverseMap();
             CreateMap<Entities.User, Models.ResponseModels.CandidateResponse.UpdateCandidateProfileResponse>().ReverseMap();
             CreateMap<Entities.User, Models.ResponseModels.UserResponse.UpdateUserResponse>().ReverseMap();
+            CreateMap<Entities.User, Models.ResponseModels.CandidateResponse.GetListCandidateCampaignResponse>().ReverseMap();
 
         }
     }

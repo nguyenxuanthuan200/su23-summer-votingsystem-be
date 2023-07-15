@@ -2,8 +2,7 @@
 {
     public class CreateCandidateCampaignRequest
     {
-        public string? Description { get; set; }
-        public string UserId { get; set; }
         public Guid CampaignId { get; set; }
+        public List<ListUserRequest> ListUser { get; set; }
     }
 }
