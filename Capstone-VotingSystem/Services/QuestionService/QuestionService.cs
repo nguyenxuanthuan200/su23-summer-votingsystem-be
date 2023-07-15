@@ -85,6 +85,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 ques.Title = request.Title;
                 ques.FormId = request.FormId;
                 ques.Content = request.Content;
+                ques.Status = true;
                 ques.TypeId = request.TypeId;
             }
             await dbContext.Questions.AddAsync(ques);
