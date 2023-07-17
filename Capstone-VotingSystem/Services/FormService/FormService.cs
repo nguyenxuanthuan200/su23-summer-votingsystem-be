@@ -2,6 +2,7 @@
 using Capstone_VotingSystem.Core.CoreModel;
 using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Models.RequestModels.FormRequest;
+using Capstone_VotingSystem.Models.ResponseModels.ElementResponse;
 using Capstone_VotingSystem.Models.ResponseModels.FormResponse;
 using Microsoft.EntityFrameworkCore;
 
@@ -132,6 +133,18 @@ namespace Capstone_VotingSystem.Services.FormService
                 question.Content = item.Content;
                 question.TypeId = checkType.TypeId;
                 result.Add(question);
+                var listElement = await dbContext.Elements.Where(p => p.Status == true && p.QuestionId == item.QuestionId).ToListAsync();
+                List<ListElementQuestionResponse> resultElement = new List<ListElementQuestionResponse>();
+                foreach (var element in listElement)
+                {
+                    var elements = new ListElementQuestionResponse();
+                    elements.ElementId = element.ElementId;
+                    elements.Answer = element.Content;
+                    elements.Rate = element.Rate;
+                    elements.Status = element.Status;
+                    resultElement.Add(elements);
+                }
+                question.Elements = resultElement;
             }
             map.Questions = result;
             response.Data = map;
