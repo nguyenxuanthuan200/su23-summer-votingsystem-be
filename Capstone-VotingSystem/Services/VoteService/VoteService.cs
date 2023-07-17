@@ -102,7 +102,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToSuccessResponse("không tìm thấy State", StatusCodes.Status404NotFound);
                 return response;
             }
-            var checkCandidate = await dbContext.Candidates.SingleOrDefaultAsync(p => p.CandidateId == request.CandidateId && p.CampaignId == checkStateId.CampaignId);
+            var checkCandidate = await dbContext.Candidates.SingleOrDefaultAsync(p => p.CandidateId == request.CandidateId && p.CampaignId == checkStateId.CampaignId && p.Status==true);
             if (checkCandidate == null)
             {
                 response.ToSuccessResponse("không tìm thấy candidate hoặc candidate không thuộc campaign này", StatusCodes.Status404NotFound);
@@ -115,7 +115,11 @@ namespace Capstone_VotingSystem.Services.VoteService
                 return response;
             }
             var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupId == checkUser.GroupId && p.GroupCandidateId == checkCandidate.GroupCandidateId && p.CampaignId== checkStateId.CampaignId);
-           
+            if (ratioGroup == null)
+            {
+                response.ToSuccessResponse("Ratio chưa được tạo", StatusCodes.Status400BadRequest);
+                return response;
+            }
             var id = Guid.NewGuid();
             Voting vote = new Voting();
             {
@@ -129,7 +133,7 @@ namespace Capstone_VotingSystem.Services.VoteService
             }
             await dbContext.Votings.AddAsync(vote);
             await dbContext.SaveChangesAsync();
-            response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
+            response.ToSuccessResponse("Vote thành công", StatusCodes.Status200OK);
             return response;
         }
     }
