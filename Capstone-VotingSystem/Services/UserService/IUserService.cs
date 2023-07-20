@@ -8,5 +8,6 @@ namespace Capstone_VotingSystem.Services.UserService
     public interface IUserService
     {
         public Task<APIResponse<UpdateUserResponse>> UpdateUser(string? userId, UpdateUserRequest request);
+        public Task<APIResponse<string>> UpdateUserGroup(string userId, Guid groupId);
     }
 }

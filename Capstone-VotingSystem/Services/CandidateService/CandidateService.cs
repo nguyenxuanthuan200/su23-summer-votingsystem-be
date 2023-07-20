@@ -63,6 +63,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 candida.UserId = us.UserId;
                 candida.Status = true;
                 candida.CampaignId = request.CampaignId;
+                candida.GroupCandidateId = request.GroupId;
             }
             await dbContext.Users.AddAsync(us);
             await dbContext.Accounts.AddAsync(acc);
@@ -111,6 +112,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                         can.Status = true;
                         can.Description = i.Description;
                         can.CampaignId = request.CampaignId;
+                        can.GroupCandidateId = checkuser.GroupId;
                     }
                     await dbContext.Candidates.AddAsync(can);
                     await dbContext.SaveChangesAsync();
