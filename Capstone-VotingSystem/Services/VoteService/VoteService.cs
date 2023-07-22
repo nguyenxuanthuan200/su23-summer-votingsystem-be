@@ -47,7 +47,11 @@ namespace Capstone_VotingSystem.Services.VoteService
                 return response;
             }
             var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupId == checkUser.GroupId && p.GroupCandidateId == checkCandidate.GroupCandidateId && p.CampaignId == checkStateId.CampaignId);
-
+            if (ratioGroup == null)
+            {
+                response.ToSuccessResponse("Ratio chưa được tạo", StatusCodes.Status400BadRequest);
+                return response;
+            }
             var id = Guid.NewGuid();
             Voting vote = new Voting();
             {

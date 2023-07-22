@@ -79,7 +79,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
         public async Task<APIResponse<CreateCandidateCampaignResponse>> CreateCandidateCampaign(CreateCandidateCampaignRequest request)
         {
             APIResponse<CreateCandidateCampaignResponse> response = new();
-            
+
             var check2 = await dbContext.Campaigns.Where(p => p.CampaignId == request.CampaignId).SingleOrDefaultAsync();
             if (check2 == null)
             {
@@ -92,38 +92,48 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 List<ListUserRequest> listUser = new List<ListUserRequest>();
                 foreach (var i in request.ListUser)
                 {
-                    var checkuser = await dbContext.Users.Where(p => p.UserId == i.UserId && p.Status==true).SingleOrDefaultAsync();
+                    var checkuser = await dbContext.Users.Where(p => p.UserId == i.UserId && p.Status == true).SingleOrDefaultAsync();
                     if (checkuser == null)
                     {
-                        response.ToFailedResponse("UserName "+i.UserId+"không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
+                        response.ToFailedResponse("UserName " + i.UserId + "không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
                         return response;
                     }
-                    var check3 = await dbContext.Candidates.Where(p => p.CampaignId == request.CampaignId && p.UserId == i.UserId).SingleOrDefaultAsync();
+                    var check3 = await dbContext.Candidates.Where(p => p.CampaignId == request.CampaignId && p.UserId == i.UserId && p.Status == true).SingleOrDefaultAsync();
                     if (check3 != null)
                     {
-                        response.ToFailedResponse("Candidate "+check3.UserId+" đã được thêm vào trước đó rồi!!!!", StatusCodes.Status400BadRequest);
+                        response.ToFailedResponse("Candidate " + check3.UserId + " đã được thêm vào trước đó rồi!!!!", StatusCodes.Status400BadRequest);
                         return response;
                     }
-                    var id = Guid.NewGuid();
-                    Candidate can = new Candidate();
+                    var check4 = await dbContext.Candidates.Where(p => p.CampaignId == request.CampaignId && p.UserId == i.UserId && p.Status == false).SingleOrDefaultAsync();
+                    if (check4 != null)
                     {
-                        can.CandidateId = id;
-                        can.UserId = i.UserId;
-                        can.Status = true;
-                        can.Description = i.Description;
-                        can.CampaignId = request.CampaignId;
-                        can.GroupCandidateId = checkuser.GroupId;
+                        check4.Status = true;
+                        dbContext.Candidates.Update(check4);
+                        await dbContext.SaveChangesAsync();
                     }
-                    await dbContext.Candidates.AddAsync(can);
-                    await dbContext.SaveChangesAsync();
+                    else
+                    {
+                        var id = Guid.NewGuid();
+                        Candidate can = new Candidate();
+                        {
+                            can.CandidateId = id;
+                            can.UserId = i.UserId;
+                            can.Status = true;
+                            can.Description = i.Description;
+                            can.CampaignId = request.CampaignId;
+                            can.GroupCandidateId = checkuser.GroupId;
+                        }
+                        await dbContext.Candidates.AddAsync(can);
+                        await dbContext.SaveChangesAsync();
+                    }
                 }
             }
-           
 
-           
+
+
             //var map = _mapper.Map<CreateCandidateCampaignResponse>(can);
             response.ToSuccessResponse("Thêm Candidate Thành công!!", StatusCodes.Status200OK);
-           // response.Data = map;
+            // response.Data = map;
             return response;
 
         }
@@ -140,7 +150,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
             }
 
             var listCandidate = await dbContext.Candidates
-               .Where(p => p.CampaignId == campaignId).ToListAsync();
+               .Where(p => p.CampaignId == campaignId && p.Status == true).ToListAsync();
             List<GetListCandidateCampaignResponse> result = new List<GetListCandidateCampaignResponse>();
             foreach (var item in listCandidate)
             {
@@ -154,6 +164,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                     candidate.GroupId = checkuser.GroupId;
                     candidate.FullName = checkuser.FullName;
                     candidate.Phone = checkuser.Phone;
+                    candidate.Status= checkuser.Status;
                     candidate.Gender = checkuser.Gender;
                     candidate.Dob = checkuser.Dob;
                     candidate.Email = checkuser.Email;
@@ -208,7 +219,13 @@ namespace Capstone_VotingSystem.Services.CandidateService
         public async Task<APIResponse<string>> DeleteCandidateCampaign(Guid candidateId, DeleteCandidateRequest request)
         {
             APIResponse<string> response = new();
-            var deleteCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CandidateId.Equals(candidateId) && p.CampaignId == request.campaignId && p.UserId.Equals(request.userId)).SingleOrDefaultAsync();
+            var checkCampaign = await dbContext.Campaigns.Where(p => p.Status == true && p.UserId == request.userId && p.CampaignId==request.campaignId).SingleOrDefaultAsync();
+            if (checkCampaign == null)
+            {
+                response.ToFailedResponse("Không phải là người tạo chiến dịch, bạn không thể xóa ứng cử viên trong đó hoặc chiến dịch đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var deleteCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CandidateId==candidateId && p.CampaignId == request.campaignId).SingleOrDefaultAsync();
             if (deleteCandidate == null)
             {
                 response.ToFailedResponse("Không có Candidate nào phù hợp trong Campaign hoặc đã bị xóa", StatusCodes.Status400BadRequest);
