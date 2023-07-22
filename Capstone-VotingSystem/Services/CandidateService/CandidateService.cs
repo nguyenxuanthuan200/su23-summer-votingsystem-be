@@ -321,13 +321,15 @@ namespace Capstone_VotingSystem.Services.CandidateService
             List<ListCandidateStageResponse> result = new List<ListCandidateStageResponse>();
             foreach (var item in listCandidate)
             {
+                var group = await dbContext.Groups.Where(p => p.GroupId == checkCandidate.GroupCandidateId).SingleOrDefaultAsync();
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
                 var candidate = new ListCandidateStageResponse();
                 {
                     candidate.CandidateId = item.CandidateId;
                     candidate.Description = item.Description;
                     candidate.UserId = item.UserId;
-                    candidate.GroupId = checkuser.GroupId;
+                    candidate.GroupId = checkCandidate.GroupCandidateId;
+                    candidate.GroupName = group.Name;
                     candidate.FullName = checkuser.FullName;
                     candidate.Phone = checkuser.Phone;
                     candidate.Gender = checkuser.Gender;

@@ -129,6 +129,7 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                     user.UserId = userrecord.Email;
                     user.FullName = userrecord.DisplayName;
                     user.AvatarUrl = userrecord.PhotoUrl;
+                    user.Email = userrecord.Email;
                 }
                 var claims = new[]
                    {
@@ -178,6 +179,7 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                    new Claim(ClaimTypes.Role, "User"),
                     new Claim("RoleId", role.RoleId.ToString()),
                     new Claim("RoleName", role.Name),
+                    new Claim("Username", status.UserName),
                     new Claim("Email", userrecord.Email),
                     new Claim("Photo", userrecord.PhotoUrl),
                     };
