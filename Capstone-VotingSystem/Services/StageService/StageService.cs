@@ -29,12 +29,16 @@ namespace Capstone_VotingSystem.Services.StageService
                 response.ToFailedResponse("Campaign không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var checkForm = await dbContext.Forms.Where(p => p.FormId == request.FormId).SingleOrDefaultAsync();
-            if (checkForm == null)
+            if(request.FormId !=null)
             {
-                response.ToFailedResponse("Form không tồn tại", StatusCodes.Status400BadRequest);
-                return response;
+                var checkForm = await dbContext.Forms.Where(p => p.FormId == request.FormId).SingleOrDefaultAsync();
+                if (checkForm == null)
+                {
+                    response.ToFailedResponse("Form không tồn tại", StatusCodes.Status400BadRequest);
+                    return response;
+                }
             }
+            
             DateTime startTime = (DateTime)campaign.StartTime;
             DateTime endTime = (DateTime)campaign.EndTime;
             DateTime newStartTime = request.StartTime;
@@ -65,7 +69,8 @@ namespace Capstone_VotingSystem.Services.StageService
                 stage.Description = request.Description;
                 stage.Title = request.Title;
                 stage.Content = request.Content;
-                stage.FormId = request.FormId;
+                if (request.FormId != null)
+                    stage.FormId = request.FormId;
                 stage.StartTime = request.StartTime;
                 stage.EndTime = request.EndTime;
                 stage.Status = true;
