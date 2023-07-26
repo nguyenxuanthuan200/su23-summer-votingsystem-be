@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Swashbuckle.AspNetCore.Annotations;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace Capstone_VotingSystem.Controller
 {
@@ -21,10 +21,29 @@ namespace Capstone_VotingSystem.Controller
         {
             this.candidateService = candidateService;
         }
-
+        [Authorize(Roles = "User,Admin")]
+        [HttpGet("{id}")]
+        [SwaggerOperation(summary: "Get candidate by id")]
+        public async Task<IActionResult> GetCandidateById(Guid id)
+        {
+            try
+            {
+                var result = await candidateService.GetCandidateById(id);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+        //[Authorize(Roles = "User,Admin")]
         [HttpGet("campaign/{id}")]
         [SwaggerOperation(summary: "Get list candidate by campaign id")]
-        public async Task<IActionResult> getListCandidateCampaign(Guid id)
+        public async Task<IActionResult> GetListCandidateCampaign(Guid id)
         {
             try
             {
@@ -40,9 +59,28 @@ namespace Capstone_VotingSystem.Controller
                 return BadRequest();
             }
         }
-
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        [SwaggerOperation(summary: "Get All Candidate with role admin")]
+        public async Task<IActionResult> GetAllCandidate()
+        {
+            try
+            {
+                var result = await candidateService.GetAllCandidate();
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+        [Authorize(Roles = "User,Admin")]
         [HttpPost("account")]
-        [SwaggerOperation(summary: "Add account Candidate to Campagin with some info of Candidate")]
+        [SwaggerOperation(summary: "Create account Candidate to Campagin with some info of Candidate")]
         public async Task<IActionResult> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request)
         {
             try
@@ -61,13 +99,14 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
+        [Authorize(Roles = "User")]
         [HttpPost]
         [SwaggerOperation(summary: "Add Candidate to Campagin with some info of Candidate")]
         public async Task<IActionResult> CreateCandidateCampaign(CreateCandidateCampaignRequest request)
         {
             try
             {
-                APIResponse<GetCandidateCampaignResponse> response = await candidateService.CreateCandidateCampaign(request);
+                var response = await candidateService.CreateCandidateCampaign(request);
                 if (response.Success == false)
                 {
                     return BadRequest(response);
@@ -78,6 +117,44 @@ namespace Capstone_VotingSystem.Controller
             {
                 return BadRequest(ex);
 
+            }
+        }
+        [Authorize(Roles = "User")]
+        [HttpDelete("{id}")]
+        [SwaggerOperation(summary: "Delete Candidate trong Campaign")]
+        public async Task<IActionResult> DeleteCandidate(Guid id, DeleteCandidateRequest request)
+        {
+            try
+            {
+                var result = await candidateService.DeleteCandidateCampaign(id, request);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        [HttpGet("stageid")]
+        [SwaggerOperation(summary: "Get All Candidate with role user")]
+        public async Task<IActionResult> GetListCandidateByStage(Guid stageid)
+        {
+            try
+            {
+                var result = await candidateService.getListcandidatStage(stageid);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
             }
         }
     }

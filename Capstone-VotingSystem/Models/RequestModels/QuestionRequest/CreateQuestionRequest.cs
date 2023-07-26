@@ -4,9 +4,10 @@ namespace Capstone_VotingSystem.Models.RequestModels.QuestionRequest
 {
     public class CreateQuestionRequest
     {
-        public string? QuestionName { get; set; }
+        public string? Title { get; set; }
+        public string? Content { get; set; }
         public Guid? FormId { get; set; }
-        public Guid? QuestionTypeId { get; set; }
+        public Guid? TypeId { get; set; }
         public List<CreateElementRequest> Element { get; set; }
     }
 }

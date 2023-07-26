@@ -19,7 +19,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
             _mapper = mapper;
         }
 
-        public async Task<APIResponse<GetQuestionResponse>> CreateElementQuestion(Guid questionId,CreateElementRequest request)
+        public async Task<APIResponse<GetQuestionResponse>> CreateElementQuestion(Guid questionId, CreateElementRequest request)
         {
             APIResponse<GetQuestionResponse> response = new();
             var checkquestion = await dbContext.Questions.SingleOrDefaultAsync(c => c.QuestionId == questionId);
@@ -28,26 +28,30 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 response.ToFailedResponse("Question không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var checktypequestion = await dbContext.QuestionTypes.SingleOrDefaultAsync(c => c.QuestionTypeId == checkquestion.QuestionTypeId);
+            var checktypequestion = await dbContext.Types.SingleOrDefaultAsync(c => c.TypeId == checkquestion.TypeId);
             var id = Guid.NewGuid();
             Element ele = new Element();
             {
                 ele.ElementId = id;
-                ele.Text = request.Text;
-                ele.QuestionId=questionId;
+                ele.Content = request.Answer;
+                ele.Status = true;
+                ele.QuestionId = questionId;
+                ele.Rate = request.Rate;
             }
             await dbContext.Elements.AddAsync(ele);
             await dbContext.SaveChangesAsync();
             var mapq = _mapper.Map<GetQuestionResponse>(checkquestion);
-            mapq.TypeName = checktypequestion.TypeName;
-            var element = await dbContext.Elements.Where(p => p.QuestionId == checkquestion.QuestionId).ToListAsync();
+            mapq.TypeName = checktypequestion.Name;
+            var element = await dbContext.Elements.Where(p => p.QuestionId == checkquestion.QuestionId && p.Status == true).ToListAsync();
             List<GetElementResponse> listelement = element.Select(
            x =>
            {
                return new GetElementResponse()
                {
                    ElementId = x.ElementId,
-                   Text = x.Text,
+                   Answer = x.Content,
+                   QuestionId = x.QuestionId,
+                   Rate = x.Rate,
                };
            }
            ).ToList();
@@ -67,53 +71,104 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 response.ToFailedResponse("Form không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var checktype = await dbContext.QuestionTypes.SingleOrDefaultAsync(c => c.QuestionTypeId == request.QuestionTypeId);
+            var checktype = await dbContext.Types.SingleOrDefaultAsync(c => c.TypeId == request.TypeId);
             if (checktype == null)
             {
                 response.ToFailedResponse("Type của question không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
-            if (request.Element == null)
-            {
-                response.ToFailedResponse("Element của question trống", StatusCodes.Status400BadRequest);
-                return response;
-            }
+
             var id = Guid.NewGuid();
             Question ques = new Question();
             {
                 ques.QuestionId = id;
-                ques.QuestionName = request.QuestionName;
+                ques.Title = request.Title;
                 ques.FormId = request.FormId;
-                ques.QuestionTypeId = request.QuestionTypeId;
+                ques.Content = request.Content;
+                ques.Status = true;
+                ques.TypeId = request.TypeId;
             }
             await dbContext.Questions.AddAsync(ques);
             await dbContext.SaveChangesAsync();
-            if (request.Element == null)
-            {
-                response.ToFailedResponse("Element của question trống", StatusCodes.Status400BadRequest);
-                return response;
-            }
-            List<GetElementResponse> listelement = new List<GetElementResponse>();
-            foreach (var i in request.Element)
-            {
-                var ide = Guid.NewGuid();
-                Element ele=new Element ();
-                {
-                    ele.ElementId = ide;
-                    ele.Text = i.Text;
-                    ele.QuestionId = ques.QuestionId;
-                }
-                await dbContext.Elements.AddAsync(ele);
-                await dbContext.SaveChangesAsync();
-                var map1 = _mapper.Map<GetElementResponse>(ele);
-                listelement.Add(map1);
-            }
             var map = _mapper.Map<GetQuestionResponse>(ques);
-            map.Element = listelement;
-            var type = await dbContext.QuestionTypes.SingleOrDefaultAsync(c => c.QuestionTypeId == request.QuestionTypeId);
-            map.TypeName = type.TypeName;
+            if (request.Element != null)
+            {
+                List<GetElementResponse> listelement = new List<GetElementResponse>();
+                foreach (var i in request.Element)
+                {
+                    var ide = Guid.NewGuid();
+                    Element ele = new Element();
+                    {
+                        ele.ElementId = ide;
+                        ele.Content = i.Answer;
+                        ele.Status = true;
+                        ele.QuestionId = ques.QuestionId;
+                        ele.Rate = i.Rate;
+                    }
+                    await dbContext.Elements.AddAsync(ele);
+                    await dbContext.SaveChangesAsync();
+                    var map1 = _mapper.Map<GetElementResponse>(ele);
+                    map1.Answer = ele.Content;
+                    listelement.Add(map1);
+                }
+                map.Element = listelement;
+            }
+
+            map.TypeName = checktype.Name;
             response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
             response.Data = map;
+            return response;
+        }
+
+        public async Task<APIResponse<GetQuestionNoElementResponse>> CreateQuestionNoElement(CreateQuestionWithNoElementRequest request)
+        {
+            APIResponse<GetQuestionNoElementResponse> response = new();
+            var checkform = await dbContext.Forms.SingleOrDefaultAsync(c => c.FormId == request.FormId);
+            if (checkform == null)
+            {
+                response.ToFailedResponse("Form không tồn tại", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var checktype = await dbContext.Types.SingleOrDefaultAsync(c => c.TypeId == request.TypeId);
+            if (checktype == null)
+            {
+                response.ToFailedResponse("Type của question không tồn tại", StatusCodes.Status400BadRequest);
+                return response;
+            }
+
+            var id = Guid.NewGuid();
+            Question ques = new Question();
+            {
+                ques.QuestionId = id;
+                ques.Title = request.Title;
+                ques.FormId = request.FormId;
+                ques.Content = request.Content;
+                ques.TypeId = request.TypeId;
+            }
+            await dbContext.Questions.AddAsync(ques);
+            await dbContext.SaveChangesAsync();
+            var map = _mapper.Map<GetQuestionNoElementResponse>(ques);
+            
+            map.TypeName = checktype.Name;
+            response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
+            response.Data = map;
+            return response;
+        }
+
+        public async Task<APIResponse<string>> DeleteQuestion(Guid id)
+        {
+            APIResponse<String> response = new();
+           
+            var checkQuestion= await dbContext.Questions.SingleOrDefaultAsync(c => c.QuestionId == id && c.Status == true);
+            if (checkQuestion == null)
+            {
+                response.ToFailedResponse("Câu hỏi không tồn tại hoặc bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            checkQuestion.Status = false;
+            dbContext.Questions.Update(checkQuestion);
+            await dbContext.SaveChangesAsync();
+            response.ToSuccessResponse("Xóa thành công", StatusCodes.Status200OK);
             return response;
         }
 
@@ -121,26 +176,29 @@ namespace Capstone_VotingSystem.Services.QuestionService
         {
             APIResponse<IEnumerable<GetQuestionResponse>> response = new();
             var question = await dbContext.Questions.Where(p => p.FormId == formid).ToListAsync();
-            List<GetQuestionResponse> listquestion=new List<GetQuestionResponse>();
+            List<GetQuestionResponse> listquestion = new List<GetQuestionResponse>();
             foreach (var item in question)
             {
-                var type = await dbContext.QuestionTypes.Where(p => p.QuestionTypeId == item.QuestionTypeId).SingleOrDefaultAsync();
+                var type = await dbContext.Types.Where(p => p.TypeId == item.TypeId).SingleOrDefaultAsync();
                 GetQuestionResponse quest = new GetQuestionResponse();
                 quest.QuestionId = item.QuestionId;
-                quest.QuestionName = item.QuestionName;
-                quest.FormId=item.FormId;
-                quest.TypeName = type.TypeName;
+                quest.Content = item.Content;
+                quest.Title = item.Title;
+                quest.FormId = item.FormId;
+                quest.TypeName = type.Name;
                 var element = await dbContext.Elements.Where(p => p.QuestionId == item.QuestionId).ToListAsync();
-                 List < GetElementResponse > listelement = element.Select(
-                x =>
-                {
-                    return new GetElementResponse()
-                    {
-                        ElementId = x.ElementId,
-                        Text = x.Text,
-                    };
-                }
-                ).ToList();
+                List<GetElementResponse> listelement = element.Select(
+               x =>
+               {
+                   return new GetElementResponse()
+                   {
+                       ElementId = x.ElementId,
+                       Answer = x.Content,
+                       QuestionId = x.QuestionId,
+                       Rate = x.Rate,
+                   };
+               }
+               ).ToList();
                 quest.Element = listelement;
 
                 listquestion.Add(quest);
@@ -164,23 +222,24 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 response.ToFailedResponse("Không có câu hỏi nào phù hợp theo yêu cầu ", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var questiontype = await dbContext.QuestionTypes.Where(p => p.QuestionTypeId == request.QuestionTypeId).SingleOrDefaultAsync();
+            var questiontype = await dbContext.Types.Where(p => p.TypeId == request.TypeId).SingleOrDefaultAsync();
             if (questiontype == null)
             {
                 response.ToFailedResponse("Không có loại câu hỏi nào phù hợp theo yêu cầu ", StatusCodes.Status400BadRequest);
                 return response;
             }
-            question.QuestionName = request.QuestionName;
-            question.QuestionTypeId = request.QuestionTypeId;
+            question.Title = request.Title;
+            question.Content = request.Content;
+            question.TypeId = request.TypeId;
             dbContext.Questions.Update(question);
             await dbContext.SaveChangesAsync();
 
             var mapq = _mapper.Map<GetQuestionResponse>(question);
-            mapq.TypeName = questiontype.TypeName;
+            mapq.TypeName = questiontype.Name;
             List<GetElementResponse> listelement = new();
-            foreach(var item in request.Element)
+            foreach (var item in request.Element)
             {
-                var element = await dbContext.Elements.Where(p => p.QuestionId == id && p.ElementId==item.ElementId).SingleOrDefaultAsync();
+                var element = await dbContext.Elements.Where(p => p.QuestionId == id && p.ElementId == item.ElementId).SingleOrDefaultAsync();
                 if (element == null)
                 {
                     response.ToFailedResponse("Câu trả lời không nằm trong câu hỏi heo yêu cầu ", StatusCodes.Status400BadRequest);
@@ -188,15 +247,30 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 }
                 else
                 {
-                    element.Text = item.Text;
+                    element.Content = item.Answer;
+                    element.Rate = item.Rate;
                     dbContext.Elements.Update(element);
                     await dbContext.SaveChangesAsync();
                 }
-                var map = _mapper.Map<GetElementResponse>(element);
-                listelement.Add(map);
+
+                //var map = _mapper.Map<GetElementResponse>(element);
+                //listelement.Add(map);
 
             }
-            mapq.Element = listelement;
+            var elementt = await dbContext.Elements.Where(p => p.QuestionId == question.QuestionId && p.Status == true).ToListAsync();
+            List<GetElementResponse> listelementt = elementt.Select(
+           x =>
+           {
+               return new GetElementResponse()
+               {
+                   ElementId = x.ElementId,
+                   Answer = x.Content,
+                   QuestionId = x.QuestionId,
+                   Rate = x.Rate,
+               };
+           }
+           ).ToList();
+            mapq.Element = listelementt;
             response.Data = mapq;
             response.ToSuccessResponse(response.Data, "Cập nhật câu hỏi và câu trả lời thành công", StatusCodes.Status200OK);
             return response;

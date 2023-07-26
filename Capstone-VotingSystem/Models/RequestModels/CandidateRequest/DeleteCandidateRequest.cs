@@ -2,5 +2,7 @@
 {
     public class DeleteCandidateRequest
     {
+        public string userId { get; set; }
+        public Guid campaignId { get; set; }
     }
 }

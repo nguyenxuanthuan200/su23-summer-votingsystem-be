@@ -38,7 +38,7 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [Authorize(Roles = "User")]
-        [HttpPost]
+        [HttpPost("elements")]
         [SwaggerOperation(summary: "Create new question and element")]
         public async Task<IActionResult> CreateQuestion(CreateQuestionRequest request)
         {
@@ -60,13 +60,35 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [Authorize(Roles = "User")]
-        [HttpPost("{questionId}")]
-        [SwaggerOperation(summary: "Create new element for question")]
-        public async Task<IActionResult> CreateElementQuestion(Guid questionId,CreateElementRequest request)
+        [HttpPost]
+        [SwaggerOperation(summary: "Create new question rating không câu trả lời")]
+        public async Task<IActionResult> CreateQuestionNoElement(CreateQuestionWithNoElementRequest request)
         {
             try
             {
-                var result = await questionService.CreateElementQuestion(questionId,request);
+                var result = await questionService.CreateQuestionNoElement(request);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+
+
+            }
+        }
+        [Authorize(Roles = "User")]
+        [HttpPost("{id}/element")]
+        [SwaggerOperation(summary: "Create new element for question")]
+        public async Task<IActionResult> CreateElementQuestion(Guid id,CreateElementRequest request)
+        {
+            try
+            {
+                var result = await questionService.CreateElementQuestion(id,request);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -84,11 +106,33 @@ namespace Capstone_VotingSystem.Controller
         [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Question and Element")]
-        public async Task<IActionResult> UpdateCampaign(Guid id, UpdateQuestionRequest request)
+        public async Task<IActionResult> UpdateQuestion(Guid id, UpdateQuestionRequest request)
         {
             try
             {
                 var result = await questionService.UpdateQuestion(id, request);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        [Authorize(Roles = "User")]
+        [HttpDelete("{id}")]
+        [SwaggerOperation(summary: "Delete Question")]
+        public async Task<IActionResult> DeleteQuestion(Guid id)
+        {
+            try
+            {
+                var result = await questionService.DeleteQuestion(id);
                 if (result.Success == false)
                 {
                     return BadRequest(result);

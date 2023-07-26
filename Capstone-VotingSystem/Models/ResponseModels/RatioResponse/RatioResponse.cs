@@ -1,13 +1,11 @@
-﻿namespace Capstone_VotingSystem.Models.ResponseModels.RateResponse
+﻿namespace Capstone_VotingSystem.Models.ResponseModels.RatioResponse
 {
     public class RatioResponse
     {
-        public Guid RatioCategoryId { get; set; }
+        public Guid RatioGroupId { get; set; }
         public decimal? Percent { get; set; }
-        public double? Ratio { get; set; }
-        public bool? CheckRatio { get; set; }
-        public Guid? CategoryId1 { get; set; }
-        public Guid? CategoryId2 { get; set; }
+        public Guid? GroupId { get; set; }
         public Guid? CampaignId { get; set; }
+        public Guid? GroupCandidateId { get; set; }
     }
 }

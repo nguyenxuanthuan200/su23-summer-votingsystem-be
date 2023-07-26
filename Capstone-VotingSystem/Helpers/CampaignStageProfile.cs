@@ -5,8 +5,8 @@ namespace Capstone_VotingSystem.Helpers
     {
         public CampaignStageProfile()
         {
-            CreateMap<Entities.CampaignStage, Models.ResponseModels.CampaignStageResponse.GetCampaignStageByCampaignResponse>().ReverseMap();
-            CreateMap<Entities.CampaignStage, Models.ResponseModels.CampaignStageResponse.CreateCampaginStageResponse>().ReverseMap();
+            CreateMap<Entities.Stage, Models.ResponseModels.StageResponse.GetStageResponse>().ReverseMap();
+            CreateMap<Entities.Stage, Models.ResponseModels.StageResponse.CreateStageResponse>().ReverseMap();
         }
     }
 }

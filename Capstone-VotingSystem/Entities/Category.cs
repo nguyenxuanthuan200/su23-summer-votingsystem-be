@@ -7,16 +7,15 @@ namespace Capstone_VotingSystem.Entities
     {
         public Category()
         {
-            RatioCategoryCategoryId1Navigations = new HashSet<RatioCategory>();
-            RatioCategoryCategoryId2Navigations = new HashSet<RatioCategory>();
-            Users = new HashSet<User>();
+            Campaigns = new HashSet<Campaign>();
+            Forms = new HashSet<Form>();
         }
 
         public Guid CategoryId { get; set; }
         public string? Name { get; set; }
+        public string? Description { get; set; }
 
-        public virtual ICollection<RatioCategory> RatioCategoryCategoryId1Navigations { get; set; }
-        public virtual ICollection<RatioCategory> RatioCategoryCategoryId2Navigations { get; set; }
-        public virtual ICollection<User> Users { get; set; }
+        public virtual ICollection<Campaign> Campaigns { get; set; }
+        public virtual ICollection<Form> Forms { get; set; }
     }
 }

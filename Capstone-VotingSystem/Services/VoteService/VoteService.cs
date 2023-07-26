@@ -1,6 +1,10 @@
-﻿using Capstone_VotingSystem.Entities;
-using Capstone_VotingSystem.Models.RequestModels.VoteDetailRequest;
+﻿using AutoMapper;
+using Capstone_VotingSystem.Core.CoreModel;
+using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Models.RequestModels.VoteRequest;
+using Capstone_VotingSystem.Models.RequestModels.VotingDetailRequest;
+using Capstone_VotingSystem.Models.ResponseModels.VotingDetailResponse;
+using Capstone_VotingSystem.Models.ResponseModels.VotingResponse;
 using Microsoft.EntityFrameworkCore;
 
 namespace Capstone_VotingSystem.Services.VoteService
@@ -8,94 +12,178 @@ namespace Capstone_VotingSystem.Services.VoteService
     public class VoteService : IVoteService
     {
         private readonly VotingSystemContext dbContext;
+        private readonly IMapper _mapper;
 
-        public VoteService(VotingSystemContext dbContext)
+        public VoteService(VotingSystemContext dbContext, IMapper mapper)
         {
             this.dbContext = dbContext;
+            this._mapper = mapper;
         }
-
-        public async Task<bool> CreateVote(CreateVoteRequest request)
+        public async Task<APIResponse<string>> CreateVote(CreateVoteRequest request)
         {
-            var user = await dbContext.Users.Where(
-              p => p.UserName == request.UserName).SingleOrDefaultAsync();
-
-            if (user == null)
+            APIResponse<string> response = new();
+            var checkUser = await dbContext.Users.Where(p => p.UserId == request.UserId).SingleOrDefaultAsync();
+            if (checkUser == null)
             {
-                return false;
+                response.ToFailedResponse("không tìm thấy user", StatusCodes.Status404NotFound);
+                return response;
             }
-            var camp = await dbContext.CampaignStages.Where(
-              p => p.CampaignStageId == request.CampaignStageId).SingleOrDefaultAsync();
-
-            if (camp == null)
+            var checkStateId = await dbContext.Stages.SingleOrDefaultAsync(p => p.StageId == request.StageId);
+            if (checkStateId == null)
             {
-                return false;
+                response.ToSuccessResponse("không tìm thấy State", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var checkCandidate = await dbContext.Candidates.SingleOrDefaultAsync(p => p.CandidateId == request.CandidateId && p.CampaignId == checkStateId.CampaignId);
+            if (checkCandidate == null)
+            {
+                response.ToSuccessResponse("không tìm thấy candidate hoặc candidate không thuộc campaign này", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var checkVote = await dbContext.Votings.SingleOrDefaultAsync(p => p.UserId == request.UserId && p.CandidateId == request.CandidateId && p.StageId == request.StageId && p.Status == true);
+            if (checkVote != null)
+            {
+                response.ToSuccessResponse("Bạn đã bình chọn cho ứng cử viên này trong giai đoạn này rồi", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupId == checkUser.GroupId && p.GroupCandidateId == checkCandidate.GroupCandidateId && p.CampaignId == checkStateId.CampaignId);
+            if (ratioGroup == null)
+            {
+                response.ToSuccessResponse("Ratio chưa được tạo", StatusCodes.Status400BadRequest);
+                return response;
             }
             var id = Guid.NewGuid();
             Voting vote = new Voting();
             {
                 vote.VotingId = id;
-                vote.Time = request.Time;
-                vote.CampaignStageId = request.CampaignStageId;
-                vote.UserName = request.UserName;
+                vote.UserId = request.UserId;
+                vote.StageId = request.StageId;
+                vote.RatioGroupId = ratioGroup.RatioGroupId;
+                vote.CandidateId = request.CandidateId;
+                vote.Status = true;
+                vote.SendingTime = request.SendingTime;
             }
             await dbContext.Votings.AddAsync(vote);
             await dbContext.SaveChangesAsync();
-            //VoteDetail votedetail = new VoteDetail()
-            //{
-            //    votedetail.VoteDetailId = id;
-            //    votedetail.Time = DateTime.Now;
-            //    votedetail.TeacherCampaignId = request.TeacherCampaignId;
-            //    votedetail.Mssv = request.MssvStudent;
-            //};
-            //var idAnswerVote = Guid.NewGuid();
-            //AnswerVote answervote = new AnswerVote();
-            //{
-            //    answervote.AnswerVoteId = idAnswerVote;
-            //    answervote.Answer = request.Answer;
-            //    answervote.QuestionStageId = request.QuestionId;
-            //    answervote.VoteDetailId = id;
-            //}
-            //await dbContext.VoteDetails.AddAsync(votedetail);
-            //await dbContext.AnswerVotes.AddAsync(answervote);
-            //await dbContext.SaveChangesAsync();
-            //var re = _mapper.map<createpostresponse>(post);
-            //var mapproduct = _mapper.map<getproductresponse>(product);
-            //re.product = mapproduct;
-
-            return true;
+            var map = _mapper.Map<CreateVoteResponse>(vote);
+            decimal scorevotedetail = 0;
+            if (request.VotingDetail != null)
+            {
+                
+                List<CreateVoteDetailResponse> listVotingDetail = new List<CreateVoteDetailResponse>();
+                foreach (var i in request.VotingDetail)
+                {
+                    var scoreElement = await dbContext.Elements.Where(p => p.ElementId == i.ElementId).SingleOrDefaultAsync();
+                    scorevotedetail +=scoreElement.Rate;
+                    var ide = Guid.NewGuid();
+                    VotingDetail votingDetail = new VotingDetail();
+                    {
+                        votingDetail.VotingDetailId = ide;
+                        votingDetail.Time = DateTime.Now;
+                        votingDetail.ElementId = i.ElementId;
+                        votingDetail.VotingId = vote.VotingId;
+                    }
+                    await dbContext.VotingDetails.AddAsync(votingDetail);
+                    await dbContext.SaveChangesAsync();
+                    var map1 = _mapper.Map<CreateVoteDetailResponse>(votingDetail);
+                    listVotingDetail.Add(map1);
+                }
+                map.VoteDetails = listVotingDetail;
+            }
+            var checkscore = await dbContext.Scores.Where(p => p.StageId == request.StageId && p.CandidateId==request.CandidateId).SingleOrDefaultAsync();
+            if (checkscore==null)
+            {
+                var scoreid = Guid.NewGuid();
+                Score sc = new();
+                {
+                    sc.Score1 = (int?)(scorevotedetail * ratioGroup.Percent);
+                    sc.ScoreId = scoreid;
+                    sc.CandidateId = request.CandidateId;
+                    sc.StageId = request.StageId;
+                }
+                await dbContext.Scores.AddAsync(sc);
+                await dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                checkscore.Score1 += (int?)(scorevotedetail * ratioGroup.Percent);
+                dbContext.Scores.Update(checkscore);
+                await dbContext.SaveChangesAsync();
+            }
+            response.ToSuccessResponse("Bình chọn thành công", StatusCodes.Status200OK);
+            //response.Data = map;
+            return response;
         }
 
-        public async Task<bool> CreateVoteDetail(CreateVoteDetailRequest request)
+        public async Task<APIResponse<string>> CreateVoteLike(CreateVoteLikeRequest request)
         {
-            var checkvote = await dbContext.Votings.Where(
-             p => p.VotingId == request.VotingId).SingleOrDefaultAsync();
-            if (checkvote == null) return false;
-
-            var checkform = await dbContext.FormStages.Where(
-             p => p.FormStageId == request.FormStageId).SingleOrDefaultAsync();
-            if (checkform == null) return false;
-
-            var checkratio = await dbContext.RatioCategories.Where(
-             p => p.RatioCategoryId == request.RatioCategoryId).SingleOrDefaultAsync();
-            if (checkvote == null) return false;
-
-            var checkcandidate = await dbContext.CandidateProfiles.Where(
-             p => p.CandidateProfileId == request.CandidateProfileId).SingleOrDefaultAsync();
-            if (checkcandidate == null) return false;
-
-            var id = Guid.NewGuid();
-            VotingDetail votedetail = new VotingDetail();
+            APIResponse<string> response = new();
+            var checkUser = await dbContext.Users.Where(p => p.UserId == request.UserId).SingleOrDefaultAsync();
+            if (checkUser == null)
             {
-                votedetail.VotingDetailId = id;
-                votedetail.Time = request.Time;
-                votedetail.VotingId = request.VotingId;
-                votedetail.FormStageId = request.FormStageId;
-                votedetail.RatioCategoryId = request.RatioCategoryId;
-                votedetail.CandidateProfileId = request.CandidateProfileId;
+                response.ToFailedResponse("không tìm thấy user", StatusCodes.Status404NotFound);
+                return response;
             }
-            await dbContext.VotingDetails.AddAsync(votedetail);
+            var checkStateId = await dbContext.Stages.SingleOrDefaultAsync(p => p.StageId == request.StageId);
+            if (checkStateId == null)
+            {
+                response.ToSuccessResponse("không tìm thấy State", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var checkCandidate = await dbContext.Candidates.SingleOrDefaultAsync(p => p.CandidateId == request.CandidateId && p.CampaignId == checkStateId.CampaignId && p.Status==true);
+            if (checkCandidate == null)
+            {
+                response.ToSuccessResponse("không tìm thấy candidate hoặc candidate không thuộc campaign này", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var checkVote = await dbContext.Votings.SingleOrDefaultAsync(p => p.UserId == request.UserId && p.CandidateId == request.CandidateId && p.StageId == request.StageId && p.Status==true);
+            if (checkVote != null)
+            {
+                response.ToSuccessResponse("Bạn đã bình chọn cho ứng cử viên này trong giai đoạn này rồi", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupId == checkUser.GroupId && p.GroupCandidateId == checkCandidate.GroupCandidateId && p.CampaignId== checkStateId.CampaignId);
+            if (ratioGroup == null)
+            {
+                response.ToSuccessResponse("Ratio chưa được tạo", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var id = Guid.NewGuid();
+            Voting vote = new Voting();
+            {
+                vote.VotingId = id;
+                vote.UserId = request.UserId;
+                vote.StageId = request.StageId;
+                vote.RatioGroupId = ratioGroup.RatioGroupId;
+                vote.CandidateId = request.CandidateId;
+                vote.Status = true;
+                vote.SendingTime = request.SendingTime;
+            }
+            //decimal scorevotedetail = 0;
+            var checkscore = await dbContext.Scores.Where(p => p.StageId == request.StageId && p.CandidateId == request.CandidateId).SingleOrDefaultAsync();
+            if (checkscore == null)
+            {
+                var scoreid = Guid.NewGuid();
+                Score sc = new();
+                {
+                    sc.Score1 = (int?)ratioGroup.Percent;
+                    sc.ScoreId = scoreid;
+                    sc.CandidateId = request.CandidateId;
+                    sc.StageId = request.StageId;
+                }
+                await dbContext.Scores.AddAsync(sc);
+                await dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                checkscore.Score1 += (int?)ratioGroup.Percent;
+                dbContext.Scores.Update(checkscore);
+                await dbContext.SaveChangesAsync();
+            }
+            await dbContext.Votings.AddAsync(vote);
             await dbContext.SaveChangesAsync();
-            return true;
+            response.ToSuccessResponse("Bình chọn thành công", StatusCodes.Status200OK);
+            return response;
         }
     }
 }

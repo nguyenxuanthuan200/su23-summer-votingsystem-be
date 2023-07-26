@@ -6,8 +6,10 @@
         public string? Title { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
-        public bool? Visibility { get; set; }
+        public string? Visibility { get; set; }
+        public string? ImgUrl { get; set; }
         public bool? Status { get; set; }
-        public string? UserName { get; set; }
+        public string? UserId { get; set; }
+        public Guid? CategoryId { get; set; }
     }
 }
