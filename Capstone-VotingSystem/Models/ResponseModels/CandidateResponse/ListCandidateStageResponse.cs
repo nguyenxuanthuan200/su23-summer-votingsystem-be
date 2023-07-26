@@ -14,5 +14,7 @@
         public DateTime? Dob { get; set; }
         public string? Email { get; set; }
         public string? AvatarUrl { get; set; }
+
+        public int? StageScore { get; set; }
     }
 }

@@ -47,7 +47,11 @@ namespace Capstone_VotingSystem.Services.VoteService
                 return response;
             }
             var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupId == checkUser.GroupId && p.GroupCandidateId == checkCandidate.GroupCandidateId && p.CampaignId == checkStateId.CampaignId);
-
+            if (ratioGroup == null)
+            {
+                response.ToSuccessResponse("Ratio chưa được tạo", StatusCodes.Status400BadRequest);
+                return response;
+            }
             var id = Guid.NewGuid();
             Voting vote = new Voting();
             {
@@ -62,11 +66,15 @@ namespace Capstone_VotingSystem.Services.VoteService
             await dbContext.Votings.AddAsync(vote);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<CreateVoteResponse>(vote);
+            decimal scorevotedetail = 0;
             if (request.VotingDetail != null)
             {
+                
                 List<CreateVoteDetailResponse> listVotingDetail = new List<CreateVoteDetailResponse>();
                 foreach (var i in request.VotingDetail)
                 {
+                    var scoreElement = await dbContext.Elements.Where(p => p.ElementId == i.ElementId).SingleOrDefaultAsync();
+                    scorevotedetail +=scoreElement.Rate;
                     var ide = Guid.NewGuid();
                     VotingDetail votingDetail = new VotingDetail();
                     {
@@ -82,7 +90,27 @@ namespace Capstone_VotingSystem.Services.VoteService
                 }
                 map.VoteDetails = listVotingDetail;
             }
-            response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
+            var checkscore = await dbContext.Scores.Where(p => p.StageId == request.StageId && p.CandidateId==request.CandidateId).SingleOrDefaultAsync();
+            if (checkscore==null)
+            {
+                var scoreid = Guid.NewGuid();
+                Score sc = new();
+                {
+                    sc.Score1 = (int?)(scorevotedetail * ratioGroup.Percent);
+                    sc.ScoreId = scoreid;
+                    sc.CandidateId = request.CandidateId;
+                    sc.StageId = request.StageId;
+                }
+                await dbContext.Scores.AddAsync(sc);
+                await dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                checkscore.Score1 += (int?)(scorevotedetail * ratioGroup.Percent);
+                dbContext.Scores.Update(checkscore);
+                await dbContext.SaveChangesAsync();
+            }
+            response.ToSuccessResponse("Bình chọn thành công", StatusCodes.Status200OK);
             //response.Data = map;
             return response;
         }
@@ -102,7 +130,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToSuccessResponse("không tìm thấy State", StatusCodes.Status404NotFound);
                 return response;
             }
-            var checkCandidate = await dbContext.Candidates.SingleOrDefaultAsync(p => p.CandidateId == request.CandidateId && p.CampaignId == checkStateId.CampaignId);
+            var checkCandidate = await dbContext.Candidates.SingleOrDefaultAsync(p => p.CandidateId == request.CandidateId && p.CampaignId == checkStateId.CampaignId && p.Status==true);
             if (checkCandidate == null)
             {
                 response.ToSuccessResponse("không tìm thấy candidate hoặc candidate không thuộc campaign này", StatusCodes.Status404NotFound);
@@ -115,7 +143,11 @@ namespace Capstone_VotingSystem.Services.VoteService
                 return response;
             }
             var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupId == checkUser.GroupId && p.GroupCandidateId == checkCandidate.GroupCandidateId && p.CampaignId== checkStateId.CampaignId);
-           
+            if (ratioGroup == null)
+            {
+                response.ToSuccessResponse("Ratio chưa được tạo", StatusCodes.Status400BadRequest);
+                return response;
+            }
             var id = Guid.NewGuid();
             Voting vote = new Voting();
             {
@@ -127,9 +159,30 @@ namespace Capstone_VotingSystem.Services.VoteService
                 vote.Status = true;
                 vote.SendingTime = request.SendingTime;
             }
+            //decimal scorevotedetail = 0;
+            var checkscore = await dbContext.Scores.Where(p => p.StageId == request.StageId && p.CandidateId == request.CandidateId).SingleOrDefaultAsync();
+            if (checkscore == null)
+            {
+                var scoreid = Guid.NewGuid();
+                Score sc = new();
+                {
+                    sc.Score1 = (int?)ratioGroup.Percent;
+                    sc.ScoreId = scoreid;
+                    sc.CandidateId = request.CandidateId;
+                    sc.StageId = request.StageId;
+                }
+                await dbContext.Scores.AddAsync(sc);
+                await dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                checkscore.Score1 += (int?)ratioGroup.Percent;
+                dbContext.Scores.Update(checkscore);
+                await dbContext.SaveChangesAsync();
+            }
             await dbContext.Votings.AddAsync(vote);
             await dbContext.SaveChangesAsync();
-            response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
+            response.ToSuccessResponse("Bình chọn thành công", StatusCodes.Status200OK);
             return response;
         }
     }

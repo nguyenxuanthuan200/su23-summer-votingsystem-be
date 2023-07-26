@@ -140,7 +140,7 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [HttpGet("stageid")]
-        [SwaggerOperation(summary: "Get All Candidate with role user")]
+        [SwaggerOperation(summary: "Get All Candidate by Stage")]
         public async Task<IActionResult> GetListCandidateByStage(Guid stageid)
         {
             try
@@ -154,7 +154,8 @@ namespace Capstone_VotingSystem.Controller
             }
             catch (Exception)
             {
-                return BadRequest();
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
             }
         }
     }

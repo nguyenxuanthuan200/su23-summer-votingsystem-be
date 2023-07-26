@@ -7,7 +7,6 @@ using Capstone_VotingSystem.Services.CampaignService;
 using Swashbuckle.AspNetCore.Annotations;
 using Capstone_VotingSystem.Controllers;
 using Microsoft.AspNetCore.Authorization;
-
 namespace Capstone_VotingSystem.Controller
 {
     [Route("api/v1/campaigns")]

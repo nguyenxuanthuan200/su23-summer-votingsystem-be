@@ -85,6 +85,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 ques.Title = request.Title;
                 ques.FormId = request.FormId;
                 ques.Content = request.Content;
+                ques.Status = true;
                 ques.TypeId = request.TypeId;
             }
             await dbContext.Questions.AddAsync(ques);
@@ -151,6 +152,23 @@ namespace Capstone_VotingSystem.Services.QuestionService
             map.TypeName = checktype.Name;
             response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
             response.Data = map;
+            return response;
+        }
+
+        public async Task<APIResponse<string>> DeleteQuestion(Guid id)
+        {
+            APIResponse<String> response = new();
+           
+            var checkQuestion= await dbContext.Questions.SingleOrDefaultAsync(c => c.QuestionId == id && c.Status == true);
+            if (checkQuestion == null)
+            {
+                response.ToFailedResponse("Câu hỏi không tồn tại hoặc bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            checkQuestion.Status = false;
+            dbContext.Questions.Update(checkQuestion);
+            await dbContext.SaveChangesAsync();
+            response.ToSuccessResponse("Xóa thành công", StatusCodes.Status200OK);
             return response;
         }
 

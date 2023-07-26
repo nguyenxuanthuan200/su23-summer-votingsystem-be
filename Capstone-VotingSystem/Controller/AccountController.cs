@@ -7,7 +7,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1/account")]
+    [Route("api/v1/accounts")]
     [ApiController]
     public class AccountController : BaseApiController
     {
