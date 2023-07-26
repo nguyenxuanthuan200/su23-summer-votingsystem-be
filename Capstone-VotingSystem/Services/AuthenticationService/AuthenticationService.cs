@@ -179,8 +179,8 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                    new Claim(ClaimTypes.Role, "User"),
                     new Claim("RoleId", role.RoleId.ToString()),
                     new Claim("RoleName", role.Name),
-                    new Claim("Username", status.UserName),
-                    new Claim("Email", userrecord.Email),
+                    new Claim("Username", userrecord.Email),
+                    //new Claim("Email", userrecord.Email),
                     new Claim("Photo", userrecord.PhotoUrl),
                     };
 
