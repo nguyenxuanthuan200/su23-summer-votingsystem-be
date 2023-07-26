@@ -304,12 +304,12 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == checkcam.UserId);
-            if (checkCandidate == null)
-            {
-                response.ToFailedResponse("ứng cử viên không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
-                return response;
-            }
+            //var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == checkcam.UserId);
+            //if (checkCandidate == null)
+            //{
+            //    response.ToFailedResponse("ứng cử viên không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+            //    return response;
+            //}
             var stage = new GetListCandidateStageResponse()
             {
                 StageId = stageId,
@@ -321,8 +321,10 @@ namespace Capstone_VotingSystem.Services.CandidateService
             List<ListCandidateStageResponse> result = new List<ListCandidateStageResponse>();
             foreach (var item in listCandidate)
             {
-                var group = await dbContext.Groups.Where(p => p.GroupId == checkCandidate.GroupCandidateId).SingleOrDefaultAsync();
+                
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
+                var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId &&p.CampaignId== checkcam.CampaignId);
+                var group = await dbContext.Groups.Where(p => p.GroupId == checkCandidate.GroupCandidateId).SingleOrDefaultAsync();
                 var scoreStage = await dbContext.Scores.Where(p => p.StageId == stage.StageId && p.CandidateId == item.CandidateId).SingleOrDefaultAsync();
                 var score = 0;
                 if (scoreStage != null)
