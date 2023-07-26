@@ -285,12 +285,6 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == checkcam.UserId);
-            if (checkCandidate == null)
-            {
-                response.ToFailedResponse("ứng cử viên không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
-                return response;
-            }
             var stage = new GetListCandidateStageResponse()
             {
                 StageId = stageId,
@@ -302,14 +296,15 @@ namespace Capstone_VotingSystem.Services.CandidateService
             List<ListCandidateStageResponse> result = new List<ListCandidateStageResponse>();
             foreach (var item in listCandidate)
             {
-                var group = await dbContext.Groups.Where(p => p.GroupId == checkCandidate.GroupCandidateId).SingleOrDefaultAsync();
+                //var group = await dbContext.Groups.Where(p => p.GroupId == checkCandidate.GroupCandidateId).SingleOrDefaultAsync();
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
+                var group = await dbContext.Groups.Where(g => g.GroupId == checkuser.GroupId).SingleOrDefaultAsync();
                 var candidate = new ListCandidateStageResponse();
                 {
                     candidate.CandidateId = item.CandidateId;
                     candidate.Description = item.Description;
                     candidate.UserId = item.UserId;
-                    candidate.GroupId = checkCandidate.GroupCandidateId;
+                    candidate.GroupId = item.GroupCandidateId;
                     candidate.GroupName = group.Name;
                     candidate.FullName = checkuser.FullName;
                     candidate.Phone = checkuser.Phone;
