@@ -7,5 +7,6 @@ namespace Capstone_VotingSystem.Services.ScoreService
     public interface IScoreService
     {
         Task<APIResponse<GetScoreResponse>> GetScore(GetScoreByCampaginRequest request);
+        Task<APIResponse<GetScoreResponse>> SortScore(GetScoreByCampaginRequest request);
     }
 }

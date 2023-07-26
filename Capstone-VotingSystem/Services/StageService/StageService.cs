@@ -29,6 +29,34 @@ namespace Capstone_VotingSystem.Services.StageService
                 response.ToFailedResponse("Campaign không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
+            var checkForm = await dbContext.Forms.Where(p => p.FormId == request.FormId).SingleOrDefaultAsync();
+            if (checkForm == null)
+            {
+                response.ToFailedResponse("Form không tồn tại", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            DateTime startTime = (DateTime)campaign.StartTime;
+            DateTime endTime = (DateTime)campaign.EndTime;
+            DateTime newStartTime = request.StartTime;
+            DateTime newEndTime = request.EndTime;
+            TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+
+            if (DateTime.Compare(newEndTime, newStartTime) <= 0)
+            {
+                response.ToFailedResponse("Thời gian bắt đầu không sau thời gian hiện tại hoặc thời gian kết thúc không sau thời gian bắt đầu.", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            // Kiểm tra giá trị của hai biến DateTime mới
+            if (DateTime.Compare(newStartTime, startTime) >= 0 && DateTime.Compare(newEndTime, endTime) <= 0)
+            {
+                //Console.WriteLine("New start time and new end time are within the range of start time and end time.");
+            }
+            else
+            {
+                response.ToFailedResponse("Thời gian bắt đầu của giai đoạn và thời gian kết thúc của giai đoạn không nằm trong phạm vi của thời gian bắt đầu và thời gian kết thúc của chiến dịch.", StatusCodes.Status400BadRequest);
+                return response;
+            }
+
             var id = Guid.NewGuid();
             Stage stage = new Stage();
             {

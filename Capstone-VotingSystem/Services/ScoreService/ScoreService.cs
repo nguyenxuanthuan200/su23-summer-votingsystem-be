@@ -81,5 +81,10 @@ namespace Capstone_VotingSystem.Services.ScoreService
             response.Data = scorerp;
             return response;
         }
+
+        public Task<APIResponse<GetScoreResponse>> SortScore(GetScoreByCampaginRequest request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

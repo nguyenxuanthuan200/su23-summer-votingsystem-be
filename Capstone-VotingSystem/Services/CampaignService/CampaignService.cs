@@ -40,16 +40,58 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 response.ToFailedResponse("UserName không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
-            //var checkCategory = await dbContext.Categories.SingleOrDefaultAsync(c => c.CategoryId == request.CategoryId);
-            //if (checkCategory == null)
-            //{
-            //    response.ToFailedResponse("Category không tồn tại", StatusCodes.Status400BadRequest);
-            //    return
-            //    response;
-            //}
+            var checkCategory = await dbContext.Categories.SingleOrDefaultAsync(c => c.CategoryId == request.CategoryId);
+            if (checkCategory == null)
+            {
+                response.ToFailedResponse("Category không tồn tại", StatusCodes.Status400BadRequest);
+                return
+                response;
+            }
             if (!request.Visibility.Equals("public") && !request.Visibility.Equals("private"))
             {
                 response.ToFailedResponse("Visibility không đúng định dạng!! (public or private)", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            #region
+            //string StartDateString = ""+request.StartTime;
+            //string EndDateString = ""+request.EndTime;
+            //DateTime dateToCheck;
+
+            //if (DateTime.TryParseExact(StartDateString, "yyyy-MM-dd'T'HH:mm:ss.fff'Z'", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateToCheck) && dateToCheck.CompareTo(DateTime.UtcNow) > 0)
+            //{
+            //    DateTime startDate;
+            //    DateTime endDate;
+
+            //    if (DateTime.TryParseExact(StartDateString, "yyyy-MM-dd'T'HH:mm:ss.fff'Z'", CultureInfo.InvariantCulture, DateTimeStyles.None, out startDate) &&
+            //        DateTime.TryParseExact(EndDateString, "yyyy-MM-dd'T'HH:mm:ss.fff'Z'", CultureInfo.InvariantCulture, DateTimeStyles.None, out endDate) &&
+            //        endDate.CompareTo(startDate) > 0)
+            //    {
+
+            //    }
+            //    else
+            //    {
+            //        response.ToFailedResponse("Thời gian kết thúc chiến dịch phải lớn hơn thời gian bắt đầu chiến dịch", StatusCodes.Status400BadRequest);
+            //        return response;
+            //    }
+            //}
+            //else
+            //{
+            //    // dateToCheck không hợp lệ hoặc nhỏ hơn hoặc bằng ngày giờ hiện tại (theo múi giờ UTC)
+            //    response.ToFailedResponse("Thời gian bắt đầu chiến dịch phải lớn hơn thời gian hiện tại ", StatusCodes.Status400BadRequest);
+            //    return response;
+            //}
+            #endregion
+            TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
+
+            // Kiểm tra giá trị của hai biến DateTime
+            if (DateTime.Compare(request.StartTime, currentDateTimeVn) > 0 && DateTime.Compare(request.EndTime, request.StartTime) > 0)
+            {
+                //Console.WriteLine("Start time is after current time, and end time is after start time.");
+            }
+            else
+            {
+                response.ToFailedResponse("Thời gian bắt đầu không sau thời gian hiện tại hoặc thời gian kết thúc không sau thời gian bắt đầu.", StatusCodes.Status400BadRequest);
                 return response;
             }
             var uploadResult = new ImageUploadResult();
