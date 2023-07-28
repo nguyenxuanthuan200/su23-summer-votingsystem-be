@@ -11,7 +11,6 @@ namespace Capstone_VotingSystem.Entities
         }
 
         public Guid QuestionId { get; set; }
-        public string? Title { get; set; }
         public string? Content { get; set; }
         public bool? Status { get; set; }
         public Guid? FormId { get; set; }
