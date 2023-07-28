@@ -54,7 +54,13 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 us.FullName = request.FullName;
                 us.Status = true;
                 us.Address = request.Address;
-                us.GroupId = request.GroupId;
+            }
+            var uuid = Guid.NewGuid();
+            GroupUser groupUser = new GroupUser();
+            {
+                groupUser.GroupUserId = uuid;
+                groupUser.UserId = request.UserName;
+                groupUser.GroupId = request.GroupId;
             }
             var id = Guid.NewGuid();
             Candidate candida = new Candidate();
@@ -63,11 +69,11 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 candida.UserId = us.UserId;
                 candida.Status = true;
                 candida.CampaignId = request.CampaignId;
-                candida.GroupCandidateId = request.GroupId;
             }
             await dbContext.Users.AddAsync(us);
             await dbContext.Accounts.AddAsync(acc);
             await dbContext.Candidates.AddAsync(candida);
+            await dbContext.GroupUsers.AddAsync(groupUser);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<CreateAccountCandidateResponse>(us);
             response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
@@ -121,7 +127,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                             can.Status = true;
                             can.Description = i.Description;
                             can.CampaignId = request.CampaignId;
-                            can.GroupCandidateId = checkuser.GroupId;
+
                         }
                         await dbContext.Candidates.AddAsync(can);
                         await dbContext.SaveChangesAsync();
@@ -155,16 +161,19 @@ namespace Capstone_VotingSystem.Services.CandidateService
             foreach (var item in listCandidate)
             {
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
+                var checkGroupUser = await dbContext.GroupUsers
+                                    .Where(p => p.UserId == checkuser.UserId)
+                                    .Join(dbContext.Groups, gu => gu.GroupId, g => g.GroupId, (gu, g) => new { GroupUser = gu, Group = g }).SingleOrDefaultAsync();
                 var candidate = new GetListCandidateCampaignResponse();
                 {
                     candidate.CandidateId = item.CandidateId;
                     candidate.CampaignId = item.CampaignId;
                     candidate.Description = item.Description;
                     candidate.UserId = item.UserId;
-                    candidate.GroupId = checkuser.GroupId;
+                    candidate.GroupId = checkGroupUser != null ? checkGroupUser.GroupUser.GroupId : null;
                     candidate.FullName = checkuser.FullName;
                     candidate.Phone = checkuser.Phone;
-                    candidate.Status= checkuser.Status;
+                    candidate.Status = checkuser.Status;
                     candidate.Gender = checkuser.Gender;
                     candidate.Dob = checkuser.Dob;
                     candidate.Email = checkuser.Email;
@@ -189,13 +198,16 @@ namespace Capstone_VotingSystem.Services.CandidateService
             foreach (var item in listCandidate)
             {
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
+                var checkGroupUser = await dbContext.GroupUsers
+                                    .Where(p => p.UserId == checkuser.UserId)
+                                    .Join(dbContext.Groups, gu => gu.GroupId, g => g.GroupId, (gu, g) => new { GroupUser = gu, Group = g }).SingleOrDefaultAsync();
                 var candidate = new GetListCandidateCampaignResponse();
                 {
                     candidate.CandidateId = item.CandidateId;
                     candidate.CampaignId = item.CampaignId;
                     candidate.Description = item.Description;
                     candidate.UserId = item.UserId;
-                    candidate.GroupId = checkuser.GroupId;
+                    candidate.GroupId = checkGroupUser.GroupUser.GroupId;
                     candidate.FullName = checkuser.FullName;
                     candidate.Phone = checkuser.Phone;
                     candidate.Gender = checkuser.Gender;
@@ -219,13 +231,13 @@ namespace Capstone_VotingSystem.Services.CandidateService
         public async Task<APIResponse<string>> DeleteCandidateCampaign(Guid candidateId, DeleteCandidateRequest request)
         {
             APIResponse<string> response = new();
-            var checkCampaign = await dbContext.Campaigns.Where(p => p.Status == true && p.UserId == request.userId && p.CampaignId==request.campaignId).SingleOrDefaultAsync();
+            var checkCampaign = await dbContext.Campaigns.Where(p => p.Status == true && p.UserId == request.userId && p.CampaignId == request.campaignId).SingleOrDefaultAsync();
             if (checkCampaign == null)
             {
                 response.ToFailedResponse("Không phải là người tạo chiến dịch, bạn không thể xóa ứng cử viên trong đó hoặc chiến dịch đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var deleteCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CandidateId==candidateId && p.CampaignId == request.campaignId).SingleOrDefaultAsync();
+            var deleteCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CandidateId == candidateId && p.CampaignId == request.campaignId).SingleOrDefaultAsync();
             if (deleteCandidate == null)
             {
                 response.ToFailedResponse("Không có Candidate nào phù hợp trong Campaign hoặc đã bị xóa", StatusCodes.Status400BadRequest);
@@ -315,30 +327,32 @@ namespace Capstone_VotingSystem.Services.CandidateService
             List<ListCandidateStageResponse> result = new List<ListCandidateStageResponse>();
             foreach (var item in listCandidate)
             {
-             
+
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
-                var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId &&p.CampaignId== checkcam.CampaignId);
-                var group = await dbContext.Groups.Where(p => p.GroupId == checkCandidate.GroupCandidateId).SingleOrDefaultAsync();
+                var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId && p.CampaignId == checkcam.CampaignId);
+                var checkGroupUser = await dbContext.GroupUsers
+                                    .Where(p => p.UserId == checkuser.UserId)
+                                    .Join(dbContext.Groups, gu => gu.GroupId, g => g.GroupId, (gu, g) => new { GroupUser = gu, Group = g }).SingleOrDefaultAsync();
                 var scoreStage = await dbContext.Scores.Where(p => p.StageId == stage.StageId && p.CandidateId == item.CandidateId).SingleOrDefaultAsync();
                 var score = 0;
                 if (scoreStage != null)
                 {
-                    score = (int)scoreStage.Score1;
+                    score = (int)scoreStage.Point;
                 }
                 var candidate = new ListCandidateStageResponse();
                 {
                     candidate.CandidateId = item.CandidateId;
                     candidate.Description = item.Description;
                     candidate.UserId = item.UserId;
-                    candidate.GroupId = item.GroupCandidateId;
-                    candidate.GroupName = group.Name;
+                    candidate.GroupId = checkGroupUser != null ? checkGroupUser.GroupUser.GroupId : null;
+                    candidate.GroupName = checkGroupUser.Group.Name;
                     candidate.FullName = checkuser.FullName;
                     candidate.Phone = checkuser.Phone;
                     candidate.Gender = checkuser.Gender;
                     candidate.Dob = checkuser.Dob;
                     candidate.Email = checkuser.Email;
                     candidate.AvatarUrl = checkuser.AvatarUrl;
-                    candidate.StageScore= score;
+                    candidate.StageScore = score;
                 }
                 result.Add(candidate);
             }

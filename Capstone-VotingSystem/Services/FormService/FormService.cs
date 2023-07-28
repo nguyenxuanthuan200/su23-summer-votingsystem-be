@@ -129,7 +129,6 @@ namespace Capstone_VotingSystem.Services.FormService
                 var checkType = await dbContext.Types.Where(p => p.TypeId == item.TypeId).SingleOrDefaultAsync();
                 var question = new GetListQuestionResponse();
                 question.QuestionId = item.QuestionId;
-                question.Title = item.Title;
                 question.Content = item.Content;
                 question.TypeId = checkType.TypeId;
                 result.Add(question);
@@ -140,7 +139,7 @@ namespace Capstone_VotingSystem.Services.FormService
                     var elements = new ListElementQuestionResponse();
                     elements.ElementId = element.ElementId;
                     elements.Answer = element.Content;
-                    elements.Rate = element.Rate;
+                    elements.Rate = element.Score;
                     elements.Status = element.Status;
                     resultElement.Add(elements);
                 }
