@@ -21,7 +21,7 @@ namespace Capstone_VotingSystem.Services.RatioService
         public async Task<APIResponse<RatioResponse>> CreateCampaignRatio(CreateRatioRequest request)
         {
             APIResponse<RatioResponse> response = new();
-            var checkCampaign = await dbContext.Campaigns.SingleOrDefaultAsync(c => c.CampaignId == request.CampaignId && c.Status==true);
+            var checkCampaign = await dbContext.Campaigns.SingleOrDefaultAsync(c => c.CampaignId == request.CampaignId && c.Status == true);
             if (checkCampaign == null)
             {
                 response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
@@ -43,10 +43,10 @@ namespace Capstone_VotingSystem.Services.RatioService
             Ratio ratio = new Ratio();
             {
                 ratio.RatioGroupId = id;
-                ratio.Percent = request.Percent;
+                //    ratio.Percent = request.Percent;
                 ratio.GroupId = request.GroupId;
                 ratio.CampaignId = request.CampaignId;
-                ratio.GroupCandidateId = request.GroupCandidateId;
+                //   ratio.GroupCandidateId = request.GroupCandidateId;
             };
             await dbContext.Ratios.AddAsync(ratio);
             await dbContext.SaveChangesAsync();
@@ -68,7 +68,7 @@ namespace Capstone_VotingSystem.Services.RatioService
             }
             var getById = await dbContext.Ratios.Where(p => p.CampaignId == campaignId)
                 .ToListAsync();
-            if (getById == null || getById.Count==0)
+            if (getById == null || getById.Count == 0)
             {
                 response.ToFailedResponse(" không tồn tại Ratio nào hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
@@ -79,9 +79,9 @@ namespace Capstone_VotingSystem.Services.RatioService
                    return new RatioResponse()
                    {
                        RatioGroupId = x.RatioGroupId,
-                       Percent = x.Percent,
+                       //    Percent = x.Percent,
                        GroupId = x.GroupId,
-                       GroupCandidateId = x.GroupCandidateId,
+                       //  GroupCandidateId = x.GroupCandidateId,
                        CampaignId = x.CampaignId,
                    };
                }
@@ -111,12 +111,12 @@ namespace Capstone_VotingSystem.Services.RatioService
                 response.ToFailedResponse("Group không phù hợp", StatusCodes.Status400BadRequest);
                 return response;
             }
-            if (ratio.GroupCandidateId != request.GroupCandidateId)
-            {
-                response.ToFailedResponse("Group Candidate không phù hợp", StatusCodes.Status400BadRequest);
-                return response;
-            }
-            ratio.Percent = request.Percent;
+            //if (ratio.GroupCandidateId != request.GroupCandidateId)
+            //{
+            //    response.ToFailedResponse("Group Candidate không phù hợp", StatusCodes.Status400BadRequest);
+            //    return response;
+            //}
+            //      ratio.Percent = request.Percent;
             dbContext.Ratios.Update(ratio);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<RatioResponse>(cam);
@@ -125,5 +125,5 @@ namespace Capstone_VotingSystem.Services.RatioService
             return response;
         }
     }
-    
+
 }

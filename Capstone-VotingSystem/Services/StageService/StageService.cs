@@ -29,7 +29,7 @@ namespace Capstone_VotingSystem.Services.StageService
                 response.ToFailedResponse("Campaign không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
-            if(request.FormId !=null)
+            if (request.FormId != null)
             {
                 var checkForm = await dbContext.Forms.Where(p => p.FormId == request.FormId).SingleOrDefaultAsync();
                 if (checkForm == null)
@@ -38,11 +38,16 @@ namespace Capstone_VotingSystem.Services.StageService
                     return response;
                 }
             }
-            
+            if (!request.Process.Equals("Chưa diễn ra") && !request.Process.Equals("Đang diễn ra") && !request.Process.Equals("Đã kết thúc"))
+            {
+                response.ToFailedResponse("Process không đúng định dạng!! (Chưa diễn ra hoặc Đang diễn ra hoặc Đã kết thúc )", StatusCodes.Status400BadRequest);
+                return response;
+            }
+
             DateTime startTime = (DateTime)campaign.StartTime;
             DateTime endTime = (DateTime)campaign.EndTime;
-            DateTime newStartTime = request.StartTime;
-            DateTime newEndTime = request.EndTime;
+            DateTime newStartTime = (DateTime)request.StartTime;
+            DateTime newEndTime = (DateTime)request.EndTime;
             TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
 
             if (DateTime.Compare(newEndTime, newStartTime) <= 0)
@@ -70,10 +75,19 @@ namespace Capstone_VotingSystem.Services.StageService
                 stage.Title = request.Title;
                 stage.Content = request.Content;
                 if (request.FormId != null)
+                {
                     stage.FormId = request.FormId;
+                    stage.IsUseForm = true;
+                }
+                else
+                {
+                    stage.IsUseForm = false;
+                }
                 stage.StartTime = request.StartTime;
                 stage.EndTime = request.EndTime;
                 stage.Status = true;
+                stage.Process = request.Process;
+                stage.LimitVote = request.LimitVote;
             };
             await dbContext.Stages.AddAsync(stage);
             await dbContext.SaveChangesAsync();
@@ -110,6 +124,8 @@ namespace Capstone_VotingSystem.Services.StageService
                         Title = x.Title,
                         StartTime = x.StartTime,
                         EndTime = x.StartTime,
+                        LimitVote = x.LimitVote,
+                        Process = x.Process,
                         Content = x.Content,
                         FormId = x.FormId,
 
@@ -145,11 +161,19 @@ namespace Capstone_VotingSystem.Services.StageService
                     return response;
                 }
             }
+            if (!request.Process.Equals("Chưa diễn ra") && !request.Process.Equals("Đang diễn ra") && !request.Process.Equals("Đã kết thúc"))
+            {
+                response.ToFailedResponse("Process không đúng định dạng!! (Chưa diễn ra hoặc Đang diễn ra hoặc Đã kết thúc )", StatusCodes.Status400BadRequest);
+                return response;
+            }
+
             upStage.Description = request.Description;
             upStage.Title = request.Title;
             upStage.StartTime = request.StartTime;
             upStage.EndTime = request.EndTime;
             upStage.Content = request.Content;
+            upStage.LimitVote = request.LimitVote;
+            upStage.Process = request.Process;
             upStage.FormId = request.FormId;
             dbContext.Stages.Update(upStage);
             await dbContext.SaveChangesAsync();

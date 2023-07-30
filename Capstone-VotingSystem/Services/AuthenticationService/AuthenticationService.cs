@@ -24,7 +24,7 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
 
         public async Task<ResponseAccount> GenerateToken(Account account)
         {
-            //var user = await dbContext.Users.SingleOrDefaultAsync(p => p.UserId == account.UserName);
+            var user = await dbContext.Users.SingleOrDefaultAsync(p => p.UserId == account.UserName);
             var roleName = await dbContext.Roles.SingleOrDefaultAsync(p => p.RoleId == account.RoleId);
 
             if (roleName == null)
@@ -76,6 +76,7 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                     new Claim("Username", account.UserName),
                     new Claim("RoleId", roleName.RoleId.ToString()),
                     new Claim("RoleName", roleName.Name),
+                    new Claim("Permission", user.Permission.ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                     };
 
@@ -131,6 +132,7 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                     user.AvatarUrl = userrecord.PhotoUrl;
                     user.Email = userrecord.Email;
                     user.Status = true;
+                    user.Permission = 0;
                 }
                 var claims = new[]
                    {
@@ -139,6 +141,7 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                     new Claim("userId", user.UserId),
                     new Claim("RoleName", role.Name),
                     new Claim("Photo", userrecord.PhotoUrl),
+                    new Claim("Permission", check.Permission.ToString())
 
                     };
 
@@ -182,6 +185,7 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                     new Claim("RoleName", role.Name),
                     new Claim("Username", userrecord.Email),
                     new Claim("Photo", userrecord.PhotoUrl),
+                    new Claim("Permission", check.Permission.ToString())
                     };
 
                     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtConfig:Key"]));

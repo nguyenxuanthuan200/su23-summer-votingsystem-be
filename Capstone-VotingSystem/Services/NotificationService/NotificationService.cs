@@ -37,6 +37,7 @@ namespace Capstone_VotingSystem.Services.NotificationService
                 notification.Title = request.Title;
                 notification.Message = request.Message;
                 notification.CreateDate = DateTime.UtcNow;
+                notification.IsRead = false;
                 notification.Status = true;
                 notification.Username = request.Username;
             }
@@ -74,6 +75,7 @@ namespace Capstone_VotingSystem.Services.NotificationService
                          Title = x.Title,
                          Message = x.Message,
                          CreateDate = x.CreateDate,
+                         IsRead = x.IsRead,
                          Status = x.Status,
                          Username = x.Username,
                      };
@@ -96,6 +98,7 @@ namespace Capstone_VotingSystem.Services.NotificationService
             checkAccout.Title = request.Title;
             checkAccout.Message = request.Message;
             checkAccout.CreateDate = DateTime.UtcNow;
+            checkAccout.IsRead = true;
             checkAccout.Status = true;
 
             dbContext.Update(checkAccout);
