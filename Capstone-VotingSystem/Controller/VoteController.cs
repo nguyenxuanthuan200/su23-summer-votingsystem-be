@@ -20,7 +20,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.voteService = voteService;
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpPost]
         [SwaggerOperation(summary: "Create new vote have form ")]
         public async Task<IActionResult> CreateVote(CreateVoteRequest request)
@@ -40,7 +40,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpPost("like")]
         [SwaggerOperation(summary: "Create new vote Like ")]
         public async Task<IActionResult> CreateVoteLike(CreateVoteLikeRequest request)

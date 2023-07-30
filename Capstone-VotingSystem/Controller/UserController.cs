@@ -17,7 +17,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.userService = userService;
         }
-        [Authorize(Roles = "Admin,User")]
+       // [Authorize(Roles = "Admin,User")]
         [HttpPut]
         [SwaggerOperation(summary: "Update persional profile by userId")]
         public async Task<IActionResult> UpdateUser(string? id, [FromForm] UpdateUserRequest request)
@@ -37,7 +37,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "Admin,User")]
+       // [Authorize(Roles = "Admin,User")]
         [HttpPut("{id}/group/{groupid}")]
         [SwaggerOperation(summary: "Update Group User")]
         public async Task<IActionResult> UpdateUserGroup(string id, Guid groupid)

@@ -17,7 +17,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.groupService = groupService;
         }
-        [Authorize(Roles = "User,Admin")]
+        //[Authorize(Roles = "User,Admin")]
         [HttpGet]
         [SwaggerOperation(summary: "Get all Group (role user and admin)")]
         public async Task<IActionResult> GetGroup()
@@ -37,7 +37,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "Admin")]
+       // [Authorize(Roles = "Admin")]
         [HttpPost]
         [SwaggerOperation(summary: "Create new Group (role admin)")]
         public async Task<IActionResult> CreateGroup(CreateGroupRequest request)
@@ -57,7 +57,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Group (role admin)")]
         public async Task<IActionResult> UpdateGroup(Guid id, UpdateGroupRequest request)

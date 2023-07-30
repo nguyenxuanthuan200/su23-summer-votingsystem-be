@@ -304,12 +304,6 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            //var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == checkcam.UserId);
-            //if (checkCandidate == null)
-            //{
-            //    response.ToFailedResponse("ứng cử viên không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
-            //    return response;
-            //}
             var stage = new GetListCandidateStageResponse()
             {
                 StageId = stageId,

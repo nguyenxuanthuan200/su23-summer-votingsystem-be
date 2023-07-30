@@ -18,7 +18,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this._feedback = feedbackService;
         }
-        [Authorize(Roles = "Admin")]
+       // [Authorize(Roles = "Admin")]
         [HttpGet]
         [SwaggerOperation(summary: "Get All FeedBack")]
         public async Task<IActionResult> GetAllFeedback()
@@ -39,7 +39,7 @@ namespace Capstone_VotingSystem.Controller
                      "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         [SwaggerOperation(summary: "Get Feedback By CampaignId")]
         public async Task<IActionResult> GetFeedBack(Guid? id)
@@ -60,7 +60,7 @@ namespace Capstone_VotingSystem.Controller
                      "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpPost]
         [SwaggerOperation(summary: "Create Feedback Campaign")]
         public async Task<IActionResult> CreateFeedback(FeedbackRequest request)
@@ -81,7 +81,7 @@ namespace Capstone_VotingSystem.Controller
                      "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "Admin")]
+       // [Authorize(Roles = "Admin")]
         [HttpDelete]
         [SwaggerOperation(summary: "Delete Feedback")]
         public async Task<IActionResult> DeleteFeedback(Guid? feedbackid, DeleteFeedbackRequest request)

@@ -21,7 +21,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.candidateService = candidateService;
         }
-        [Authorize(Roles = "User,Admin")]
+       // [Authorize(Roles = "User,Admin")]
         [HttpGet("{id}")]
         [SwaggerOperation(summary: "Get candidate by id")]
         public async Task<IActionResult> GetCandidateById(Guid id)
@@ -59,7 +59,7 @@ namespace Capstone_VotingSystem.Controller
                 return BadRequest();
             }
         }
-        [Authorize(Roles = "Admin")]
+      //  [Authorize(Roles = "Admin")]
         [HttpGet]
         [SwaggerOperation(summary: "Get All Candidate with role admin")]
         public async Task<IActionResult> GetAllCandidate()
@@ -78,7 +78,7 @@ namespace Capstone_VotingSystem.Controller
                 return BadRequest();
             }
         }
-        [Authorize(Roles = "User,Admin")]
+       // [Authorize(Roles = "User,Admin")]
         [HttpPost("account")]
         [SwaggerOperation(summary: "Create account Candidate to Campagin with some info of Candidate")]
         public async Task<IActionResult> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request)
@@ -99,7 +99,7 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpPost]
         [SwaggerOperation(summary: "Add Candidate to Campagin with some info of Candidate")]
         public async Task<IActionResult> CreateCandidateCampaign(CreateCandidateCampaignRequest request)
@@ -119,7 +119,7 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpDelete("{id}")]
         [SwaggerOperation(summary: "Delete Candidate trong Campaign")]
         public async Task<IActionResult> DeleteCandidate(Guid id, DeleteCandidateRequest request)
@@ -139,7 +139,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [HttpGet("stageid")]
+      //  [HttpGet("stageid")]
         [SwaggerOperation(summary: "Get All Candidate by Stage")]
         public async Task<IActionResult> GetListCandidateByStage(Guid stageid)
         {

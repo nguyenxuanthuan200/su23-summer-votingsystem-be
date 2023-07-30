@@ -17,7 +17,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.activityService = activityService;
         }
-        [Authorize(Roles = "User,Admin")]
+       // [Authorize(Roles = "User,Admin")]
         [HttpGet("candidate/{id}")]
         [SwaggerOperation(summary: "Get activity by candidateId")]
         public async Task<IActionResult> GetActivityByCandidateId(Guid id)
@@ -36,7 +36,7 @@ namespace Capstone_VotingSystem.Controller
                 return BadRequest();
             }
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpPost]
         [SwaggerOperation(summary: "Create new Activity")]
         public async Task<IActionResult> CreateActivity(CreateActivityRequest request)
@@ -56,7 +56,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Activity")]
         public async Task<IActionResult> UpdateActivity(Guid id, UpdateActivityRequest request)
@@ -78,7 +78,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpDelete("{id}")]
         [SwaggerOperation(summary: "Delete Activity")]
         public async Task<IActionResult> DeleteActivity(Guid id, DeleteActivityRequest request)
