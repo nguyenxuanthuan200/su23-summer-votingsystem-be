@@ -67,8 +67,10 @@ namespace Capstone_VotingSystem.Services.CandidateService
             {
                 candida.CandidateId = id;
                 candida.UserId = us.UserId;
+                candida.FullName = request.FullName;
                 candida.Status = true;
                 candida.CampaignId = request.CampaignId;
+                candida.GroupId = request.GroupId;
             }
             await dbContext.Users.AddAsync(us);
             await dbContext.Accounts.AddAsync(acc);
@@ -127,6 +129,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                             can.Status = true;
                             can.Description = i.Description;
                             can.CampaignId = request.CampaignId;
+                            can.GroupId = check3.GroupId;
 
                         }
                         await dbContext.Candidates.AddAsync(can);
@@ -161,16 +164,14 @@ namespace Capstone_VotingSystem.Services.CandidateService
             foreach (var item in listCandidate)
             {
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
-                var checkGroupUser = await dbContext.GroupUsers
-                                    .Where(p => p.UserId == checkuser.UserId)
-                                    .Join(dbContext.Groups, gu => gu.GroupId, g => g.GroupId, (gu, g) => new { GroupUser = gu, Group = g }).SingleOrDefaultAsync();
+                var checkGroup = await dbContext.Groups.Where(p => p.GroupId == item.GroupId).SingleOrDefaultAsync();
                 var candidate = new GetListCandidateCampaignResponse();
                 {
                     candidate.CandidateId = item.CandidateId;
                     candidate.CampaignId = item.CampaignId;
                     candidate.Description = item.Description;
                     candidate.UserId = item.UserId;
-                    candidate.GroupId = checkGroupUser != null ? checkGroupUser.GroupUser.GroupId : null;
+                    candidate.GroupId = checkGroup != null ? checkGroup.GroupId : null;
                     candidate.FullName = checkuser.FullName;
                     candidate.Phone = checkuser.Phone;
                     candidate.Status = checkuser.Status;
@@ -198,16 +199,13 @@ namespace Capstone_VotingSystem.Services.CandidateService
             foreach (var item in listCandidate)
             {
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
-                var checkGroupUser = await dbContext.GroupUsers
-                                    .Where(p => p.UserId == checkuser.UserId)
-                                    .Join(dbContext.Groups, gu => gu.GroupId, g => g.GroupId, (gu, g) => new { GroupUser = gu, Group = g }).SingleOrDefaultAsync();
                 var candidate = new GetListCandidateCampaignResponse();
                 {
                     candidate.CandidateId = item.CandidateId;
                     candidate.CampaignId = item.CampaignId;
                     candidate.Description = item.Description;
                     candidate.UserId = item.UserId;
-                    candidate.GroupId = checkGroupUser.GroupUser.GroupId;
+                    candidate.GroupId = item.GroupId;
                     candidate.FullName = checkuser.FullName;
                     candidate.Phone = checkuser.Phone;
                     candidate.Gender = checkuser.Gender;
@@ -330,9 +328,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
 
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
                 var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId && p.CampaignId == checkcam.CampaignId);
-                var checkGroupUser = await dbContext.GroupUsers
-                                    .Where(p => p.UserId == checkuser.UserId)
-                                    .Join(dbContext.Groups, gu => gu.GroupId, g => g.GroupId, (gu, g) => new { GroupUser = gu, Group = g }).SingleOrDefaultAsync();
+                var group = await dbContext.Groups.SingleOrDefaultAsync(p => p.GroupId == item.GroupId);
                 var scoreStage = await dbContext.Scores.Where(p => p.StageId == stage.StageId && p.CandidateId == item.CandidateId).SingleOrDefaultAsync();
                 var score = 0;
                 if (scoreStage != null)
@@ -344,8 +340,8 @@ namespace Capstone_VotingSystem.Services.CandidateService
                     candidate.CandidateId = item.CandidateId;
                     candidate.Description = item.Description;
                     candidate.UserId = item.UserId;
-                    candidate.GroupId = checkGroupUser != null ? checkGroupUser.GroupUser.GroupId : null;
-                    candidate.GroupName = checkGroupUser.Group.Name;
+                    candidate.GroupId = item.GroupId;
+                    candidate.GroupName = group != null ? group.Name : null;
                     candidate.FullName = checkuser.FullName;
                     candidate.Phone = checkuser.Phone;
                     candidate.Gender = checkuser.Gender;
