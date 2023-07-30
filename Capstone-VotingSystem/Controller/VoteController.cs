@@ -20,7 +20,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.voteService = voteService;
         }
-       // [Authorize(Roles = "User")]
+      // [Authorize(Roles = "User")]
         [HttpPost]
         [SwaggerOperation(summary: "Create new vote have form ")]
         public async Task<IActionResult> CreateVote(CreateVoteRequest request)
