@@ -211,6 +211,8 @@ namespace Capstone_VotingSystem.Entities
                     .HasMaxLength(100)
                     .HasColumnName("fullName");
 
+                entity.Property(e => e.GroupId).HasColumnName("groupId");
+
                 entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.Property(e => e.UserId)
@@ -222,6 +224,11 @@ namespace Capstone_VotingSystem.Entities
                     .WithMany(p => p.Candidates)
                     .HasForeignKey(d => d.CampaignId)
                     .HasConstraintName("FK_CandidateProfile_Campaign");
+
+                entity.HasOne(d => d.Group)
+                    .WithMany(p => p.Candidates)
+                    .HasForeignKey(d => d.GroupId)
+                    .HasConstraintName("FK_Candidate_Group");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Candidates)
@@ -355,6 +362,8 @@ namespace Capstone_VotingSystem.Entities
                     .ValueGeneratedNever()
                     .HasColumnName("groupId");
 
+                entity.Property(e => e.CampaignId).HasColumnName("campaignId");
+
                 entity.Property(e => e.Description)
                     .HasMaxLength(200)
                     .HasColumnName("description");
@@ -364,6 +373,11 @@ namespace Capstone_VotingSystem.Entities
                 entity.Property(e => e.Name)
                     .HasMaxLength(50)
                     .HasColumnName("name");
+
+                entity.HasOne(d => d.Campaign)
+                    .WithMany(p => p.Groups)
+                    .HasForeignKey(d => d.CampaignId)
+                    .HasConstraintName("FK_Group_Campaign");
             });
 
             modelBuilder.Entity<GroupUser>(entity =>
