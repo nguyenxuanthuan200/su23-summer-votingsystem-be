@@ -11,7 +11,7 @@ namespace Capstone_VotingSystem.Entities
         }
 
         public Guid TypeActionId { get; set; }
-        public string? Name { get; set; }
+        public string Name { get; set; } = null!;
 
         public virtual ICollection<HistoryAction> HistoryActions { get; set; }
     }

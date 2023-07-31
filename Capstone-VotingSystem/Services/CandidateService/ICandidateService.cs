@@ -12,6 +12,6 @@ namespace Capstone_VotingSystem.Services.CandidateService
         Task<APIResponse<CreateAccountCandidateResponse>> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request);
         Task<APIResponse<string>> DeleteCandidateCampaign(Guid candidateId, DeleteCandidateRequest request);
         //Task<UpdateCandidateProfileResponse> UpdateCandidateProfile(Guid id, UpdateCandidateProfileRequesst request);
-        Task<APIResponse<GetListCandidateStageResponse>> getListcandidatStage(Guid stageId);
+        Task<APIResponse<GetListCandidateStageResponse>> GetListcandidatStage(Guid stageId,string userId);
     }
 }

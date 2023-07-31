@@ -12,11 +12,11 @@ namespace Capstone_VotingSystem.Entities
 
         public Guid ElementId { get; set; }
         public string? Content { get; set; }
-        public bool? Status { get; set; }
-        public Guid? QuestionId { get; set; }
-        public decimal? Score { get; set; }
+        public bool Status { get; set; }
+        public Guid QuestionId { get; set; }
+        public decimal Score { get; set; }
 
-        public virtual Question? Question { get; set; }
+        public virtual Question Question { get; set; } = null!;
         public virtual ICollection<VotingDetail> VotingDetails { get; set; }
     }
 }

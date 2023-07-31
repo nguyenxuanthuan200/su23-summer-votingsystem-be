@@ -24,34 +24,34 @@ namespace Capstone_VotingSystem.Services.RatioService
             var checkCampaign = await dbContext.Campaigns.SingleOrDefaultAsync(c => c.CampaignId == request.CampaignId && c.Status == true);
             if (checkCampaign == null)
             {
-                response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var checkGroup = await dbContext.Groups.SingleOrDefaultAsync(c => c.GroupId == request.GroupId);
+            var checkGroup = await dbContext.Groups.SingleOrDefaultAsync(c => c.GroupId == request.GroupVoterId &&c.IsVoter==true);
             if (checkGroup == null)
             {
-                response.ToFailedResponse("Group không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Nhóm người bình chọn không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var checkGroup1 = await dbContext.Groups.SingleOrDefaultAsync(c => c.GroupId == request.GroupCandidateId);
+            var checkGroup1 = await dbContext.Groups.SingleOrDefaultAsync(c => c.GroupId == request.GroupCandidateId && c.IsVoter == false);
             if (checkGroup1 == null)
             {
-                response.ToFailedResponse("Group không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Nhóm ứng cử viên không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
             var id = Guid.NewGuid();
             Ratio ratio = new Ratio();
             {
                 ratio.RatioGroupId = id;
-                //    ratio.Percent = request.Percent;
-                ratio.GroupId = request.GroupId;
+                ratio.Proportion = request.Proportion;
+                ratio.GroupVoterId = request.GroupVoterId;
                 ratio.CampaignId = request.CampaignId;
-                //   ratio.GroupCandidateId = request.GroupCandidateId;
+                ratio.GroupCandidateId = request.GroupCandidateId;
             };
             await dbContext.Ratios.AddAsync(ratio);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<RatioResponse>(ratio);
-            response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
+            response.ToSuccessResponse("Tạo trọng số thành công", StatusCodes.Status200OK);
             response.Data = map;
             return response;
         }
@@ -79,48 +79,49 @@ namespace Capstone_VotingSystem.Services.RatioService
                    return new RatioResponse()
                    {
                        RatioGroupId = x.RatioGroupId,
-                       //    Percent = x.Percent,
-                       GroupId = x.GroupId,
-                       //  GroupCandidateId = x.GroupCandidateId,
+                       Proportion = x.Proportion,
+                       GroupVoterId = x.GroupVoterId,
+                       GroupCandidateId = x.GroupCandidateId,
                        CampaignId = x.CampaignId,
                    };
                }
                ).ToList();
             response.Data = result;
-            response.ToSuccessResponse(response.Data, "Lấy danh sách thành công", StatusCodes.Status200OK);
+            response.ToSuccessResponse(response.Data, "Lấy danh sách tỷ trọng thành công", StatusCodes.Status200OK);
             return response;
         }
 
         public async Task<APIResponse<RatioResponse>> UpdateRatio(Guid id, UpdateRatioRequest request)
         {
             APIResponse<RatioResponse> response = new();
-            var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == request.CampaignId);
-            if (cam == null)
-            {
-                response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
-                return response;
-            }
+            
             var ratio = await dbContext.Ratios.SingleOrDefaultAsync(c => c.RatioGroupId == id);
             if (ratio == null)
             {
-                response.ToFailedResponse("Ratio không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Tỷ trọng không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
-            if (ratio.GroupId != request.GroupId)
+            var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == ratio.CampaignId);
+            if (cam == null)
             {
-                response.ToFailedResponse("Group không phù hợp", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            //if (ratio.GroupCandidateId != request.GroupCandidateId)
-            //{
-            //    response.ToFailedResponse("Group Candidate không phù hợp", StatusCodes.Status400BadRequest);
-            //    return response;
-            //}
-            //      ratio.Percent = request.Percent;
+            if (ratio.GroupVoterId != request.GroupVoterId)
+            {
+                response.ToFailedResponse("Nhóm của người bình chọn không đúng", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            if (ratio.GroupCandidateId != request.GroupCandidateId)
+            {
+                response.ToFailedResponse("Nhóm của người ứng cử không đúng", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            ratio.Proportion = request.Proportion;
             dbContext.Ratios.Update(ratio);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<RatioResponse>(cam);
-            response.ToSuccessResponse("Cập nhật thành công", StatusCodes.Status200OK);
+            response.ToSuccessResponse("Cập nhật tỷ trọng thành công", StatusCodes.Status200OK);
             response.Data = map;
             return response;
         }
