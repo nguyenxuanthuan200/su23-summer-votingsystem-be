@@ -17,7 +17,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.categoryService = categoryService;
         }
-        [Authorize(Roles = "User,Admin")]
+       // [Authorize(Roles = "User,Admin")]
         [HttpGet]
         [SwaggerOperation(summary: "Get category")]
         public async Task<IActionResult> GetCategory()
@@ -36,7 +36,7 @@ namespace Capstone_VotingSystem.Controller
                 return BadRequest();
             }
         }
-        [Authorize(Roles = "Admin")]
+       // [Authorize(Roles = "Admin")]
         [HttpPost]
         [SwaggerOperation(summary: "Create Category")]
         public async Task<IActionResult> CreateCategory(CreateCategoryRequest request)
@@ -56,7 +56,7 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
-        [Authorize(Roles = "Admin")]
+       // [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Category")]
         public async Task<IActionResult> UpdateCategory(Guid id, UpdateCategoryRequest request)

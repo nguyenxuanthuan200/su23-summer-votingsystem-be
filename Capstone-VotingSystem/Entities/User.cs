@@ -24,8 +24,8 @@ namespace Capstone_VotingSystem.Entities
         public DateTime? Dob { get; set; }
         public string? Email { get; set; }
         public string? AvatarUrl { get; set; }
-        public bool? Status { get; set; }
-        public int? Permission { get; set; }
+        public bool Status { get; set; }
+        public int Permission { get; set; }
 
         public virtual Account UserNavigation { get; set; } = null!;
         public virtual ICollection<Campaign> Campaigns { get; set; }

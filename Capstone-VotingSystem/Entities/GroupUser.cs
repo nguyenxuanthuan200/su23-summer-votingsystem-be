@@ -6,10 +6,12 @@ namespace Capstone_VotingSystem.Entities
     public partial class GroupUser
     {
         public Guid GroupUserId { get; set; }
-        public string? UserId { get; set; }
-        public Guid? GroupId { get; set; }
+        public string UserId { get; set; } = null!;
+        public Guid GroupId { get; set; }
+        public Guid CampaignId { get; set; }
 
-        public virtual Group? Group { get; set; }
-        public virtual User? User { get; set; }
+        public virtual Campaign Campaign { get; set; } = null!;
+        public virtual Group Group { get; set; } = null!;
+        public virtual User User { get; set; } = null!;
     }
 }

@@ -17,7 +17,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.typeService = typeService;
         }
-        [Authorize(Roles = "User,Admin")]
+       //[Authorize(Roles = "User,Admin")]
         [HttpGet]
         [SwaggerOperation(summary: "Get all type (role user and admin)")]
         public async Task<IActionResult> GetType()
@@ -37,7 +37,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "Admin")]
+      // [Authorize(Roles = "Admin")]
         [HttpPost]
         [SwaggerOperation(summary: "Create new Type (role admin)")]
         public async Task<IActionResult> CreateType(CreateTypeRequest request)
@@ -57,7 +57,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "Admin")]
+       //[Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Type (role admin)")]
         public async Task<IActionResult> UpdateType(Guid id, UpdateTypeRequest request)

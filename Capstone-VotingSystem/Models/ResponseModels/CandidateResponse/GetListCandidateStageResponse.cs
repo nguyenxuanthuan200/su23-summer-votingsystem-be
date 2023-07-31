@@ -7,5 +7,6 @@
         public Guid? CampaignId { get; set; }
 
         public List<ListCandidateStageResponse> Candidate { get; set; }
+        public List<ListCandidateVotedByUser> CandidateIsVoted { get; set; }
     }
 }

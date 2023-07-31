@@ -11,9 +11,9 @@ namespace Capstone_VotingSystem.Entities
         }
 
         public Guid ActivityId { get; set; }
-        public string? Title { get; set; }
+        public string Title { get; set; } = null!;
         public string? Content { get; set; }
-        public Guid? CandidateId { get; set; }
+        public Guid CandidateId { get; set; }
 
         public virtual ICollection<ActivityContent> ActivityContents { get; set; }
     }

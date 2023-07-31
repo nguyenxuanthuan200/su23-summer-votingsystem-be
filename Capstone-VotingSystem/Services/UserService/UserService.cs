@@ -73,7 +73,7 @@ namespace Capstone_VotingSystem.Services.UserService
             return response;
         }
 
-        public async Task<APIResponse<string>> UpdateUserGroup(string userId, Guid groupId)
+        public async Task<APIResponse<string>> UpdateUserGroup(string userId, Guid groupId, Guid campaignId)
         {
             APIResponse<string> response = new();
             var checkAccount = await dbContext.Accounts.Where(p => p.UserName == userId && p.Status == true).SingleOrDefaultAsync();
@@ -88,7 +88,7 @@ namespace Capstone_VotingSystem.Services.UserService
                 response.ToFailedResponse("không tìm thấy người dùng", StatusCodes.Status404NotFound);
                 return response;
             }
-            var checkGroup = await dbContext.GroupUsers.Where(p => p.UserId == userId && p.GroupId == groupId).SingleOrDefaultAsync();
+            var checkGroup = await dbContext.GroupUsers.Where(p => p.UserId == userId && p.GroupId == groupId && p.CampaignId == campaignId).SingleOrDefaultAsync();
             if (checkGroup == null)
             {
                 var id = Guid.NewGuid();
@@ -97,10 +97,11 @@ namespace Capstone_VotingSystem.Services.UserService
                     groupUser.GroupUserId = id;
                     groupUser.GroupId = groupId;
                     groupUser.UserId = userId;
+                    groupUser.CampaignId = campaignId;
                 }
                 await dbContext.GroupUsers.AddAsync(groupUser);
                 await dbContext.SaveChangesAsync();
-                response.ToSuccessResponse("Thêm thành công", StatusCodes.Status200OK);
+                response.ToSuccessResponse("Cập nhật thành công", StatusCodes.Status200OK);
                 return response;
             }
             checkGroup.GroupId = groupId;

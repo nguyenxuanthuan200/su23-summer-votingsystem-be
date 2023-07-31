@@ -38,7 +38,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        //[Authorize(Roles = "User,Admin")]
+       // [Authorize(Roles = "User,Admin")]
         [HttpGet("{id}")]
         [SwaggerOperation(summary: "Get Campaign by Id")]
         public async Task<IActionResult> GetCampaignById(Guid id)
@@ -58,9 +58,9 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User,Admin")]
+       //[Authorize(Roles = "User,Admin")]
         [HttpGet("user/{id}")]
-        [SwaggerOperation(summary: "Get Campaign by User Id")]
+        [SwaggerOperation(summary: "Get List Campaign by User Id")]
         public async Task<IActionResult> GetCampaignByUserId(string id)
         {
             try
@@ -78,7 +78,27 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User")]
+        //[Authorize(Roles = "Admin")]
+        [HttpGet("list-approve")]
+        [SwaggerOperation(summary: "Get Campaign Need Approve")]
+        public async Task<IActionResult> GetCampaignNeedApprove()
+        {
+            try
+            {
+                var result = await campaignService.GetCampaignNeedApprove();
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        // [Authorize(Roles = "User")]
         [HttpPost]
         [SwaggerOperation(summary: "Create new Campaign")]
         public async Task<IActionResult> CreateCampaign([FromForm] CreateCampaignRequest request)
@@ -98,7 +118,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User")]
+      // [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Campaign")]
         public async Task<IActionResult> UpdateCampaign(Guid id, [FromForm] UpdateCampaignRequest request)
@@ -120,14 +140,14 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User,Admin")]
-        [HttpPut]
-        [SwaggerOperation(summary: "Update Visibility Campaign")]
-        public async Task<IActionResult> UpdateVisibilityCampaign(Guid id, string visibility, string userId)
+        // [Authorize(Roles = "Admin")]
+        [HttpPut("approve/{campaignId}")]
+        [SwaggerOperation(summary: "Approve Campaign")]
+        public async Task<IActionResult> ApproveCampaign(Guid campaignId)
         {
             try
             {
-                var result = await campaignService.UpdateVisibilityCampaign(id, visibility, userId);
+                var result = await campaignService.ApproveCampaign(campaignId);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -142,7 +162,8 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User,Admin")]
+
+        //[Authorize(Roles = "User,Admin")]
         [HttpDelete("{id}")]
         [SwaggerOperation(summary: "Delete Campaign")]
         public async Task<IActionResult> DeleteCampaign(Guid id, DeleteCampaignRequest request)

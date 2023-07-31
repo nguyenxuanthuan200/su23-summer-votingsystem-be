@@ -45,7 +45,7 @@ namespace Capstone_VotingSystem.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=DESKTOP-NNLOED3;Initial Catalog=VotingSystem;User ID=sa;Password=123456");
+                optionsBuilder.UseSqlServer("Data Source=XUANTHUAN\\SQLEXPRESS;Initial Catalog=VotingSystem;Persist Security Info=True;User ID=sa;Password=123");
             }
         }
 
@@ -83,6 +83,7 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.Accounts)
                     .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Account_Role");
             });
 
@@ -124,11 +125,13 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.Activity)
                     .WithMany(p => p.ActivityContents)
                     .HasForeignKey(d => d.ActivityId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ActivityContent_Activity");
 
                 entity.HasOne(d => d.Candidate)
                     .WithMany(p => p.ActivityContents)
                     .HasForeignKey(d => d.CandidateId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ActivityContent_Candidate");
             });
 
@@ -180,11 +183,13 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.Category)
                     .WithMany(p => p.Campaigns)
                     .HasForeignKey(d => d.CategoryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Campaign_Category");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Campaigns)
                     .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Campaign_User");
             });
 
@@ -223,11 +228,13 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.Campaign)
                     .WithMany(p => p.Candidates)
                     .HasForeignKey(d => d.CampaignId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_CandidateProfile_Campaign");
 
                 entity.HasOne(d => d.Group)
                     .WithMany(p => p.Candidates)
                     .HasForeignKey(d => d.GroupId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Candidate_Group");
 
                 entity.HasOne(d => d.User)
@@ -276,6 +283,7 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.Question)
                     .WithMany(p => p.Elements)
                     .HasForeignKey(d => d.QuestionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Element_Question");
             });
 
@@ -307,11 +315,13 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.Campaign)
                     .WithMany(p => p.FeedBacks)
                     .HasForeignKey(d => d.CampaignId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_FeedBack_Campaign");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.FeedBacks)
                     .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_FeedBack_User");
             });
 
@@ -346,11 +356,13 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.Category)
                     .WithMany(p => p.Forms)
                     .HasForeignKey(d => d.CategoryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Form_Category");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Forms)
                     .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Form_User");
             });
 
@@ -377,6 +389,7 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.Campaign)
                     .WithMany(p => p.Groups)
                     .HasForeignKey(d => d.CampaignId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Group_Campaign");
             });
 
@@ -388,6 +401,8 @@ namespace Capstone_VotingSystem.Entities
                     .ValueGeneratedNever()
                     .HasColumnName("groupUserId");
 
+                entity.Property(e => e.CampaignId).HasColumnName("campaignId");
+
                 entity.Property(e => e.GroupId).HasColumnName("groupId");
 
                 entity.Property(e => e.UserId)
@@ -395,14 +410,22 @@ namespace Capstone_VotingSystem.Entities
                     .IsUnicode(false)
                     .HasColumnName("userId");
 
+                entity.HasOne(d => d.Campaign)
+                    .WithMany(p => p.GroupUsers)
+                    .HasForeignKey(d => d.CampaignId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_GroupUser_Campaign");
+
                 entity.HasOne(d => d.Group)
                     .WithMany(p => p.GroupUsers)
                     .HasForeignKey(d => d.GroupId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_GroupUser_Group");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.GroupUsers)
                     .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_GroupUser_User");
             });
 
@@ -432,11 +455,13 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.TypeAction)
                     .WithMany(p => p.HistoryActions)
                     .HasForeignKey(d => d.TypeActionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_HistoryAction_TypeAction");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.HistoryActions)
                     .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_HistoryAction_User");
             });
 
@@ -472,6 +497,7 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.UsernameNavigation)
                     .WithMany(p => p.Notifications)
                     .HasForeignKey(d => d.Username)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Notification_Account");
             });
 
@@ -496,11 +522,13 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.Form)
                     .WithMany(p => p.Questions)
                     .HasForeignKey(d => d.FormId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Question_Form");
 
                 entity.HasOne(d => d.Type)
                     .WithMany(p => p.Questions)
                     .HasForeignKey(d => d.TypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Question_Type");
             });
 
@@ -516,25 +544,28 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.CampaignId).HasColumnName("campaignId");
 
-                entity.Property(e => e.CandidateId).HasColumnName("candidateId");
+                entity.Property(e => e.GroupCandidateId).HasColumnName("groupCandidateId");
 
-                entity.Property(e => e.GroupId).HasColumnName("groupId");
+                entity.Property(e => e.GroupVoterId).HasColumnName("groupVoterId");
 
                 entity.Property(e => e.Proportion).HasColumnName("proportion");
 
                 entity.HasOne(d => d.Campaign)
                     .WithMany(p => p.Ratios)
                     .HasForeignKey(d => d.CampaignId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Ratio_Campaign");
 
-                entity.HasOne(d => d.Candidate)
-                    .WithMany(p => p.Ratios)
-                    .HasForeignKey(d => d.CandidateId)
-                    .HasConstraintName("FK_Ratio_Candidate1");
+                entity.HasOne(d => d.GroupCandidate)
+                    .WithMany(p => p.RatioGroupCandidates)
+                    .HasForeignKey(d => d.GroupCandidateId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Ratio_Group1");
 
-                entity.HasOne(d => d.Group)
-                    .WithMany(p => p.Ratios)
-                    .HasForeignKey(d => d.GroupId)
+                entity.HasOne(d => d.GroupVoter)
+                    .WithMany(p => p.RatioGroupVoters)
+                    .HasForeignKey(d => d.GroupVoterId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Ratio_Group");
             });
 
@@ -568,11 +599,13 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.Candidate)
                     .WithMany(p => p.Scores)
                     .HasForeignKey(d => d.CandidateId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Score_Candidate");
 
                 entity.HasOne(d => d.Stage)
                     .WithMany(p => p.Scores)
                     .HasForeignKey(d => d.StageId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Score_Stage");
             });
 
@@ -621,11 +654,13 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.Campaign)
                     .WithMany(p => p.Stages)
                     .HasForeignKey(d => d.CampaignId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Stage_Campaign");
 
                 entity.HasOne(d => d.Form)
                     .WithMany(p => p.Stages)
                     .HasForeignKey(d => d.FormId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Stage_Form");
             });
 
@@ -744,21 +779,25 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.Candidate)
                     .WithMany(p => p.Votings)
                     .HasForeignKey(d => d.CandidateId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Voting_CandidateProfile");
 
                 entity.HasOne(d => d.RatioGroup)
                     .WithMany(p => p.Votings)
                     .HasForeignKey(d => d.RatioGroupId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Voting_Ratio");
 
                 entity.HasOne(d => d.Stage)
                     .WithMany(p => p.Votings)
                     .HasForeignKey(d => d.StageId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Voting_Stage");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Votings)
                     .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Voting_User");
             });
 
@@ -781,11 +820,13 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.Element)
                     .WithMany(p => p.VotingDetails)
                     .HasForeignKey(d => d.ElementId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_VotingDetail_Element");
 
                 entity.HasOne(d => d.Voting)
                     .WithMany(p => p.VotingDetails)
                     .HasForeignKey(d => d.VotingId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_VotingDetail_Voting");
             });
 

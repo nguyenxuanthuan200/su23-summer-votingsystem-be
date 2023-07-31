@@ -18,7 +18,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.questionService = questionService;
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpGet("form/{id}")]
         [SwaggerOperation(summary: "Get list question by form id")]
         public async Task<IActionResult> GetListQuestionForm(Guid id)
@@ -37,7 +37,7 @@ namespace Capstone_VotingSystem.Controller
                 return BadRequest();
             }
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpPost("elements")]
         [SwaggerOperation(summary: "Create new question and element")]
         public async Task<IActionResult> CreateQuestion(CreateQuestionRequest request)
@@ -59,7 +59,7 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
-        [Authorize(Roles = "User")]
+       //[Authorize(Roles = "User")]
         [HttpPost]
         [SwaggerOperation(summary: "Create new question rating không câu trả lời")]
         public async Task<IActionResult> CreateQuestionNoElement(CreateQuestionWithNoElementRequest request)
@@ -81,7 +81,7 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpPost("{id}/element")]
         [SwaggerOperation(summary: "Create new element for question")]
         public async Task<IActionResult> CreateElementQuestion(Guid id,CreateElementRequest request)
@@ -103,7 +103,7 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Question and Element")]
         public async Task<IActionResult> UpdateQuestion(Guid id, UpdateQuestionRequest request)
@@ -125,7 +125,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpDelete("{id}")]
         [SwaggerOperation(summary: "Delete Question")]
         public async Task<IActionResult> DeleteQuestion(Guid id)

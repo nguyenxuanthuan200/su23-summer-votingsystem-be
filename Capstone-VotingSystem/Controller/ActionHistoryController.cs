@@ -17,7 +17,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.actionHistory = actionHistoryRepositories;
         }
-        [Authorize(Roles = "User")]
+        //[Authorize(Roles = "User")]
         [HttpGet("user/{id}")]
         [SwaggerOperation(summary: "Get Action History by UserId")]
         public async Task<IActionResult> GetActionHistoryByUser(string? id)

@@ -298,19 +298,19 @@ namespace Capstone_VotingSystem.Services.CandidateService
         //    return null;
         //}
 
-        public async Task<APIResponse<GetListCandidateStageResponse>> getListcandidatStage(Guid stageId)
+        public async Task<APIResponse<GetListCandidateStageResponse>> GetListcandidatStage(Guid stageId, string userId)
         {
             APIResponse<GetListCandidateStageResponse> response = new APIResponse<GetListCandidateStageResponse>();
             var checkStage = await dbContext.Stages.Where(p => p.StageId == stageId && p.Status == true).SingleOrDefaultAsync();
             if (checkStage == null)
             {
-                response.ToFailedResponse("Stage không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Giai đoạn không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
             var checkcam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.CampaignId == checkStage.CampaignId);
             if (checkcam == null)
             {
-                response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
             var stage = new GetListCandidateStageResponse()
@@ -319,7 +319,22 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 CampaignId = checkStage.CampaignId,
                 FormId = checkStage.FormId,
             };
+            List<ListCandidateVotedByUser> listVoted = new ();
+            var checkVote = await dbContext.Votings.Where(p => p.StageId == stageId && p.UserId == userId && p.Status == true).ToListAsync();
+            if (checkVote != null)
+            {
+                
+                foreach (var item in checkVote)
+                {
+                    var ListCandidateVotedByUser = new ListCandidateVotedByUser();
+                    var groupUser = await dbContext.GroupUsers.SingleOrDefaultAsync(p => p.UserId == item.UserId);
+                    var group = await dbContext.Groups.SingleOrDefaultAsync(p => p.GroupId == groupUser.GroupId);
+                    ListCandidateVotedByUser.CandidateId = item.CandidateId;
+                    ListCandidateVotedByUser.GroupName = group.Name;
+                    listVoted.Add(ListCandidateVotedByUser);
 
+                }
+            }
             var listCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CampaignId == checkcam.CampaignId).ToListAsync();
             List<ListCandidateStageResponse> result = new List<ListCandidateStageResponse>();
             foreach (var item in listCandidate)
@@ -352,6 +367,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 result.Add(candidate);
             }
             stage.Candidate = result;
+            stage.CandidateIsVoted = listVoted;
             response.Data = stage;
 
             if (response.Data == null)

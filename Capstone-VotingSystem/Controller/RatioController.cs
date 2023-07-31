@@ -20,7 +20,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.ratioService = ratioService;
         }
-        [Authorize(Roles = "User,Admin")]
+        //[Authorize(Roles = "User,Admin")]
         [HttpGet("campaign/{id}")]
         [SwaggerOperation(summary: "Get all Ratio By Campaign (role user and admin)")]
         public async Task<IActionResult> GetRatioByCampaign(Guid id)
@@ -41,7 +41,7 @@ namespace Capstone_VotingSystem.Controller
             }
         }
 
-        [Authorize(Roles = "User")]
+        //[Authorize(Roles = "User")]
         [HttpPost]
         [SwaggerOperation(summary: "Create new Ratio")]
         public async Task<IActionResult> CreateRatio(CreateRatioRequest request)
@@ -61,7 +61,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Ratio")]
         public async Task<IActionResult> UpdateRatio(Guid id, UpdateRatioRequest request)

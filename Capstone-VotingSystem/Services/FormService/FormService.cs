@@ -21,16 +21,16 @@ namespace Capstone_VotingSystem.Services.FormService
         public async Task<APIResponse<GetFormResponse>> CreateForm(CreateFormRequest request)
         {
             APIResponse<GetFormResponse> response = new();
-            var checkUser = await dbContext.Users.SingleOrDefaultAsync(c => c.UserId == request.UserId);
+            var checkUser = await dbContext.Users.SingleOrDefaultAsync(c => c.UserId == request.UserId && c.Status == true);
             if (checkUser == null)
             {
-                response.ToFailedResponse("UserName không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Người dùng không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
             var checkcate = await dbContext.Categories.SingleOrDefaultAsync(c => c.CategoryId == request.CategoryId);
             if (checkcate == null)
             {
-                response.ToFailedResponse("Category không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Thể loại không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
             if (!request.Visibility.Equals("public") && !request.Visibility.Equals("private"))
@@ -46,13 +46,14 @@ namespace Capstone_VotingSystem.Services.FormService
                 form.Name = request.Name;
                 form.Visibility = request.Visibility;
                 form.Status = true;
+                form.IsApprove = false;
                 form.CategoryId = request.CategoryId;
 
             }
             await dbContext.Forms.AddAsync(form);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<GetFormResponse>(form);
-            response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
+            response.ToSuccessResponse("Tạo biểu mẫu thành công", StatusCodes.Status200OK);
             response.Data = map;
             return response;
         }
@@ -60,8 +61,8 @@ namespace Capstone_VotingSystem.Services.FormService
         public async Task<APIResponse<string>> DeleteForm(Guid formId, DeleteFormRequest request)
         {
             APIResponse<String> response = new();
-            var cam = await dbContext.Users.SingleOrDefaultAsync(c => c.UserId == request.UserId && c.Status == true);
-            if (cam == null)
+            var user = await dbContext.Users.SingleOrDefaultAsync(c => c.UserId == request.UserId && c.Status == true);
+            if (user == null)
             {
                 response.ToFailedResponse("User không tồn tại hoặc đã bị xóa ", StatusCodes.Status400BadRequest);
                 return response;
@@ -72,10 +73,15 @@ namespace Capstone_VotingSystem.Services.FormService
                 response.ToFailedResponse("Form không tồn tại hoặc bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var checkus = await dbContext.Forms.SingleOrDefaultAsync(c => c.FormId == formId && c.UserId == request.UserId);
-            if (checkus == null)
+
+            if (!checkform.UserId.Equals(request.UserId))
             {
-                response.ToFailedResponse("UserName này không phải người tạo Form", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Người dùng không đủ quyền hạn để thực hiện ", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            if (checkform.IsApprove == true)
+            {
+                response.ToFailedResponse("Không thể thực hiện khi biểu mẫu đã được duyệt", StatusCodes.Status400BadRequest);
                 return response;
             }
             checkform.Status = false;
@@ -88,10 +94,10 @@ namespace Capstone_VotingSystem.Services.FormService
         public async Task<APIResponse<IEnumerable<GetFormResponse>>> GetAllForm()
         {
             APIResponse<IEnumerable<GetFormResponse>> response = new();
-            var form = await dbContext.Forms.Where(p => p.Visibility == "public" && p.Status == true).ToListAsync();
+            var form = await dbContext.Forms.Where(p => p.Visibility == "public" && p.Status == true && p.IsApprove == true).ToListAsync();
             if (form == null)
             {
-                response.ToFailedResponse("Không có Form nào", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Không có biểu mẫu nào phù hợp", StatusCodes.Status400BadRequest);
                 return response;
             }
             IEnumerable<GetFormResponse> result = form.Select(
@@ -177,6 +183,7 @@ namespace Capstone_VotingSystem.Services.FormService
                        CategoryId = x.CategoryId,
                        FormId = x.FormId,
                        Name = x.Name,
+                       IsApprove = x.IsApprove,
                        UserId = x.UserId,
                        Visibility = x.Visibility,
                    };
@@ -193,30 +200,35 @@ namespace Capstone_VotingSystem.Services.FormService
             var cam = await dbContext.Users.SingleOrDefaultAsync(c => c.UserId == request.UserId && c.Status == true);
             if (cam == null)
             {
-                response.ToFailedResponse("User không tồn tại hoặc đã bị xóa ", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Người dùng không tồn tại hoặc đã bị xóa ", StatusCodes.Status400BadRequest);
                 return response;
             }
             var checkform = await dbContext.Forms.SingleOrDefaultAsync(c => c.FormId == id && c.Status == true);
             if (checkform == null)
             {
-                response.ToFailedResponse("Form không tồn tại hoặc bị xóa", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Biểu mẫu này không tồn tại hoặc bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
             var checkus = await dbContext.Forms.SingleOrDefaultAsync(c => c.FormId == id && c.UserId == request.UserId);
             if (checkus == null)
             {
-                response.ToFailedResponse("UserName này không phải người tạo Form", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Bạn không có đủ quyền hạn để thay đổi biểu mẫu này", StatusCodes.Status400BadRequest);
                 return response;
             }
             var checkcate = await dbContext.Categories.SingleOrDefaultAsync(c => c.CategoryId == request.CategoryId);
             if (checkcate == null)
             {
-                response.ToFailedResponse("Category không tồn tại hoặc chưa có", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Thể loại không tồn tại hoặc chưa có", StatusCodes.Status400BadRequest);
                 return response;
             }
             if (!request.Visibility.Equals("public") && !request.Visibility.Equals("private"))
             {
                 response.ToFailedResponse("Visibility không đúng định dạng!! (public or private)", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            if (checkform.IsApprove == true)
+            {
+                response.ToFailedResponse("Không thể thay đổi khi biểu mẫu đã được duyệt", StatusCodes.Status400BadRequest);
                 return response;
             }
 

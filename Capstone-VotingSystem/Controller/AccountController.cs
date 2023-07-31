@@ -17,7 +17,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.account = accountService;
         }
-        [Authorize(Roles = "User,Admin")]
+       // [Authorize(Roles = "User,Admin")]
         [HttpGet]
         [SwaggerOperation(summary: "Get All Account by Role is Admin and User")]
         public async Task<IActionResult> GetAllAccount()
@@ -37,6 +37,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
+        // [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         [SwaggerOperation(summary: "Ban Account")]
         public async Task<IActionResult> BanAccount(string id)

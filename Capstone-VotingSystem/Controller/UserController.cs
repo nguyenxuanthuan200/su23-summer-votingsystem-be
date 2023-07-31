@@ -17,7 +17,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.userService = userService;
         }
-        [Authorize(Roles = "Admin,User")]
+        // [Authorize(Roles = "Admin,User")]
         [HttpPut]
         [SwaggerOperation(summary: "Update persional profile by userId")]
         public async Task<IActionResult> UpdateUser(string? id, [FromForm] UpdateUserRequest request)
@@ -37,14 +37,14 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "Admin,User")]
-        [HttpPut("{id}/group/{groupid}")]
-        [SwaggerOperation(summary: "Update Group User")]
-        public async Task<IActionResult> UpdateUserGroup(string id, Guid groupid)
+        // [Authorize(Roles = "User")]
+        [HttpPut("{userid}/group/{groupid}/campaign/{campaignid}")]
+        [SwaggerOperation(summary: "Update or add new Group User for Campaign")]
+        public async Task<IActionResult> UpdateUserGroup(string userid, Guid groupid, Guid campaignid)
         {
             try
             {
-                var result = await userService.UpdateUserGroup(id, groupid);
+                var result = await userService.UpdateUserGroup(userid, groupid, campaignid);
                 if (result.Success == false)
                 {
                     return BadRequest(result.Message);

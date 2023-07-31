@@ -12,7 +12,7 @@ namespace Capstone_VotingSystem.Entities
         }
 
         public Guid CategoryId { get; set; }
-        public string? Name { get; set; }
+        public string Name { get; set; }
         public string? Description { get; set; }
 
         public virtual ICollection<Campaign> Campaigns { get; set; }
