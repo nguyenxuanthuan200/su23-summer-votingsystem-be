@@ -139,13 +139,13 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-      [HttpGet("stageid")]
+      [HttpGet("stage/{stageid}/user/{userid}")]
         [SwaggerOperation(summary: "Get All Candidate by Stage")]
-        public async Task<IActionResult> GetListCandidateByStage(Guid stageid)
+        public async Task<IActionResult> GetListCandidateByStage(Guid stageid,string userid)
         {
             try
             {
-                var result = await candidateService.getListcandidatStage(stageid);
+                var result = await candidateService.GetListcandidatStage(stageid, userid);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
