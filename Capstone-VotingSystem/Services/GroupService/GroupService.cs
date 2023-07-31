@@ -36,7 +36,7 @@ namespace Capstone_VotingSystem.Services.GroupService
         {
             APIResponse<GroupResponse> response = new();
             var checkCam = await dbContext.Campaigns.Where(x => x.CampaignId == request.CampaignId && x.Status == true).SingleOrDefaultAsync();
-            if (checkCam != null)
+            if (checkCam == null)
             {
                 response.ToFailedResponse("Chiến dịch này không tồn tại hoặc đã bị xóa", StatusCodes.Status404NotFound);
                 return response;

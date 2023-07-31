@@ -31,37 +31,37 @@ namespace Capstone_VotingSystem.Services.VoteService
             var checkStateId = await dbContext.Stages.SingleOrDefaultAsync(p => p.StageId == request.StageId);
             if (checkStateId == null)
             {
-                response.ToSuccessResponse("không tìm thấy giai đoạn", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("không tìm thấy giai đoạn", StatusCodes.Status404NotFound);
                 return response;
             }
             var checkCandidate = await dbContext.Candidates.SingleOrDefaultAsync(p => p.CandidateId == request.CandidateId && p.CampaignId == checkStateId.CampaignId);
             if (checkCandidate == null)
             {
-                response.ToSuccessResponse("không tìm thấy ứng cử viên hoặc ứng cử viên không thuộc chiến dịch này", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("không tìm thấy ứng cử viên hoặc ứng cử viên không thuộc chiến dịch này", StatusCodes.Status404NotFound);
                 return response;
             }
             var checkVote = await dbContext.Votings.SingleOrDefaultAsync(p => p.UserId == request.UserId && p.CandidateId == request.CandidateId && p.StageId == request.StageId && p.Status == true);
             if (checkVote != null)
             {
-                response.ToSuccessResponse("Bạn đã bình chọn cho ứng cử viên này trong giai đoạn này rồi", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Bạn đã bình chọn cho ứng cử viên này trong giai đoạn này rồi", StatusCodes.Status404NotFound);
                 return response;
             }
             var checkGroupUser = await dbContext.GroupUsers.SingleOrDefaultAsync(p => p.UserId == checkUser.UserId && p.CampaignId == checkStateId.CampaignId);
             if (checkGroupUser == null)
             {
-                response.ToSuccessResponse("Bạn chưa chọn nhóm của mình khi tham gia chiến dịch này", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Bạn chưa chọn nhóm của mình khi tham gia chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
             }
             var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupVoterId == checkGroupUser.GroupId && p.GroupCandidateId == checkCandidate.GroupId && p.CampaignId == checkStateId.CampaignId);
             if (ratioGroup == null)
             {
-                response.ToSuccessResponse("Tỷ trọng chưa được tạo", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Tỷ trọng chưa được tạo", StatusCodes.Status400BadRequest);
                 return response;
             }
             var checkLimitVote = await dbContext.Votings.Where(p=>p.UserId==request.UserId&&p.StageId==request.StageId && p.Status==true).ToListAsync();
             if (checkLimitVote.Count >=checkStateId.LimitVote)
             {
-                response.ToSuccessResponse("Bạn đã hết phiếu để bình chọn cho giai đoạn này rồi", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Bạn đã hết phiếu để bình chọn cho giai đoạn này rồi", StatusCodes.Status400BadRequest);
                 return response;
             }
 
@@ -145,37 +145,37 @@ namespace Capstone_VotingSystem.Services.VoteService
             var checkStateId = await dbContext.Stages.SingleOrDefaultAsync(p => p.StageId == request.StageId);
             if (checkStateId == null)
             {
-                response.ToSuccessResponse("không tìm thấy giai đoạn", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("không tìm thấy giai đoạn", StatusCodes.Status404NotFound);
                 return response;
             }
             var checkCandidate = await dbContext.Candidates.SingleOrDefaultAsync(p => p.CandidateId == request.CandidateId && p.CampaignId == checkStateId.CampaignId && p.Status == true);
             if (checkCandidate == null)
             {
-                response.ToSuccessResponse("không tìm thấy ứng cử viên hoặc ứng cử viên không thuộc chiến dịch này", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("không tìm thấy ứng cử viên hoặc ứng cử viên không thuộc chiến dịch này", StatusCodes.Status404NotFound);
                 return response;
             }
             var checkVote = await dbContext.Votings.SingleOrDefaultAsync(p => p.UserId == request.UserId && p.CandidateId == request.CandidateId && p.StageId == request.StageId && p.Status == true);
             if (checkVote != null)
             {
-                response.ToSuccessResponse("Bạn đã bình chọn cho ứng cử viên này trong giai đoạn này rồi", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Bạn đã bình chọn cho ứng cử viên này trong giai đoạn này rồi", StatusCodes.Status404NotFound);
                 return response;
             }
             var checkGroupUser = await dbContext.GroupUsers.SingleOrDefaultAsync(p => p.UserId == checkUser.UserId && p.CampaignId == checkStateId.CampaignId);
             if (checkGroupUser == null)
             {
-                response.ToSuccessResponse("Bạn chưa chọn nhóm của mình khi tham gia chiến dịch này", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Bạn chưa chọn nhóm của mình khi tham gia chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
             }
             var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupVoterId == checkGroupUser.GroupId && p.GroupCandidateId == checkCandidate.GroupId && p.CampaignId == checkStateId.CampaignId);
             if (ratioGroup == null)
             {
-                response.ToSuccessResponse("Tỷ trọng chưa được tạo", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Tỷ trọng chưa được tạo", StatusCodes.Status400BadRequest);
                 return response;
             }
             var checkLimitVote = await dbContext.Votings.Where(p => p.UserId == request.UserId && p.StageId == request.StageId && p.Status == true).ToListAsync();
             if (checkLimitVote.Count >= checkStateId.LimitVote)
             {
-                response.ToSuccessResponse("Bạn đã hết phiếu để bình chọn cho giai đoạn này rồi", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Bạn đã hết phiếu để bình chọn cho giai đoạn này rồi", StatusCodes.Status400BadRequest);
                 return response;
             }
             var id = Guid.NewGuid();
