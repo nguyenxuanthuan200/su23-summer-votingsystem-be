@@ -22,7 +22,7 @@ namespace Capstone_VotingSystem.Entities
         public bool IsUseForm { get; set; }
         public bool Status { get; set; }
         public Guid CampaignId { get; set; }
-        public Guid FormId { get; set; }
+        public Guid? FormId { get; set; }
 
         public virtual Campaign Campaign { get; set; } = null!;
         public virtual Form Form { get; set; } = null!;
