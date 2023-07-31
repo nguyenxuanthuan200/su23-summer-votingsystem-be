@@ -33,6 +33,7 @@ namespace Capstone_VotingSystem.Services.GroupService
                 type.GroupId = id;
                 type.Name = request.Name;
                 type.Description = request.Description;
+                type.IsVoter = request.IsVoter;
 
             }
             await dbContext.Groups.AddAsync(type);
@@ -54,6 +55,8 @@ namespace Capstone_VotingSystem.Services.GroupService
                     GroupId = x.GroupId,
                     Name = x.Name,
                     Description = x.Description,
+                    IsVoter = x.IsVoter,
+
                 };
             }).ToList();
             response.ToSuccessResponse(response.Data = result, "Lấy danh sách Group thành công", StatusCodes.Status200OK);
@@ -79,6 +82,7 @@ namespace Capstone_VotingSystem.Services.GroupService
 
             typecheck.Name = request.Name;
             typecheck.Description = request.Description;
+            typecheck.IsVoter = request.IsVoter;
             dbContext.Groups.Update(typecheck);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<GroupResponse>(typecheck);
