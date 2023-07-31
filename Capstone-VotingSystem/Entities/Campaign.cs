@@ -9,6 +9,7 @@ namespace Capstone_VotingSystem.Entities
         {
             Candidates = new HashSet<Candidate>();
             FeedBacks = new HashSet<FeedBack>();
+            Groups = new HashSet<Group>();
             Ratios = new HashSet<Ratio>();
             Stages = new HashSet<Stage>();
         }
@@ -19,6 +20,8 @@ namespace Capstone_VotingSystem.Entities
         public DateTime? EndTime { get; set; }
         public string? Visibility { get; set; }
         public string? ImgUrl { get; set; }
+        public string? Process { get; set; }
+        public bool? IsApporve { get; set; }
         public bool? Status { get; set; }
         public string? UserId { get; set; }
         public Guid? CategoryId { get; set; }
@@ -27,6 +30,7 @@ namespace Capstone_VotingSystem.Entities
         public virtual User? User { get; set; }
         public virtual ICollection<Candidate> Candidates { get; set; }
         public virtual ICollection<FeedBack> FeedBacks { get; set; }
+        public virtual ICollection<Group> Groups { get; set; }
         public virtual ICollection<Ratio> Ratios { get; set; }
         public virtual ICollection<Stage> Stages { get; set; }
     }

@@ -36,7 +36,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 ele.Content = request.Answer;
                 ele.Status = true;
                 ele.QuestionId = questionId;
-                ele.Rate = request.Rate;
+                ele.Score = request.Score;
             }
             await dbContext.Elements.AddAsync(ele);
             await dbContext.SaveChangesAsync();
@@ -51,7 +51,8 @@ namespace Capstone_VotingSystem.Services.QuestionService
                    ElementId = x.ElementId,
                    Answer = x.Content,
                    QuestionId = x.QuestionId,
-                   Rate = x.Rate,
+                   Score = x.Score,
+                   Status = x.Status,
                };
            }
            ).ToList();
@@ -82,7 +83,6 @@ namespace Capstone_VotingSystem.Services.QuestionService
             Question ques = new Question();
             {
                 ques.QuestionId = id;
-                ques.Title = request.Title;
                 ques.FormId = request.FormId;
                 ques.Content = request.Content;
                 ques.Status = true;
@@ -103,7 +103,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
                         ele.Content = i.Answer;
                         ele.Status = true;
                         ele.QuestionId = ques.QuestionId;
-                        ele.Rate = i.Rate;
+                        ele.Score = i.Score;
                     }
                     await dbContext.Elements.AddAsync(ele);
                     await dbContext.SaveChangesAsync();
@@ -140,15 +140,15 @@ namespace Capstone_VotingSystem.Services.QuestionService
             Question ques = new Question();
             {
                 ques.QuestionId = id;
-                ques.Title = request.Title;
                 ques.FormId = request.FormId;
                 ques.Content = request.Content;
                 ques.TypeId = request.TypeId;
+                ques.Status = true;
             }
             await dbContext.Questions.AddAsync(ques);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<GetQuestionNoElementResponse>(ques);
-            
+
             map.TypeName = checktype.Name;
             response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
             response.Data = map;
@@ -158,8 +158,8 @@ namespace Capstone_VotingSystem.Services.QuestionService
         public async Task<APIResponse<string>> DeleteQuestion(Guid id)
         {
             APIResponse<String> response = new();
-           
-            var checkQuestion= await dbContext.Questions.SingleOrDefaultAsync(c => c.QuestionId == id && c.Status == true);
+
+            var checkQuestion = await dbContext.Questions.SingleOrDefaultAsync(c => c.QuestionId == id && c.Status == true);
             if (checkQuestion == null)
             {
                 response.ToFailedResponse("Câu hỏi không tồn tại hoặc bị xóa", StatusCodes.Status400BadRequest);
@@ -183,7 +183,6 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 GetQuestionResponse quest = new GetQuestionResponse();
                 quest.QuestionId = item.QuestionId;
                 quest.Content = item.Content;
-                quest.Title = item.Title;
                 quest.FormId = item.FormId;
                 quest.TypeName = type.Name;
                 var element = await dbContext.Elements.Where(p => p.QuestionId == item.QuestionId).ToListAsync();
@@ -195,7 +194,8 @@ namespace Capstone_VotingSystem.Services.QuestionService
                        ElementId = x.ElementId,
                        Answer = x.Content,
                        QuestionId = x.QuestionId,
-                       Rate = x.Rate,
+                       Status = x.Status,
+                       Score = x.Score,
                    };
                }
                ).ToList();
@@ -228,7 +228,6 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 response.ToFailedResponse("Không có loại câu hỏi nào phù hợp theo yêu cầu ", StatusCodes.Status400BadRequest);
                 return response;
             }
-            question.Title = request.Title;
             question.Content = request.Content;
             question.TypeId = request.TypeId;
             dbContext.Questions.Update(question);
@@ -248,7 +247,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 else
                 {
                     element.Content = item.Answer;
-                    element.Rate = item.Rate;
+                    element.Score = item.Rate;
                     dbContext.Elements.Update(element);
                     await dbContext.SaveChangesAsync();
                 }
@@ -266,7 +265,8 @@ namespace Capstone_VotingSystem.Services.QuestionService
                    ElementId = x.ElementId,
                    Answer = x.Content,
                    QuestionId = x.QuestionId,
-                   Rate = x.Rate,
+                   Score = x.Score,
+                   Status = x.Status,
                };
            }
            ).ToList();

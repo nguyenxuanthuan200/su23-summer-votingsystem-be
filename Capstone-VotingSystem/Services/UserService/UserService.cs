@@ -88,17 +88,24 @@ namespace Capstone_VotingSystem.Services.UserService
                 response.ToFailedResponse("không tìm thấy người dùng", StatusCodes.Status404NotFound);
                 return response;
             }
-            var checkGroup = await dbContext.Groups.Where(p => p.GroupId == groupId).SingleOrDefaultAsync();
+            var checkGroup = await dbContext.GroupUsers.Where(p => p.UserId == userId && p.GroupId == groupId).SingleOrDefaultAsync();
             if (checkGroup == null)
             {
-                response.ToFailedResponse("không tìm thấy nhóm!!", StatusCodes.Status404NotFound);
+                var id = Guid.NewGuid();
+                GroupUser groupUser = new GroupUser();
+                {
+                    groupUser.GroupUserId = id;
+                    groupUser.GroupId = groupId;
+                    groupUser.UserId = userId;
+                }
+                await dbContext.GroupUsers.AddAsync(groupUser);
+                await dbContext.SaveChangesAsync();
+                response.ToSuccessResponse("Thêm thành công", StatusCodes.Status200OK);
                 return response;
             }
-            checkUser.GroupId = groupId;
-
-            dbContext.Users.Update(checkUser);
+            checkGroup.GroupId = groupId;
+            dbContext.Update(checkGroup);
             await dbContext.SaveChangesAsync();
-
             response.ToSuccessResponse("Cập nhật thành công", StatusCodes.Status200OK);
             return response;
         }

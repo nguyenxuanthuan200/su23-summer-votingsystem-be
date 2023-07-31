@@ -73,7 +73,6 @@ namespace Capstone_VotingSystem.Services.AccountService
                         Dob = u.Dob,
                         Email = u.Email,
                         Gender = u.Gender,
-                        GroupId = u.GroupId,
                     };
                 }
                 ).ToList();

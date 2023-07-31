@@ -6,7 +6,7 @@ namespace Capstone_VotingSystem.Entities
     public partial class Score
     {
         public Guid ScoreId { get; set; }
-        public int? Score1 { get; set; }
+        public double? Point { get; set; }
         public Guid? CandidateId { get; set; }
         public Guid? StageId { get; set; }
 

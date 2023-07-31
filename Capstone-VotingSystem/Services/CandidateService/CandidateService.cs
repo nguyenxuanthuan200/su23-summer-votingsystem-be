@@ -41,7 +41,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 acc.Status = true;
                 acc.RoleId = role.RoleId;
             };
-            var checkGroup = await dbContext.Groups.Where(p => p.GroupId == request.GroupId).SingleOrDefaultAsync();
+            var checkGroup = await dbContext.Groups.Where(p => p.GroupId == request.GroupId && p.IsVoter == false).SingleOrDefaultAsync();
             if (checkGroup == null)
             {
                 response.ToFailedResponse("Group không tồn tại", StatusCodes.Status400BadRequest);
@@ -54,16 +54,16 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 us.FullName = request.FullName;
                 us.Status = true;
                 us.Address = request.Address;
-                us.GroupId = request.GroupId;
             }
             var id = Guid.NewGuid();
             Candidate candida = new Candidate();
             {
                 candida.CandidateId = id;
                 candida.UserId = us.UserId;
+                candida.FullName = request.FullName;
                 candida.Status = true;
                 candida.CampaignId = request.CampaignId;
-                candida.GroupCandidateId = request.GroupId;
+                candida.GroupId = request.GroupId;
             }
             await dbContext.Users.AddAsync(us);
             await dbContext.Accounts.AddAsync(acc);
@@ -98,10 +98,17 @@ namespace Capstone_VotingSystem.Services.CandidateService
                         response.ToFailedResponse("UserName " + i.UserId + "không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
                         return response;
                     }
+
                     var check3 = await dbContext.Candidates.Where(p => p.CampaignId == request.CampaignId && p.UserId == i.UserId && p.Status == true).SingleOrDefaultAsync();
                     if (check3 != null)
                     {
                         response.ToFailedResponse("Candidate " + check3.UserId + " đã được thêm vào trước đó rồi!!!!", StatusCodes.Status400BadRequest);
+                        return response;
+                    }
+                    var checkGroup = await dbContext.Groups.Where(p => p.GroupId == request.GroupId && p.IsVoter == false).SingleOrDefaultAsync();
+                    if (checkGroup == null)
+                    {
+                        response.ToFailedResponse("Group ứng cử viên không tồn tại", StatusCodes.Status400BadRequest);
                         return response;
                     }
                     var check4 = await dbContext.Candidates.Where(p => p.CampaignId == request.CampaignId && p.UserId == i.UserId && p.Status == false).SingleOrDefaultAsync();
@@ -121,7 +128,8 @@ namespace Capstone_VotingSystem.Services.CandidateService
                             can.Status = true;
                             can.Description = i.Description;
                             can.CampaignId = request.CampaignId;
-                            can.GroupCandidateId = checkuser.GroupId;
+                            can.GroupId = request.GroupId;
+
                         }
                         await dbContext.Candidates.AddAsync(can);
                         await dbContext.SaveChangesAsync();
@@ -155,16 +163,17 @@ namespace Capstone_VotingSystem.Services.CandidateService
             foreach (var item in listCandidate)
             {
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
+                var checkGroup = await dbContext.Groups.Where(p => p.GroupId == item.GroupId).SingleOrDefaultAsync();
                 var candidate = new GetListCandidateCampaignResponse();
                 {
                     candidate.CandidateId = item.CandidateId;
                     candidate.CampaignId = item.CampaignId;
                     candidate.Description = item.Description;
                     candidate.UserId = item.UserId;
-                    candidate.GroupId = checkuser.GroupId;
+                    candidate.GroupId = checkGroup != null ? checkGroup.GroupId : null;
                     candidate.FullName = checkuser.FullName;
                     candidate.Phone = checkuser.Phone;
-                    candidate.Status= checkuser.Status;
+                    candidate.Status = checkuser.Status;
                     candidate.Gender = checkuser.Gender;
                     candidate.Dob = checkuser.Dob;
                     candidate.Email = checkuser.Email;
@@ -195,7 +204,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                     candidate.CampaignId = item.CampaignId;
                     candidate.Description = item.Description;
                     candidate.UserId = item.UserId;
-                    candidate.GroupId = checkuser.GroupId;
+                    candidate.GroupId = item.GroupId;
                     candidate.FullName = checkuser.FullName;
                     candidate.Phone = checkuser.Phone;
                     candidate.Gender = checkuser.Gender;
@@ -219,13 +228,13 @@ namespace Capstone_VotingSystem.Services.CandidateService
         public async Task<APIResponse<string>> DeleteCandidateCampaign(Guid candidateId, DeleteCandidateRequest request)
         {
             APIResponse<string> response = new();
-            var checkCampaign = await dbContext.Campaigns.Where(p => p.Status == true && p.UserId == request.userId && p.CampaignId==request.campaignId).SingleOrDefaultAsync();
+            var checkCampaign = await dbContext.Campaigns.Where(p => p.Status == true && p.UserId == request.userId && p.CampaignId == request.campaignId).SingleOrDefaultAsync();
             if (checkCampaign == null)
             {
                 response.ToFailedResponse("Không phải là người tạo chiến dịch, bạn không thể xóa ứng cử viên trong đó hoặc chiến dịch đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var deleteCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CandidateId==candidateId && p.CampaignId == request.campaignId).SingleOrDefaultAsync();
+            var deleteCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CandidateId == candidateId && p.CampaignId == request.campaignId).SingleOrDefaultAsync();
             if (deleteCandidate == null)
             {
                 response.ToFailedResponse("Không có Candidate nào phù hợp trong Campaign hoặc đã bị xóa", StatusCodes.Status400BadRequest);
@@ -315,30 +324,30 @@ namespace Capstone_VotingSystem.Services.CandidateService
             List<ListCandidateStageResponse> result = new List<ListCandidateStageResponse>();
             foreach (var item in listCandidate)
             {
-             
+
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
-                var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId &&p.CampaignId== checkcam.CampaignId);
-                var group = await dbContext.Groups.Where(p => p.GroupId == checkCandidate.GroupCandidateId).SingleOrDefaultAsync();
+                var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId && p.CampaignId == checkcam.CampaignId);
+                var group = await dbContext.Groups.SingleOrDefaultAsync(p => p.GroupId == item.GroupId);
                 var scoreStage = await dbContext.Scores.Where(p => p.StageId == stage.StageId && p.CandidateId == item.CandidateId).SingleOrDefaultAsync();
                 var score = 0;
                 if (scoreStage != null)
                 {
-                    score = (int)scoreStage.Score1;
+                    score = (int)scoreStage.Point;
                 }
                 var candidate = new ListCandidateStageResponse();
                 {
                     candidate.CandidateId = item.CandidateId;
                     candidate.Description = item.Description;
                     candidate.UserId = item.UserId;
-                    candidate.GroupId = item.GroupCandidateId;
-                    candidate.GroupName = group.Name;
+                    candidate.GroupId = item.GroupId;
+                    candidate.GroupName = group != null ? group.Name : null;
                     candidate.FullName = checkuser.FullName;
                     candidate.Phone = checkuser.Phone;
                     candidate.Gender = checkuser.Gender;
                     candidate.Dob = checkuser.Dob;
                     candidate.Email = checkuser.Email;
                     candidate.AvatarUrl = checkuser.AvatarUrl;
-                    candidate.StageScore= score;
+                    candidate.StageScore = score;
                 }
                 result.Add(candidate);
             }
