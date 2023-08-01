@@ -18,6 +18,22 @@ namespace Capstone_VotingSystem.Services.FormService
             _mapper = mapper;
         }
 
+        public async Task<APIResponse<string>> ApproveForm(Guid id)
+        {
+            APIResponse<string> response = new();
+            var form = await dbContext.Forms.Where(p => p.Status == true && p.IsApprove == false && p.FormId == id).SingleOrDefaultAsync();
+            if (form == null)
+            {
+                response.ToFailedResponse("Biểu mẫu đã bị xóa hoặc đã được duyệt", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            form.IsApprove = true;
+            dbContext.Forms.Update(form);
+            await dbContext.SaveChangesAsync();
+            response.ToSuccessResponse("Duyệt biểu mẫu thành công", StatusCodes.Status200OK);
+            return response;
+        }
+
         public async Task<APIResponse<GetFormResponse>> CreateForm(CreateFormRequest request)
         {
             APIResponse<GetFormResponse> response = new();
@@ -176,6 +192,35 @@ namespace Capstone_VotingSystem.Services.FormService
                 return response;
             }
             IEnumerable<GetFormResponse> result = getById.Select(
+               x =>
+               {
+                   return new GetFormResponse()
+                   {
+                       CategoryId = x.CategoryId,
+                       FormId = x.FormId,
+                       Name = x.Name,
+                       IsApprove = x.IsApprove,
+                       UserId = x.UserId,
+                       Visibility = x.Visibility,
+                   };
+               }
+               ).ToList();
+            response.Data = result;
+            response.ToSuccessResponse(response.Data, "Lấy danh sách thành công", StatusCodes.Status200OK);
+            return response;
+        }
+
+        public async Task<APIResponse<IEnumerable<GetFormResponse>>> GetFormNeedApprove()
+        {
+            APIResponse<IEnumerable<GetFormResponse>> response = new();
+            var getAll = await dbContext.Forms.Where(p => p.IsApprove == false && p.Status == true)
+                .ToListAsync();
+            if (getAll.Count == 0)
+            {
+                response.ToFailedResponse("Không có biểu mẫu nào cần được duyệt", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            IEnumerable<GetFormResponse> result = getAll.Select(
                x =>
                {
                    return new GetFormResponse()

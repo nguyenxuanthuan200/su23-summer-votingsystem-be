@@ -327,10 +327,10 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 foreach (var item in checkVote)
                 {
                     var ListCandidateVotedByUser = new ListCandidateVotedByUser();
-                    var groupUser = await dbContext.GroupUsers.SingleOrDefaultAsync(p => p.UserId == item.UserId);
-                    var group = await dbContext.Groups.SingleOrDefaultAsync(p => p.GroupId == groupUser.GroupId);
+                    var ratio = await dbContext.Ratios.SingleOrDefaultAsync(p => p.RatioGroupId == item.RatioGroupId);
+                    var groupCandidate = await dbContext.Groups.SingleOrDefaultAsync(p => p.GroupId == ratio.GroupCandidateId);
                     ListCandidateVotedByUser.CandidateId = item.CandidateId;
-                    ListCandidateVotedByUser.GroupName = group.Name;
+                    ListCandidateVotedByUser.GroupName = groupCandidate.Name;
                     listVoted.Add(ListCandidateVotedByUser);
 
                 }
