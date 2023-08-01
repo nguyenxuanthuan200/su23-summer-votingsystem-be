@@ -45,7 +45,7 @@ namespace Capstone_VotingSystem.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=XUANTHUAN\\SQLEXPRESS;Initial Catalog=VotingSystem;Persist Security Info=True;User ID=sa;Password=123");
+                optionsBuilder.UseSqlServer("Data Source=sql8003.site4now.net;Initial Catalog=db_a9a782_votingsystem;Persist Security Info=True;User ID=db_a9a782_votingsystem_admin;Password=votingsystem123");
             }
         }
 
@@ -660,7 +660,6 @@ namespace Capstone_VotingSystem.Entities
                 entity.HasOne(d => d.Form)
                     .WithMany(p => p.Stages)
                     .HasForeignKey(d => d.FormId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Stage_Form");
             });
 

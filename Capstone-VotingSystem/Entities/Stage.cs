@@ -25,7 +25,7 @@ namespace Capstone_VotingSystem.Entities
         public Guid? FormId { get; set; }
 
         public virtual Campaign Campaign { get; set; } = null!;
-        public virtual Form Form { get; set; } = null!;
+        public virtual Form? Form { get; set; }
         public virtual ICollection<Score> Scores { get; set; }
         public virtual ICollection<Voting> Votings { get; set; }
     }
