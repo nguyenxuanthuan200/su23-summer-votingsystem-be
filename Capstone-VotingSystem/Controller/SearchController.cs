@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Capstone_VotingSystem.Controller
 {
-    [Route("api/v1/searchController")]
+    [Route("api/v1/search")]
     [ApiController]
     public class SearchController : ControllerBase
     {

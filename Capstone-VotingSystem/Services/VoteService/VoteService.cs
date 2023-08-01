@@ -34,6 +34,11 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToFailedResponse("không tìm thấy giai đoạn", StatusCodes.Status404NotFound);
                 return response;
             }
+            if (!checkStateId.Process.Equals("Đang diễn ra"))
+            {
+                response.ToFailedResponse("Không thể bình chọn giai đoạn chưa diễn ra hoặc đã kết thúc", StatusCodes.Status400BadRequest);
+                return response;
+            }
             var checkCandidate = await dbContext.Candidates.SingleOrDefaultAsync(p => p.CandidateId == request.CandidateId && p.CampaignId == checkStateId.CampaignId);
             if (checkCandidate == null)
             {
@@ -64,7 +69,8 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToFailedResponse("Bạn đã hết phiếu để bình chọn cho giai đoạn này rồi", StatusCodes.Status400BadRequest);
                 return response;
             }
-
+            TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
             var id = Guid.NewGuid();
             Voting vote = new Voting();
             {
@@ -74,7 +80,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                 vote.RatioGroupId = ratioGroup.RatioGroupId;
                 vote.CandidateId = request.CandidateId;
                 vote.Status = true;
-                vote.SendingTime = request.SendingTime;
+                vote.SendingTime = currentDateTimeVn;
             }
             await dbContext.Votings.AddAsync(vote);
             await dbContext.SaveChangesAsync();
@@ -96,7 +102,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                     VotingDetail votingDetail = new VotingDetail();
                     {
                         votingDetail.VotingDetailId = ide;
-                        votingDetail.CreateTime = DateTime.Now;
+                        votingDetail.CreateTime = currentDateTimeVn;
                         votingDetail.ElementId = i.ElementId;
                         votingDetail.VotingId = vote.VotingId;
                     }
@@ -129,6 +135,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                 dbContext.Scores.Update(checkscore);
                 await dbContext.SaveChangesAsync();
             }
+            //create history, notification
             response.ToSuccessResponse("Bình chọn thành công", StatusCodes.Status200OK);
             return response;
         }
@@ -146,6 +153,11 @@ namespace Capstone_VotingSystem.Services.VoteService
             if (checkStateId == null)
             {
                 response.ToFailedResponse("không tìm thấy giai đoạn", StatusCodes.Status404NotFound);
+                return response;
+            }
+            if (!checkStateId.Process.Equals("Đang diễn ra"))
+            {
+                response.ToFailedResponse("Không thể bình chọn giai đoạn chưa diễn ra hoặc đã kết thúc", StatusCodes.Status400BadRequest);
                 return response;
             }
             var checkCandidate = await dbContext.Candidates.SingleOrDefaultAsync(p => p.CandidateId == request.CandidateId && p.CampaignId == checkStateId.CampaignId && p.Status == true);
@@ -178,6 +190,8 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToFailedResponse("Bạn đã hết phiếu để bình chọn cho giai đoạn này rồi", StatusCodes.Status400BadRequest);
                 return response;
             }
+            TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
             var id = Guid.NewGuid();
             Voting vote = new Voting();
             {
@@ -187,7 +201,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                 vote.RatioGroupId = ratioGroup.RatioGroupId;
                 vote.CandidateId = request.CandidateId;
                 vote.Status = true;
-                vote.SendingTime = request.SendingTime;
+                vote.SendingTime = currentDateTimeVn;
             }
             var checkscore = await dbContext.Scores.Where(p => p.StageId == request.StageId && p.CandidateId == request.CandidateId).SingleOrDefaultAsync();
             if (checkscore == null)

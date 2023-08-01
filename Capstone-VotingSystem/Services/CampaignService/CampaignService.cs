@@ -34,7 +34,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
         public async Task<APIResponse<GetCampaignResponse>> ApproveCampaign(Guid id)
         {
             APIResponse<GetCampaignResponse> response = new();
-            var cam = await dbContext.Campaigns.Where(p => p.Status == true &&p.IsApprove ==false&&p.CampaignId==id).SingleOrDefaultAsync();
+            var cam = await dbContext.Campaigns.Where(p => p.Status == true && p.IsApprove == false && p.CampaignId == id).SingleOrDefaultAsync();
             if (cam == null)
             {
                 response.ToFailedResponse("Chiến dịch đã bị xóa hoặc đã được duyệt", StatusCodes.Status400BadRequest);
@@ -138,7 +138,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 cam.Status = true;
                 cam.UserId = request.UserId;
                 cam.CategoryId = request.CategoryId;
-                
+
             };
             await dbContext.Campaigns.AddAsync(cam);
             await dbContext.SaveChangesAsync();
@@ -151,14 +151,14 @@ namespace Capstone_VotingSystem.Services.CampaignService
         public async Task<APIResponse<string>> DeleteCampaign(Guid CampaignId, DeleteCampaignRequest request)
         {
             APIResponse<string> response = new();
-           
+
             var checkus = await dbContext.Accounts.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.UserName == request.UserName);
             if (checkus == null)
             {
                 response.ToFailedResponse("Người dùng không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var cam = await dbContext.Campaigns.Where(p => p.Status == true&& p.UserId==request.UserName).SingleOrDefaultAsync(c => c.CampaignId == CampaignId);
+            var cam = await dbContext.Campaigns.Where(p => p.Status == true && p.UserId == request.UserName).SingleOrDefaultAsync(c => c.CampaignId == CampaignId);
             if (cam == null)
             {
                 response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
@@ -182,6 +182,9 @@ namespace Capstone_VotingSystem.Services.CampaignService
             foreach (var item in campaign)
             {
                 var map = _mapper.Map<GetCampaignAndStageResponse>(item);
+
+                var totalCandidate = await dbContext.Candidates.Where(p => p.CampaignId == item.CampaignId && p.Status == true).ToListAsync();
+                map.TotalCandidate = totalCandidate.Count();
                 var stage = await dbContext.Stages.Where(p => p.CampaignId == item.CampaignId).ToListAsync();
 
                 //if (element.Exists(image => string.IsNullOrEmpty(item.Title)))
@@ -229,7 +232,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
         {
             APIResponse<IEnumerable<GetCampaignResponse>> response = new();
 
-            var getById = await dbContext.Campaigns.Where(p => p.IsApprove ==false && p.Status == true)
+            var getById = await dbContext.Campaigns.Where(p => p.IsApprove == false && p.Status == true)
                 .ToListAsync();
             if (getById == null)
             {
