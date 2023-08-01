@@ -27,7 +27,7 @@ namespace Capstone_VotingSystem.Services.RatioService
                 response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var checkGroup = await dbContext.Groups.SingleOrDefaultAsync(c => c.GroupId == request.GroupVoterId &&c.IsVoter==true);
+            var checkGroup = await dbContext.Groups.SingleOrDefaultAsync(c => c.GroupId == request.GroupVoterId && c.IsVoter == true);
             if (checkGroup == null)
             {
                 response.ToFailedResponse("Nhóm người bình chọn không tồn tại", StatusCodes.Status400BadRequest);
@@ -37,6 +37,17 @@ namespace Capstone_VotingSystem.Services.RatioService
             if (checkGroup1 == null)
             {
                 response.ToFailedResponse("Nhóm ứng cử viên không tồn tại", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var checkRatio = await dbContext.Ratios.SingleOrDefaultAsync(c => c.GroupVoterId == request.GroupVoterId && c.CampaignId == request.CampaignId && c.GroupCandidateId == request.GroupCandidateId);
+            if (checkRatio != null)
+            {
+                checkRatio.Proportion=request.Proportion;
+                dbContext.Ratios.Update(checkRatio);
+                await dbContext.SaveChangesAsync();
+               // var map = _mapper.Map<RatioResponse>(checkRatio);
+                response.ToSuccessResponse("Tạo trọng số thành công", StatusCodes.Status200OK);
+              //  response.Data = map;
                 return response;
             }
             var id = Guid.NewGuid();
@@ -90,23 +101,8 @@ namespace Capstone_VotingSystem.Services.RatioService
                 ratioRe.GroupNameOfCandidate = groupNameOfCandidate.Name;
                 ratioRe.CampaignId = i.CampaignId;
                 ListratioRe.Add(ratioRe);
-             }
+            }
 
-            
-            //IEnumerable<RatioResponse> result = getById.Select(
-            //   x =>
-            //   {
-            //       return new RatioResponse()
-            //       {
-            //           RatioGroupId = x.RatioGroupId,
-            //           Proportion = x.Proportion,
-            //           GroupVoterId = x.GroupVoterId,
-            //           GroupNameOfVoter =
-            //           GroupCandidateId = x.GroupCandidateId,
-            //           CampaignId = x.CampaignId,
-            //       };
-            //   }
-            //   ).ToList();
             response.Data = ListratioRe;
             response.ToSuccessResponse(response.Data, "Lấy danh sách tỷ trọng thành công", StatusCodes.Status200OK);
             return response;
@@ -115,7 +111,7 @@ namespace Capstone_VotingSystem.Services.RatioService
         public async Task<APIResponse<RatioResponse>> UpdateRatio(Guid id, UpdateRatioRequest request)
         {
             APIResponse<RatioResponse> response = new();
-            
+
             var ratio = await dbContext.Ratios.SingleOrDefaultAsync(c => c.RatioGroupId == id);
             if (ratio == null)
             {
