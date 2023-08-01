@@ -86,7 +86,7 @@ namespace Capstone_VotingSystem.Services.NotificationService
             return response;
         }
 
-        public async Task<APIResponse<NotificationResponse>> UpdateNotification(Guid? id, NotificationRequest request)
+        public async Task<APIResponse<NotificationResponse>> UpdateNotification(Guid? id)
         {
             APIResponse<NotificationResponse> response = new();
             var checkAccout = await dbContext.Notifications.SingleOrDefaultAsync(p => p.NotificationId == id);
@@ -95,12 +95,7 @@ namespace Capstone_VotingSystem.Services.NotificationService
                 response.ToFailedResponse("không tồn tại user", StatusCodes.Status400BadRequest);
                 return response;
             }
-            checkAccout.Title = request.Title;
-            checkAccout.Message = request.Message;
-            checkAccout.CreateDate = DateTime.UtcNow;
             checkAccout.IsRead = true;
-            checkAccout.Status = true;
-
             dbContext.Update(checkAccout);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<NotificationResponse>(checkAccout);
