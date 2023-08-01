@@ -73,20 +73,41 @@ namespace Capstone_VotingSystem.Services.RatioService
                 response.ToFailedResponse(" không tồn tại Ratio nào hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            IEnumerable<RatioResponse> result = getById.Select(
-               x =>
-               {
-                   return new RatioResponse()
-                   {
-                       RatioGroupId = x.RatioGroupId,
-                       Proportion = x.Proportion,
-                       GroupVoterId = x.GroupVoterId,
-                       GroupCandidateId = x.GroupCandidateId,
-                       CampaignId = x.CampaignId,
-                   };
-               }
-               ).ToList();
-            response.Data = result;
+            var ListratioRe = new List<RatioResponse>();
+            foreach (var i in getById)
+            {
+                var groupNameOfVoter = await dbContext.Groups.Where(p => p.GroupId == i.GroupVoterId)
+               .SingleOrDefaultAsync();
+                var groupNameOfCandidate = await dbContext.Groups.Where(p => p.GroupId == i.GroupCandidateId)
+               .SingleOrDefaultAsync();
+                var ratioRe = new RatioResponse();
+
+                ratioRe.RatioGroupId = i.RatioGroupId;
+                ratioRe.Proportion = i.Proportion;
+                ratioRe.GroupVoterId = i.GroupVoterId;
+                ratioRe.GroupNameOfVoter = groupNameOfVoter.Name;
+                ratioRe.GroupCandidateId = i.GroupCandidateId;
+                ratioRe.GroupNameOfCandidate = groupNameOfCandidate.Name;
+                ratioRe.CampaignId = i.CampaignId;
+                ListratioRe.Add(ratioRe);
+             }
+
+            
+            //IEnumerable<RatioResponse> result = getById.Select(
+            //   x =>
+            //   {
+            //       return new RatioResponse()
+            //       {
+            //           RatioGroupId = x.RatioGroupId,
+            //           Proportion = x.Proportion,
+            //           GroupVoterId = x.GroupVoterId,
+            //           GroupNameOfVoter =
+            //           GroupCandidateId = x.GroupCandidateId,
+            //           CampaignId = x.CampaignId,
+            //       };
+            //   }
+            //   ).ToList();
+            response.Data = ListratioRe;
             response.ToSuccessResponse(response.Data, "Lấy danh sách tỷ trọng thành công", StatusCodes.Status200OK);
             return response;
         }
