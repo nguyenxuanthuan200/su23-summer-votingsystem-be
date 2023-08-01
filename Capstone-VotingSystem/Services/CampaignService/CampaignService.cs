@@ -34,13 +34,13 @@ namespace Capstone_VotingSystem.Services.CampaignService
         public async Task<APIResponse<GetCampaignResponse>> ApproveCampaign(Guid id)
         {
             APIResponse<GetCampaignResponse> response = new();
-            var cam = await dbContext.Campaigns.Where(p => p.Status == true &&p.IsApporve==false&&p.CampaignId==id).SingleOrDefaultAsync();
+            var cam = await dbContext.Campaigns.Where(p => p.Status == true &&p.IsApprove ==false&&p.CampaignId==id).SingleOrDefaultAsync();
             if (cam == null)
             {
                 response.ToFailedResponse("Chiến dịch đã bị xóa hoặc đã được duyệt", StatusCodes.Status400BadRequest);
                 return response;
             }
-            cam.IsApporve = true;
+            cam.IsApprove = true;
             dbContext.Campaigns.Update(cam);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<GetCampaignResponse>(cam);
@@ -134,7 +134,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 cam.Visibility = request.Visibility;
                 cam.ImgUrl = uploadResult.SecureUrl.AbsoluteUri;
                 cam.Process = "chưa bắt đầu";
-                cam.IsApporve = false;
+                cam.IsApprove = false;
                 cam.Status = true;
                 cam.UserId = request.UserId;
                 cam.CategoryId = request.CategoryId;
@@ -176,7 +176,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
         public async Task<APIResponse<IEnumerable<GetCampaignAndStageResponse>>> GetCampaign()
         {
             APIResponse<IEnumerable<GetCampaignAndStageResponse>> response = new();
-            var campaign = await dbContext.Campaigns.Where(p => p.Status == true && p.Visibility == "public" && p.IsApporve == true).ToListAsync();
+            var campaign = await dbContext.Campaigns.Where(p => p.Status == true && p.Visibility == "public" && p.IsApprove == true).ToListAsync();
 
             List<GetCampaignAndStageResponse> listCamn = new List<GetCampaignAndStageResponse>();
             foreach (var item in campaign)
@@ -229,7 +229,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
         {
             APIResponse<IEnumerable<GetCampaignResponse>> response = new();
 
-            var getById = await dbContext.Campaigns.Where(p => p.IsApporve==false && p.Status == true)
+            var getById = await dbContext.Campaigns.Where(p => p.IsApprove ==false && p.Status == true)
                 .ToListAsync();
             if (getById == null)
             {
@@ -248,7 +248,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                        Visibility = x.Visibility,
                        ImgUrl = x.ImgUrl,
                        Process = x.Process,
-                       IsApporve = x.IsApporve,
+                       IsApporve = x.IsApprove,
                        Status = x.Status,
                        UserId = x.UserId,
                        CampaignId = x.CampaignId,
@@ -332,7 +332,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                        Visibility = x.Visibility,
                        ImgUrl = x.ImgUrl,
                        Process = x.Process,
-                       IsApporve = x.IsApporve,
+                       IsApporve = x.IsApprove,
                        Status = x.Status,
                        UserId = x.UserId,
                        CampaignId = x.CampaignId,
