@@ -275,7 +275,7 @@ namespace Capstone_VotingSystem.Services.VoteService
             int countcn= 0;
             foreach (var vote in listVoteOfUser)
             {
-                var checkCandidateOfVote = await dbContext.Candidates.Where(p => p.CandidateId == candidateId && p.CampaignId == campaignId && p.Status == true).SingleOrDefaultAsync();
+                var checkCandidateOfVote = await dbContext.Candidates.Where(p => p.CandidateId == vote.CandidateId && p.CampaignId == campaignId && p.Status == true).SingleOrDefaultAsync();
                 var checkGroupCandidateOfVote = await dbContext.Groups.Where(p => p.GroupId == checkCandidateOfVote.GroupId && p.CampaignId == campaignId && p.IsVoter == false).SingleOrDefaultAsync();
                 if (checkGroupCandidateOfVote.Name.Equals("Nhạc cụ dân tộc") || checkGroupCandidateOfVote.Name.Equals("Tiếng Anh dự bị") || checkGroupCandidateOfVote.Name.Equals("Võ"))
                     countdb= countdb+1;
