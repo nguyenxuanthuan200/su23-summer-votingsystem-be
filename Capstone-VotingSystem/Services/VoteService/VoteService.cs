@@ -22,13 +22,13 @@ namespace Capstone_VotingSystem.Services.VoteService
         public async Task<APIResponse<string>> CreateVote(CreateVoteRequest request)
         {
             APIResponse<string> response = new();
-            var checkUser = await dbContext.Users.Where(p => p.UserId == request.UserId).SingleOrDefaultAsync();
+            var checkUser = await dbContext.Users.Where(p => p.UserId == request.UserId && p.Status == true).SingleOrDefaultAsync();
             if (checkUser == null)
             {
                 response.ToFailedResponse("không tìm thấy người dùng", StatusCodes.Status404NotFound);
                 return response;
             }
-            var checkStateId = await dbContext.Stages.SingleOrDefaultAsync(p => p.StageId == request.StageId);
+            var checkStateId = await dbContext.Stages.SingleOrDefaultAsync(p => p.StageId == request.StageId && p.Status == true);
             if (checkStateId == null)
             {
                 response.ToFailedResponse("không tìm thấy giai đoạn", StatusCodes.Status404NotFound);
@@ -67,6 +67,12 @@ namespace Capstone_VotingSystem.Services.VoteService
             if (checkLimitVote.Count >= checkStateId.LimitVote)
             {
                 response.ToFailedResponse("Bạn đã hết phiếu để bình chọn cho giai đoạn này rồi", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var check = await checkVoteSuccess(request.UserId, request.CandidateId, ratioGroup.CampaignId, request.StageId);
+            if (check.Equals("false"))
+            {
+                response.ToFailedResponse("Bạn không thể bình chọn cho ứng viên này do thể lệ của chiến dịch đề ra", StatusCodes.Status400BadRequest);
                 return response;
             }
             TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
@@ -190,6 +196,13 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToFailedResponse("Bạn đã hết phiếu để bình chọn cho giai đoạn này rồi", StatusCodes.Status400BadRequest);
                 return response;
             }
+            var check = await checkVoteSuccess(request.UserId, request.CandidateId, ratioGroup.CampaignId, request.StageId);
+            if (check.Equals("false"))
+            {
+                response.ToFailedResponse("Bạn không thể bình chọn cho ứng viên này do thể lệ của chiến dịch đề ra", StatusCodes.Status400BadRequest);
+                return response;
+            }
+
             TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
             var id = Guid.NewGuid();
@@ -229,6 +242,61 @@ namespace Capstone_VotingSystem.Services.VoteService
             return response;
         }
 
+        private async Task<string> checkVoteSuccess(string userId, Guid candidateId, Guid campaignId,Guid stageid)
+        {
+            string groupOfUser = "";
+            var checkGroupUser = await dbContext.GroupUsers.Where(p => p.UserId == userId && p.CampaignId == campaignId).ToListAsync();
+            foreach (var i in checkGroupUser)
+            {
+                var checkGroup = await dbContext.Groups.Where(p => p.GroupId == i.GroupId && p.CampaignId == campaignId && p.IsVoter == true).SingleOrDefaultAsync();
+                groupOfUser = checkGroup.Name;
+            }
+            string groupOfCandidate;
+            var checkCandidate = await dbContext.Candidates.Where(p => p.CandidateId == candidateId && p.CampaignId == campaignId && p.Status == true).SingleOrDefaultAsync();
+            if (checkCandidate == null)
+            {
+                return "Ứng cử viên này không thuộc chiến dịch này hoặc đã bị loại bỏ khỏi chiến dịch";
+            }
+            var checkGroupCandidate = await dbContext.Groups.Where(p => p.GroupId == checkCandidate.GroupId && p.CampaignId == campaignId && p.IsVoter == false).SingleOrDefaultAsync();
+            if (checkGroupCandidate == null)
+            {
+                return "Nhóm của ứng cử viên này không thuộc chiến dịch này hoặc đã bị loại bỏ khỏi chiến dịch";
+            }
+            groupOfCandidate= checkGroupCandidate.Name;
+
+            int groupCategoryOfCandidate = 0;
+
+            if (groupOfCandidate.Equals("Nhạc cụ dân tộc") || groupOfCandidate.Equals("Tiếng Anh dự bị") || groupOfCandidate.Equals("Võ"))
+                 groupCategoryOfCandidate = 1;
+
+            var listVoteOfUser = await dbContext.Votings.Where(p => p.UserId == userId && p.StageId == stageid && p.Status == true).ToListAsync();
+
+            int countdb= 0;
+            int countcn= 0;
+            foreach (var vote in listVoteOfUser)
+            {
+                var checkCandidateOfVote = await dbContext.Candidates.Where(p => p.CandidateId == candidateId && p.CampaignId == campaignId && p.Status == true).SingleOrDefaultAsync();
+                var checkGroupCandidateOfVote = await dbContext.Groups.Where(p => p.GroupId == checkCandidateOfVote.GroupId && p.CampaignId == campaignId && p.IsVoter == false).SingleOrDefaultAsync();
+                if (checkGroupCandidateOfVote.Name.Equals("Nhạc cụ dân tộc") || checkGroupCandidateOfVote.Name.Equals("Tiếng Anh dự bị") || checkGroupCandidateOfVote.Name.Equals("Võ"))
+                    countdb= countdb+1;
+                else
+                    countcn= countcn+1;
+
+            }
+
+            if (groupOfUser.Equals("Chuyên ngành dự bị") && groupCategoryOfCandidate==1)
+                return  "success";
+            if (groupOfUser.Equals("Chuyên ngành(1 tới 6)") && groupCategoryOfCandidate == 1 && countdb==0)
+                return "success";
+            if (groupOfUser.Equals("Chuyên ngành(1 tới 6)") && groupCategoryOfCandidate == 0 && countcn <=1)
+                return "success";
+            if (groupOfUser.Equals("Chuyên ngành(7 tới 9)") && groupCategoryOfCandidate == 0 && countcn <= 2)
+                return "success";
+
+            return "false";
+
+        }
+
         public async Task<APIResponse<IEnumerable<SatisticalVoteInCampaignResponse>>> StatisticalVoteByCampaign(StatisticalVoteRequest request)
         {
             APIResponse<IEnumerable<SatisticalVoteInCampaignResponse>> response = new();
@@ -243,66 +311,66 @@ namespace Capstone_VotingSystem.Services.VoteService
 
             int TotalVoteInCampaign = 0;
 
-            
+
             //if (request.StageId != Guid.Empty)
             //{
-                var stage = await dbContext.Stages.Where(p => p.StageId == request.StageId && p.Status == true).SingleOrDefaultAsync();
-                if (stage == null)
+            var stage = await dbContext.Stages.Where(p => p.StageId == request.StageId && p.Status == true).SingleOrDefaultAsync();
+            if (stage == null)
+            {
+                response.ToFailedResponse("Giai đoạn không tồn tại hoặc đã bị xóa", StatusCodes.Status404NotFound);
+                return response;
+            }
+
+            while (request.DateAt.CompareTo(request.ToDate) <= 0)
+            {
+                var CountVoteByStage = await dbContext.Votings.Where(p => p.StageId == request.StageId && p.Status == true && p.SendingTime.Date.Equals(request.DateAt.Date)).ToListAsync();
+                //CountVoteByStage = CountVoteByStage.Where(p => p.SendingTime.Date.Equals(request.DateAt.Date));
+                ListSaInGroup = new();
+                var listGroupVoterOfCampagin = await dbContext.Groups.Where(p => p.CampaignId == stage.CampaignId && p.IsVoter == true).ToListAsync();
+                foreach (var group in listGroupVoterOfCampagin)
                 {
-                    response.ToFailedResponse("Giai đoạn không tồn tại hoặc đã bị xóa", StatusCodes.Status404NotFound);
-                    return response;
+                    SaInGroup = new TotalVoteOfGroupInCampaignResponse();
+                    SaInGroup.GroupId = group.GroupId;
+                    SaInGroup.GroupName = group.Name;
+                    SaInGroup.TotalVote = 0;
+                    ListSaInGroup.Add(SaInGroup);
+
                 }
 
-                while (request.DateAt.CompareTo(request.ToDate) <= 0)
+                foreach (var i in CountVoteByStage)
                 {
-                    var CountVoteByStage = await dbContext.Votings.Where(p => p.StageId == request.StageId && p.Status == true && p.SendingTime.Date.Equals(request.DateAt.Date)).ToListAsync();
-                    //CountVoteByStage = CountVoteByStage.Where(p => p.SendingTime.Date.Equals(request.DateAt.Date));
-                    ListSaInGroup = new();
-                    var listGroupVoterOfCampagin = await dbContext.Groups.Where(p => p.CampaignId == stage.CampaignId && p.IsVoter == true).ToListAsync();
-                    foreach (var group in listGroupVoterOfCampagin)
+                    var CountVoteInGroup = await dbContext.GroupUsers.Where(p => p.CampaignId == stage.CampaignId && p.UserId == i.UserId).ToListAsync();
+                    foreach (var e in CountVoteInGroup)
                     {
-                        SaInGroup = new TotalVoteOfGroupInCampaignResponse();
-                        SaInGroup.GroupId = group.GroupId;
-                        SaInGroup.GroupName = group.Name;
-                        SaInGroup.TotalVote = 0;
-                        ListSaInGroup.Add(SaInGroup);
-
-                    }
-
-                    foreach (var i in CountVoteByStage)
-                    {
-                        var CountVoteInGroup = await dbContext.GroupUsers.Where(p => p.CampaignId == stage.CampaignId && p.UserId == i.UserId).ToListAsync();
-                        foreach (var e in CountVoteInGroup)
+                        var checkGroup = await dbContext.Groups.Where(p => p.GroupId == e.GroupId && p.IsVoter == true).SingleOrDefaultAsync();
+                        if (checkGroup != null)
                         {
-                            var checkGroup = await dbContext.Groups.Where(p => p.GroupId == e.GroupId && p.IsVoter == true).SingleOrDefaultAsync();
-                            if (checkGroup != null)
+                            var index = ListSaInGroup.FindIndex(p => p is TotalVoteOfGroupInCampaignResponse && ((TotalVoteOfGroupInCampaignResponse)p).GroupId == checkGroup.GroupId);
+                            if (index != -1)
                             {
-                                var index = ListSaInGroup.FindIndex(p => p is TotalVoteOfGroupInCampaignResponse && ((TotalVoteOfGroupInCampaignResponse)p).GroupId == checkGroup.GroupId);
-                                if (index != -1)
-                                {
-                                    ((TotalVoteOfGroupInCampaignResponse)ListSaInGroup[index]).TotalVote += 1;
-                                }
+                                ((TotalVoteOfGroupInCampaignResponse)ListSaInGroup[index]).TotalVote += 1;
                             }
                         }
                     }
-                    SaInStage = new();
-                    SaInStage.StageId = stage.StageId;
-                    SaInStage.TotalVoteInStage = CountVoteByStage.Count();
-                    TotalVoteInCampaign = SaInStage.TotalVoteInStage;
-                    SaInStage.StageName = stage.Title;
-                    SaInStage.VoteOfGroup = ListSaInGroup;
-                    listSaInStage = new();
-                    listSaInStage.Add(SaInStage);
-                    SaInCam = new();
-                    SaInCam.VoteOfGroupInStage = listSaInStage;
-                    SaInCam.Date = request.DateAt;
-                    SaInCam.TotalVoteInCampaign = TotalVoteInCampaign;
-                    result.Add(SaInCam);
-
-
-                    request.DateAt = request.DateAt.AddDays(1);
                 }
-               
+                SaInStage = new();
+                SaInStage.StageId = stage.StageId;
+                SaInStage.TotalVoteInStage = CountVoteByStage.Count();
+                TotalVoteInCampaign = SaInStage.TotalVoteInStage;
+                SaInStage.StageName = stage.Title;
+                SaInStage.VoteOfGroup = ListSaInGroup;
+                listSaInStage = new();
+                listSaInStage.Add(SaInStage);
+                SaInCam = new();
+                SaInCam.VoteOfGroupInStage = listSaInStage;
+                SaInCam.Date = request.DateAt;
+                SaInCam.TotalVoteInCampaign = TotalVoteInCampaign;
+                result.Add(SaInCam);
+
+
+                request.DateAt = request.DateAt.AddDays(1);
+            }
+
             //}
             //else
             //{
@@ -315,7 +383,7 @@ namespace Capstone_VotingSystem.Services.VoteService
             //}
 
 
-           
+
 
 
 
