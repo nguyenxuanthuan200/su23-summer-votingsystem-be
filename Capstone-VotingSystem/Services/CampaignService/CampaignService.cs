@@ -133,7 +133,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 cam.EndTime = request.EndTime;
                 cam.Visibility = request.Visibility;
                 cam.ImgUrl = uploadResult.SecureUrl.AbsoluteUri;
-                cam.Process = "chưa bắt đầu";
+                cam.Process = "Chưa bắt đầu";
                 cam.IsApprove = false;
                 cam.Status = true;
                 cam.UserId = request.UserId;

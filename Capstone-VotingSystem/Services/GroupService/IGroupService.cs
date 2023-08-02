@@ -8,6 +8,7 @@ namespace Capstone_VotingSystem.Services.GroupService
     {
         Task<APIResponse<IEnumerable<GroupResponse>>> GetListGroup();
         Task<APIResponse<IEnumerable<GroupResponse>>> GetListGroupByCampaign(Guid campaignId);
+        Task<APIResponse<StatisticalGroupResponse>> StatisticalGroupByCampaign(Guid campaignId);
         Task<APIResponse<GroupResponse>> CreateGroup(CreateGroupRequest request);
         Task<APIResponse<GroupResponse>> UpdateGroup(Guid id, UpdateGroupRequest request);
         Task<APIResponse<string>> CheckGroupUser(string userName,Guid campaignID);

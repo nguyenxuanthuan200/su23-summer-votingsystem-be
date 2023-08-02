@@ -20,14 +20,14 @@ namespace Capstone_VotingSystem.Services.CandidateService
         public async Task<APIResponse<string>> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request)
         {
             APIResponse<string> response = new();
-            
+
             var checkcam = await dbContext.Campaigns.Where(p => p.CampaignId == request.CampaignId && p.Status == true).SingleOrDefaultAsync();
             if (checkcam == null)
             {
                 response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            if (!checkcam.Process.Equals("Đang diễn ra"))
+            if (checkcam.Process != "Chưa bắt đầu")
             {
                 response.ToFailedResponse("Không thể chỉnh sửa khi chiến dịch đang diễn ra", StatusCodes.Status400BadRequest);
                 return response;
@@ -37,17 +37,17 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 response.ToFailedResponse("Không thể chỉnh sửa khi chiến dịch đã được xác nhận", StatusCodes.Status400BadRequest);
                 return response;
             }
-            if (request.listAccountCandidate.Count() == 0 || request.listAccountCandidate==null)
+            if (request.listAccountCandidate.Count() == 0 || request.listAccountCandidate == null)
             {
                 response.ToFailedResponse("Danh sách tài khoản ứng cứ viên khởi tạo trống", StatusCodes.Status400BadRequest);
                 return response;
             }
-            foreach(var i in request.listAccountCandidate)
+            foreach (var i in request.listAccountCandidate)
             {
                 var check = await dbContext.Accounts.Where(p => p.UserName == i.UserName).SingleOrDefaultAsync();
                 if (check != null)
                 {
-                    response.ToFailedResponse("Tài khoản "+i.UserName+" đã tồn tại", StatusCodes.Status400BadRequest);
+                    response.ToFailedResponse("Tài khoản " + i.UserName + " đã tồn tại", StatusCodes.Status400BadRequest);
                     return response;
                 }
                 var checkGroup = await dbContext.Groups.Where(p => p.GroupId == i.GroupId && p.IsVoter == false).SingleOrDefaultAsync();
