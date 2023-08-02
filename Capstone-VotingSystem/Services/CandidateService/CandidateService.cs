@@ -374,12 +374,12 @@ namespace Capstone_VotingSystem.Services.CandidateService
                     candidate.UserId = item.UserId;
                     candidate.GroupId = item.GroupId;
                     candidate.GroupName = group != null ? group.Name : null;
-                    candidate.FullName = checkuser.FullName;
+                    candidate.FullName = item.FullName;
                     candidate.Phone = checkuser.Phone;
                     candidate.Gender = checkuser.Gender;
                     candidate.Dob = checkuser.Dob;
                     candidate.Email = checkuser.Email;
-                    candidate.AvatarUrl = checkuser.AvatarUrl;
+                    candidate.AvatarUrl = item.AvatarUrl;
                     candidate.StageScore = score;
                 }
                 result.Add(candidate);

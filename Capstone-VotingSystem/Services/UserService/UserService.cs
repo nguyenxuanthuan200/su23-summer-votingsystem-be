@@ -29,6 +29,100 @@ namespace Capstone_VotingSystem.Services.UserService
             this.dbContext = votingSystemContext;
             this._mapper = mapper;
         }
+
+        public async Task<APIResponse<IEnumerable<GetListUserResponse>>> GetAllUser()
+        {
+            APIResponse<IEnumerable<GetListUserResponse>> response = new();
+            // List<GetListUserResponse> result = new();
+            var users = await dbContext.Users.Where(p => p.Status == true).ToListAsync();
+            if (users.Count() == 0)
+            {
+                response.ToFailedResponse("không tìm thấy người dùng nào", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var account = await dbContext.Accounts.Where(p => p.Status == true).ToListAsync();
+            if (account.Count() == 0)
+            {
+                response.ToFailedResponse("không tìm thấy tài khoản nào", StatusCodes.Status404NotFound);
+                return response;
+            }
+
+            IEnumerable<GetListUserResponse> result = account.Join(users, a => a.UserName, u => u.UserId, (a, u) =>
+            {
+                var ListPermissionOfUser = checkPermission(u.Permission);
+                return new GetListUserResponse()
+                {
+                    UserName = a.UserName,
+                    CreateAt = a.CreateAt,
+                    RoleId = a.RoleId,
+                    FullName = u.FullName,
+                    Phone = u.Phone,
+                    AvatarUrl = u.AvatarUrl,
+                    Address = u.Address,
+                    Dob = u.Dob,
+                    Email = u.Email,
+                    Gender = u.Gender,
+                    Permission = ListPermissionOfUser,
+                };
+            }
+                ).ToList();
+            if (result.Count() == 0)
+            {
+                response.ToFailedResponse("không tìm thấy người dùng nào", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            response.ToSuccessResponse(response.Data = result, "Lấy danh sách thành công", StatusCodes.Status200OK);
+            return response;
+
+        }
+        private ListPermissionOfUser checkPermission(int a)
+        {
+            var list = new ListPermissionOfUser();
+            if (a == 0)
+            {
+                list.Voter = true;
+                list.Candidate = true;
+                list.Moderator = true;
+            }
+            if (a == 1)
+            {
+                list.Voter = false;
+                list.Candidate = true;
+                list.Moderator = true;
+            }
+            if (a == 2)
+            {
+                list.Voter = false;
+                list.Candidate = false;
+                list.Moderator = true;
+            }
+
+            if (a == 3)
+            {
+                list.Voter = true;
+                list.Candidate = false;
+                list.Moderator = true;
+            }
+            if (a == 4)
+            {
+                list.Voter = false;
+                list.Candidate = true;
+                list.Moderator = false;
+            }
+            if (a == 5)
+            {
+                list.Voter = true;
+                list.Candidate = true;
+                list.Moderator = false;
+            }
+            if (a == 6)
+            {
+                list.Voter = true;
+                list.Candidate = false;
+                list.Moderator = false;
+            }
+            return list;
+        }
         public async Task<APIResponse<UpdateUserResponse>> UpdateUser(string? userId, UpdateUserRequest request)
         {
             APIResponse<UpdateUserResponse> response = new();
@@ -109,6 +203,46 @@ namespace Capstone_VotingSystem.Services.UserService
             await dbContext.SaveChangesAsync();
             response.ToSuccessResponse("Cập nhật thành công", StatusCodes.Status200OK);
             return response;
+        }
+
+        public async Task<APIResponse<GetListUserResponse>> UpdateUserPermission(string userId, UserPermissionRequest request)
+        {
+            APIResponse<GetListUserResponse> response = new();
+            // List<GetListUserResponse> result = new();
+            var users = await dbContext.Users.Where(p => p.Status == true && p.UserId == userId).SingleOrDefaultAsync();
+            if (users == null)
+            {
+                response.ToFailedResponse("không tìm thấy người dùng nào", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var account = await dbContext.Accounts.Where(p => p.Status == true && p.UserName == userId).SingleOrDefaultAsync();
+            if (account == null)
+            {
+                response.ToFailedResponse("không tìm thấy tài khoản nào", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var checkPer = checkPermissionNumber(request.Voter, request.Candidate, request.Moderator);
+
+            users.Permission = checkPer;
+            dbContext.Users.Update(users);
+            await dbContext.SaveChangesAsync();
+            response.ToSuccessResponse("Cập nhật thành công", StatusCodes.Status200OK);
+            return response;
+        }
+        private int checkPermissionNumber(bool voter, bool candidate, bool moderator)
+        {
+            int a = 0;
+            if (voter == true && candidate == true && moderator == true) return a = 0;
+            if (voter == false && candidate == true && moderator == true) return a = 1;
+            if (voter == false && candidate == false && moderator == true) return a = 2;
+            if (voter == true && candidate == false && moderator == true) return a = 3;
+            if (voter == false && candidate == true && moderator == false) return a = 4;
+            if (voter == true && candidate == true && moderator == false) return a = 5;
+            if (voter == true && candidate == false && moderator == false) return a = 6;
+            if (voter == false && candidate == false && moderator == false) return a = 7;
+
+
+            return 0;
         }
     }
 }
