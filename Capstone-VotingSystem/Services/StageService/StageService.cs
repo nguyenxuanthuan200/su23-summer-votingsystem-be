@@ -29,7 +29,7 @@ namespace Capstone_VotingSystem.Services.StageService
                 response.ToFailedResponse("Chiến dịch không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
-            if (request.FormId is not null || request.FormId != Guid.Empty)
+            if (request.FormId !=null && request.FormId != Guid.Empty)
             {
                 var checkForm = await dbContext.Forms.Where(p => p.FormId == request.FormId).SingleOrDefaultAsync();
                 if (checkForm == null)
@@ -76,6 +76,7 @@ namespace Capstone_VotingSystem.Services.StageService
                 }
                 else
                 {
+                    stage.FormId = null;
                     stage.IsUseForm = false;
                 }
                 stage.StartTime = request.StartTime;
