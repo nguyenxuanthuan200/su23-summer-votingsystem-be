@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Capstone_VotingSystem.Entities
 {
-    public partial class VotingSystemContext : DbContext
+    public partial class db_a9a782_votingsystemContext : DbContext
     {
-        public VotingSystemContext()
+        public db_a9a782_votingsystemContext()
         {
         }
 
-        public VotingSystemContext(DbContextOptions<VotingSystemContext> options)
+        public db_a9a782_votingsystemContext(DbContextOptions<db_a9a782_votingsystemContext> options)
             : base(options)
         {
         }
@@ -44,6 +44,7 @@ namespace Capstone_VotingSystem.Entities
         {
             if (!optionsBuilder.IsConfigured)
             {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
                 optionsBuilder.UseSqlServer("Data Source=sql8003.site4now.net;Initial Catalog=db_a9a782_votingsystem;Persist Security Info=True;User ID=db_a9a782_votingsystem_admin;Password=votingsystem123");
             }
         }
