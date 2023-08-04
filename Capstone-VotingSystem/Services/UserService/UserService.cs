@@ -29,6 +29,44 @@ namespace Capstone_VotingSystem.Services.UserService
             this.dbContext = votingSystemContext;
             this._mapper = mapper;
         }
+
+        public async Task<APIResponse<ImageUserResponse>> AddImageUserAsync(IFormFile file, string folderName, string? userId)
+        {
+            APIResponse<ImageUserResponse> response = new();
+            var checkUser = await dbContext.Users.Where(p => p.UserId.Equals(userId)).SingleOrDefaultAsync();
+            if (checkUser == null)
+            {
+                response.ToFailedResponse("user không tồn tại", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var uploadResult = new ImageUploadResult();
+            if (file.Length > 0)
+            {
+                using var stream = file.OpenReadStream();
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Transformation = new Transformation().Crop("fill").Gravity("face"),
+                    Folder = folderName,
+
+                };
+
+                uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+            }
+            checkUser.AvatarUrl = uploadResult.SecureUrl.AbsoluteUri;
+
+            ImageUserResponse imageRes = new ImageUserResponse();
+            {
+                imageRes.userId = checkUser.UserId;
+                imageRes.SecureUrl = uploadResult.SecureUrl.AbsoluteUri;
+                imageRes.PublicId = uploadResult.PublicId;
+            }
+            dbContext.Users.Update(checkUser);
+            await dbContext.SaveChangesAsync();
+            response.ToSuccessResponse(imageRes, "ok", StatusCodes.Status200OK);
+            return response;
+        }
         public async Task<APIResponse<UpdateUserResponse>> UpdateUser(string? userId, UpdateUserRequest request)
         {
             APIResponse<UpdateUserResponse> response = new();

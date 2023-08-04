@@ -1,6 +1,6 @@
-﻿namespace Capstone_VotingSystem.Models.ResponseModels.ImageResponse
+﻿namespace Capstone_VotingSystem.Models.ResponseModels.UserResponse
 {
-    public class ImageUploadResponse
+    public class ImageUserResponse
     {
         public string? userId { get; set; }
         public string? PublicId { get; set; }

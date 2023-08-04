@@ -154,7 +154,7 @@ namespace Capstone_VotingSystem.Entities
                     .IsUnicode(false)
                     .HasColumnName("imgURL");
 
-                entity.Property(e => e.IsApporve).HasColumnName("isApporve");
+                entity.Property(e => e.IsApprove).HasColumnName("isApporve");
 
                 entity.Property(e => e.Process)
                     .HasMaxLength(50)

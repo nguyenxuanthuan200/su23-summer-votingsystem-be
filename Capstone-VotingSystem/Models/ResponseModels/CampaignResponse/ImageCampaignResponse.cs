@@ -1,4 +1,4 @@
-﻿namespace Capstone_VotingSystem.Models.ResponseModels.ImageResponse
+﻿namespace Capstone_VotingSystem.Models.ResponseModels.CampaignResponse
 {
     public class ImageCampaignResponse
     {

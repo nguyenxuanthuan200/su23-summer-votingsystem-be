@@ -319,11 +319,11 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 CampaignId = checkStage.CampaignId,
                 FormId = checkStage.FormId,
             };
-            List<ListCandidateVotedByUser> listVoted = new ();
+            List<ListCandidateVotedByUser> listVoted = new();
             var checkVote = await dbContext.Votings.Where(p => p.StageId == stageId && p.UserId == userId && p.Status == true).ToListAsync();
             if (checkVote != null)
             {
-                
+
                 foreach (var item in checkVote)
                 {
                     var ListCandidateVotedByUser = new ListCandidateVotedByUser();
@@ -356,7 +356,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                     candidate.UserId = item.UserId;
                     candidate.GroupId = item.GroupId;
                     candidate.GroupName = group != null ? group.Name : null;
-                    candidate.FullName = checkuser.FullName;
+                    candidate.FullName = item.FullName;
                     candidate.Phone = checkuser.Phone;
                     candidate.Gender = checkuser.Gender;
                     candidate.Dob = checkuser.Dob;
