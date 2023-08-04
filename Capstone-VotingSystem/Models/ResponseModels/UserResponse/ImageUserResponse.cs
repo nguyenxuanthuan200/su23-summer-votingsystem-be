@@ -5,6 +5,6 @@
         public string? userId { get; set; }
         public string? PublicId { get; set; }
 
-        public string? SecureUrl { get; set; }
+        public string? AvatarURL { get; set; }
     }
 }

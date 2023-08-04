@@ -59,7 +59,7 @@ namespace Capstone_VotingSystem.Services.UserService
             ImageUserResponse imageRes = new ImageUserResponse();
             {
                 imageRes.userId = checkUser.UserId;
-                imageRes.SecureUrl = uploadResult.SecureUrl.AbsoluteUri;
+                imageRes.AvatarURL = uploadResult.SecureUrl.AbsoluteUri;
                 imageRes.PublicId = uploadResult.PublicId;
             }
             dbContext.Users.Update(checkUser);

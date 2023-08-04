@@ -34,7 +34,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
         public async Task<APIResponse<GetCampaignResponse>> ApproveCampaign(Guid id)
         {
             APIResponse<GetCampaignResponse> response = new();
-            var cam = await dbContext.Campaigns.Where(p => p.Status == true &&p.IsApprove ==false&&p.CampaignId==id).SingleOrDefaultAsync();
+            var cam = await dbContext.Campaigns.Where(p => p.Status == true && p.IsApprove == false && p.CampaignId == id).SingleOrDefaultAsync();
             if (cam == null)
             {
                 response.ToFailedResponse("Chiến dịch đã bị xóa hoặc đã được duyệt", StatusCodes.Status400BadRequest);
@@ -229,7 +229,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
         {
             APIResponse<IEnumerable<GetCampaignResponse>> response = new();
 
-            var getById = await dbContext.Campaigns.Where(p => p.IsApprove ==false && p.Status == true)
+            var getById = await dbContext.Campaigns.Where(p => p.IsApprove == false && p.Status == true)
                 .ToListAsync();
             if (getById == null)
             {
@@ -460,7 +460,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
             ImageCampaignResponse imageRes = new ImageCampaignResponse();
             {
                 imageRes.CampaignId = checkCampaign.CampaignId;
-                imageRes.SecureUrl = uploadResult.SecureUrl.AbsoluteUri;
+                imageRes.AvatarURL = uploadResult.SecureUrl.AbsoluteUri;
                 imageRes.PublicId = uploadResult.PublicId;
             }
             dbContext.Campaigns.Update(checkCampaign);
