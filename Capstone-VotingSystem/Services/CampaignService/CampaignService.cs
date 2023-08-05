@@ -133,7 +133,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 cam.EndTime = request.EndTime;
                 cam.Visibility = request.Visibility;
                 cam.ImgUrl = uploadResult.SecureUrl.AbsoluteUri;
-                cam.Process = "chưa bắt đầu";
+                cam.Process = "Chưa bắt đầu";
                 cam.IsApprove = false;
                 cam.Status = true;
                 cam.UserId = request.UserId;
@@ -182,6 +182,9 @@ namespace Capstone_VotingSystem.Services.CampaignService
             foreach (var item in campaign)
             {
                 var map = _mapper.Map<GetCampaignAndStageResponse>(item);
+
+                var totalCandidate = await dbContext.Candidates.Where(p => p.CampaignId == item.CampaignId && p.Status == true).ToListAsync();
+                map.TotalCandidate = totalCandidate.Count();
                 var stage = await dbContext.Stages.Where(p => p.CampaignId == item.CampaignId).ToListAsync();
 
                 //if (element.Exists(image => string.IsNullOrEmpty(item.Title)))

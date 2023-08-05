@@ -135,6 +135,61 @@ namespace Capstone_VotingSystem.Services.GroupService
             return response;
         }
 
+        public async Task<APIResponse<StatisticalGroupResponse>> StatisticalGroupByCampaign(Guid campaignId)
+        {
+            APIResponse<StatisticalGroupResponse> response = new();
+            var result = new StatisticalGroupResponse();
+            var listVoter = new List<StatisticalVoterInGroupResponse>();
+            var listCandidate = new List<StatisticalCandidateInGroupResponse>();
+            var campaign = await dbContext.Campaigns.Where(p => p.CampaignId == campaignId && p.Status == true && p.IsApprove==true).SingleOrDefaultAsync();
+            if (campaign == null)
+            {
+                response.ToFailedResponse("Không thể thống kê chiến dịch đã bị xóa hoặc chưa cam kết ", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var groupVoter = await dbContext.Groups.Where(p => p.CampaignId == campaignId && p.IsVoter == true).ToListAsync();
+            if (groupVoter.Count() == 0)
+            {
+                response.ToFailedResponse("Không có nhóm cho người bình chọn nào trong chiến dịch tồn tại", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var groupCandidate = await dbContext.Groups.Where(p => p.CampaignId == campaignId && p.IsVoter == false).ToListAsync();
+            if (groupCandidate.Count() == 0)
+            {
+                response.ToFailedResponse("Không có nhóm cho người ứng cử nào trong chiến dịch tồn tại", StatusCodes.Status404NotFound);
+                return response;
+            }
+            int totalVoterInCampaign = 0;
+            foreach (var i in groupVoter)
+            {
+                var ListVoterGroup = new StatisticalVoterInGroupResponse();
+                ListVoterGroup.GroupId = i.GroupId;
+                ListVoterGroup.GroupName = i.Name;
+                var groupUser = await dbContext.GroupUsers.Where(p => p.CampaignId == campaignId && p.GroupId == i.GroupId).ToListAsync();
+                ListVoterGroup.TotalVoterInGroup = groupUser.Count();
+                listVoter.Add(ListVoterGroup);
+                totalVoterInCampaign += ListVoterGroup.TotalVoterInGroup;
+            }
+            int totalCandidateInCampaign = 0;
+            foreach (var i in groupCandidate)
+            {
+                var ListCandidateGroup = new StatisticalCandidateInGroupResponse();
+                ListCandidateGroup.GroupId = i.GroupId;
+                ListCandidateGroup.GroupName = i.Name;
+                var groupUser = await dbContext.GroupUsers.Where(p => p.CampaignId == campaignId && p.GroupId == i.GroupId).ToListAsync();
+                ListCandidateGroup.TotalCandidateInGroup = groupUser.Count();
+                listCandidate.Add(ListCandidateGroup);
+                totalCandidateInCampaign += ListCandidateGroup.TotalCandidateInGroup;
+            }
+            result.TotalVoterInCampaign = totalVoterInCampaign;
+            result.TotalCandiadteInCampaign = totalCandidateInCampaign;
+            result.StatisticalVoterInGroup = listVoter;
+            result.StatisticalCandidateInGroup = listCandidate;
+            response.ToSuccessResponse(response.Data = result, "Thống kê danh sách nhóm cho người bình chọn thành công", StatusCodes.Status200OK);
+            response.Data = result;
+            return response;
+        }
+
         public async Task<APIResponse<GroupResponse>> UpdateGroup(Guid id, UpdateGroupRequest request)
         {
             APIResponse<GroupResponse> response = new();

@@ -29,7 +29,7 @@ namespace Capstone_VotingSystem.Services.StageService
                 response.ToFailedResponse("Chiến dịch không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
-            if (request.IsUseForm == true)
+            if (request.FormId !=null && request.FormId != Guid.Empty)
             {
                 var checkForm = await dbContext.Forms.Where(p => p.FormId == request.FormId).SingleOrDefaultAsync();
                 if (checkForm == null)
@@ -76,6 +76,7 @@ namespace Capstone_VotingSystem.Services.StageService
                 }
                 else
                 {
+                    stage.FormId = null;
                     stage.IsUseForm = false;
                 }
                 stage.StartTime = request.StartTime;
@@ -92,6 +93,28 @@ namespace Capstone_VotingSystem.Services.StageService
             return response;
         }
 
+        public async Task<APIResponse<string>> DeleteStage(Guid id)
+        {
+            APIResponse<string> response = new();
+            var stage = await dbContext.Stages.Where(p => p.StageId == id && p.Status == true).SingleOrDefaultAsync();
+            if (stage == null)
+            {
+                response.ToFailedResponse("Không đúng giai đoạn hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var checkCampaignApprove = await dbContext.Campaigns.Where(p => p.CampaignId == stage.CampaignId && p.Status == true && p.IsApprove == false).SingleOrDefaultAsync();
+            if (checkCampaignApprove == null)
+            {
+                response.ToFailedResponse("Bạn chỉ có thể thực hiện chức năng này khi chiến dịch chưa được duyệt", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            stage.Status = false;
+            dbContext.Stages.Update(stage);
+            await dbContext.SaveChangesAsync();
+            response.ToSuccessResponse("Xóa giai đoạn thành công", StatusCodes.Status200OK);
+            return response;
+        }
+
         public async Task<APIResponse<IEnumerable<GetStageResponse>>> GetCampaignStageByCampaign(Guid campaignId)
         {
             APIResponse<IEnumerable<GetStageResponse>> response = new();
@@ -102,7 +125,7 @@ namespace Capstone_VotingSystem.Services.StageService
                 return response;
             }
 
-            var campaignstage = await dbContext.Stages.Where(p => p.CampaignId == campaignId).ToListAsync();
+            var campaignstage = await dbContext.Stages.Where(p => p.CampaignId == campaignId && p.Status == true).ToListAsync();
             if (campaignstage == null)
             {
                 response.ToFailedResponse("Không có Stage nào trong Campaign này", StatusCodes.Status400BadRequest);
@@ -118,7 +141,7 @@ namespace Capstone_VotingSystem.Services.StageService
                         Description = x.Description,
                         Title = x.Title,
                         StartTime = x.StartTime,
-                        EndTime = x.StartTime,
+                        EndTime = x.EndTime,
                         LimitVote = x.LimitVote,
                         Process = x.Process,
                         Content = x.Content,

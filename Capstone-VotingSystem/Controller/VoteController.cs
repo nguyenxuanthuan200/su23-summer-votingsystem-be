@@ -40,7 +40,28 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-       // [Authorize(Roles = "User")]
+        // [Authorize(Roles = "User")]
+        [HttpGet("statistical")]
+        [SwaggerOperation(summary: "Statistical Vote by campaign ")]
+        public async Task<IActionResult> StatisticalVoteByCampaign([FromQuery] StatisticalVoteRequest request)
+        {
+            try
+            {
+                var result = await voteService.StatisticalVoteByCampaign(request);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+
+        // [Authorize(Roles = "User")]
         [HttpPost("like")]
         [SwaggerOperation(summary: "Create new vote Like ")]
         public async Task<IActionResult> CreateVoteLike(CreateVoteLikeRequest request)
@@ -54,10 +75,12 @@ namespace Capstone_VotingSystem.Controller
                 }
                 return Ok(result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                //return StatusCode(StatusCodes.Status500InternalServerError,
+                //    "Error retrieving data from the database.");
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database.");
+                    e.Message);
             }
         }
     }

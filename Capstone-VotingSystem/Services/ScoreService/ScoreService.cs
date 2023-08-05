@@ -47,7 +47,7 @@ namespace Capstone_VotingSystem.Services.ScoreService
 
             foreach (var candidate in CandidateInCampaign)
             {
-                int? score = 0;
+                double score = 0;
                 ListScoreInStage = new();
                 foreach (var stage in StageInCampagin)
                 {
@@ -60,9 +60,9 @@ namespace Capstone_VotingSystem.Services.ScoreService
                         scoreInStage.StageScore = 0;
                     }
                     else
-                        //                 scoreInStage.StageScore = scoreStage.Score1;
-                        // ListScoreInStage = new();
-                        ListScoreInStage.Add(scoreInStage);
+                        scoreInStage.StageScore = scoreStage.Point;
+                    
+                    ListScoreInStage.Add(scoreInStage);
                     score += scoreInStage.StageScore;
                 }
                 var getName = await dbContext.Users.Where(p => p.UserId == candidate.UserId).SingleOrDefaultAsync();

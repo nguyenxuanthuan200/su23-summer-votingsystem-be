@@ -9,5 +9,6 @@ namespace Capstone_VotingSystem.Services.StageService
         Task<APIResponse<IEnumerable<GetStageResponse>>> GetCampaignStageByCampaign(Guid campaignId);
         Task<APIResponse<CreateStageResponse>> CreateCampaignStage(CreateStageRequest request);
         Task<APIResponse<GetStageResponse>> UpdateCampaignStage(Guid id,UpdateStageRequest request);
+        Task<APIResponse<string>> DeleteStage(Guid id);
     }
 }

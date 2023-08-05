@@ -79,8 +79,8 @@ namespace Capstone_VotingSystem.Controller
             }
         }
        //[Authorize(Roles = "User,Admin")]
-        [HttpPost("account")]
-        [SwaggerOperation(summary: "Create account Candidate to Campagin with some info of Candidate")]
+        [HttpPost("accounts")]
+        [SwaggerOperation(summary: "Create list account Candidate to Campagin")]
         public async Task<IActionResult> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request)
         {
             try
@@ -101,7 +101,7 @@ namespace Capstone_VotingSystem.Controller
         }
        //[Authorize(Roles = "User")]
         [HttpPost]
-        [SwaggerOperation(summary: "Add Candidate to Campagin with some info of Candidate")]
+        [SwaggerOperation(summary: "Add list Candidate to Campagin")]
         public async Task<IActionResult> CreateCandidateCampaign(CreateCandidateCampaignRequest request)
         {
             try

@@ -10,6 +10,6 @@
         public string Process { get; set; }
         public int LimitVote { get; set; }
         public Guid CampaignId { get; set; }
-        public Guid FormId { get; set; }
+        public Guid? FormId { get; set; }
     }
 }
