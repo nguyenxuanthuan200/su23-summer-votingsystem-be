@@ -67,7 +67,7 @@ namespace Capstone_VotingSystem.Services.UserService
             await dbContext.SaveChangesAsync();
             response.ToSuccessResponse(imageRes, "ok", StatusCodes.Status200OK);
             return response;
-
+        }
         public async Task<APIResponse<IEnumerable<GetListUserResponse>>> GetAllUser()
         {
             APIResponse<IEnumerable<GetListUserResponse>> response = new();
@@ -221,7 +221,7 @@ namespace Capstone_VotingSystem.Services.UserService
                 response.ToFailedResponse("không tìm thấy người dùng", StatusCodes.Status404NotFound);
                 return response;
             }
-            var checkGroup = await dbContext.GroupUsers.Where(p => p.UserId == userId  && p.CampaignId == campaignId).SingleOrDefaultAsync();
+            var checkGroup = await dbContext.GroupUsers.Where(p => p.UserId == userId && p.CampaignId == campaignId).SingleOrDefaultAsync();
             if (checkGroup == null)
             {
                 var id = Guid.NewGuid();
@@ -285,3 +285,4 @@ namespace Capstone_VotingSystem.Services.UserService
         }
     }
 }
+
