@@ -44,7 +44,7 @@ namespace Capstone_VotingSystem.Entities
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Data Source=sql5110.site4now.net;Initial Catalog=db_a9d259_votingsystem;Persist Security Info=True;User ID=db_a9d259_votingsystem_admin;Password=votingsystem123");
+                optionsBuilder.UseSqlServer("Data Source=XUANTHUAN\\SQLEXPRESS;Initial Catalog=VotingSystem;Persist Security Info=True;User ID=sa;Password=123");
             }
         }
 
