@@ -141,7 +141,7 @@ namespace Capstone_VotingSystem.Services.StageService
                         Description = x.Description,
                         Title = x.Title,
                         StartTime = x.StartTime,
-                        EndTime = x.StartTime,
+                        EndTime = x.EndTime,
                         LimitVote = x.LimitVote,
                         Process = x.Process,
                         Content = x.Content,

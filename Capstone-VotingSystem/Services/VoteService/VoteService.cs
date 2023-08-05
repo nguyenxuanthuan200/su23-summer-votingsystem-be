@@ -69,12 +69,12 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToFailedResponse("Bạn đã hết phiếu để bình chọn cho giai đoạn này rồi", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var check = await checkVoteSuccess(request.UserId, request.CandidateId, ratioGroup.CampaignId, request.StageId);
-            if (check.Equals("false"))
-            {
-                response.ToFailedResponse("Bạn không thể bình chọn cho ứng viên này do thể lệ của chiến dịch đề ra", StatusCodes.Status400BadRequest);
-                return response;
-            }
+            //var check = await checkVoteSuccess(request.UserId, request.CandidateId, ratioGroup.CampaignId, request.StageId);
+            //if (check.Equals("false"))
+            //{
+            //    response.ToFailedResponse("Bạn không thể bình chọn cho ứng viên này do thể lệ của chiến dịch đề ra", StatusCodes.Status400BadRequest);
+            //    return response;
+            //}
             TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
             var id = Guid.NewGuid();
@@ -196,12 +196,12 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToFailedResponse("Bạn đã hết phiếu để bình chọn cho giai đoạn này rồi", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var check = await checkVoteSuccess(request.UserId, request.CandidateId, ratioGroup.CampaignId, request.StageId);
-            if (check.Equals("false"))
-            {
-                response.ToFailedResponse("Bạn không thể bình chọn cho ứng viên này do thể lệ của chiến dịch đề ra", StatusCodes.Status400BadRequest);
-                return response;
-            }
+            //var check = await checkVoteSuccess(request.UserId, request.CandidateId, ratioGroup.CampaignId, request.StageId);
+            //if (check.Equals("false"))
+            //{
+            //    response.ToFailedResponse("Bạn không thể bình chọn cho ứng viên này do thể lệ của chiến dịch đề ra", StatusCodes.Status400BadRequest);
+            //    return response;
+            //}
 
             TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
