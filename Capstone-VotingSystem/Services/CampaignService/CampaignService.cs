@@ -434,5 +434,42 @@ namespace Capstone_VotingSystem.Services.CampaignService
             return response;
         }
 
+        public async Task<APIResponse<ImageCampaignResponse>> AddImageCampaignAsync(IFormFile file, string folderName, Guid? campaignId)
+        {
+            APIResponse<ImageCampaignResponse> response = new();
+            var checkCampaign = await dbContext.Campaigns.Where(p => p.CampaignId.Equals(campaignId)).SingleOrDefaultAsync();
+            if (checkCampaign == null)
+            {
+                response.ToFailedResponse("chiến dịch không tồn tại", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var uploadResult = new ImageUploadResult();
+            if (file.Length > 0)
+            {
+                using var stream = file.OpenReadStream();
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Transformation = new Transformation().Crop("fill").Gravity("face"),
+                    Folder = folderName,
+
+                };
+
+                uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+            }
+            checkCampaign.ImgUrl = uploadResult.SecureUrl.AbsoluteUri;
+
+            ImageCampaignResponse imageRes = new ImageCampaignResponse();
+            {
+                imageRes.CampaignId = checkCampaign.CampaignId;
+                imageRes.AvatarURL = uploadResult.SecureUrl.AbsoluteUri;
+                imageRes.PublicId = uploadResult.PublicId;
+            }
+            dbContext.Campaigns.Update(checkCampaign);
+            await dbContext.SaveChangesAsync();
+            response.ToSuccessResponse(imageRes, "Cập nhật thành công", StatusCodes.Status200OK);
+            return response;
+        }
     }
 }

@@ -97,5 +97,22 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
+        [HttpPut("userid")]
+        [SwaggerOperation(summary: "Update Image for User")]
+        public async Task<IActionResult> AddUserImage(IFormFile formFile, string? userid)
+        {
+            try
+            {
+                var folderName = "user";
+                var result = await userService.AddImageUserAsync(formFile, folderName, userid);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+
     }
 }
