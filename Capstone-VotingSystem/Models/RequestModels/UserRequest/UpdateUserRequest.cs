@@ -8,6 +8,6 @@
         public string? Address { get; set; }
         public DateTime? Dob { get; set; }
 
-        public IFormFile ImageFile { get; set; }
+        public IFormFile? ImageFile { get; set; }
     }
 }
