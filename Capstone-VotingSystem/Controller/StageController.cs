@@ -84,7 +84,7 @@ namespace Capstone_VotingSystem.Controller
         }
         //[Authorize(Roles = "User")]
         [SwaggerOperation(summary: "Delete Stage")]
-        [HttpGet("{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStage(Guid id)
         {
             try
