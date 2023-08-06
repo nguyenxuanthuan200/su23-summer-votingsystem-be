@@ -261,17 +261,17 @@ namespace Capstone_VotingSystem.Services.CandidateService
             deleteCandidate.Status = false;
             dbContext.Candidates.Update(deleteCandidate);
             await dbContext.SaveChangesAsync();
-            response.ToSuccessResponse("Xóa Candidate thành công", StatusCodes.Status200OK);
+            response.ToSuccessResponse("Loại bỏ ứng cử viên thành công", StatusCodes.Status200OK);
             return response;
         }
 
-        public async Task<APIResponse<GetCandidateDetailResponse>> GetCandidateById(Guid candidateId)
+        public async Task<APIResponse<GetCandidateDetailResponse>> GetCandidateById(Guid candidateId, Guid stageId)
         {
             APIResponse<GetCandidateDetailResponse> response = new();
             var checkcandi = await dbContext.Candidates.Where(p => p.CandidateId == candidateId && p.Status == true).SingleOrDefaultAsync();
             if (checkcandi == null)
             {
-                response.ToFailedResponse("Candidate không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Ứng cử viên không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
                 return response;
             }
             var checkuser = await dbContext.Users.Where(p => p.UserId == checkcandi.UserId && p.Status == true).SingleOrDefaultAsync();
@@ -280,10 +280,25 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 response.ToFailedResponse("Candidate không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
                 return response;
             }
+            var checkCampaign = await dbContext.Stages.Where(p => p.StageId == stageId && p.Status == true).SingleOrDefaultAsync();
+            if (checkCampaign == null)
+            {
+                response.ToFailedResponse("Giai đoạn không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var scoreStage = await dbContext.Scores.Where(p => p.StageId == stageId && p.CandidateId == candidateId).SingleOrDefaultAsync();
+            var score = 0;
+            if (scoreStage != null)
+            {
+                score = (int)scoreStage.Point;
+            }
             var map = _mapper.Map<GetCandidateDetailResponse>(checkuser);
             map.CandidateId = checkcandi.CandidateId;
             map.Description = checkcandi.Description;
-            response.ToSuccessResponse("Xem chi tiết Candidate Thành công!!", StatusCodes.Status200OK);
+            map.StageId = stageId;
+            map.CampaignId = checkCampaign.CampaignId;
+            map.Score = score;
+            response.ToSuccessResponse("Xem chi tiết ứng cử viên thành công!!", StatusCodes.Status200OK);
             response.Data = map;
             return response;
         }
@@ -316,7 +331,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
         //    return null;
         //}
 
-        public async Task<APIResponse<GetListCandidateStageResponse>> GetListcandidatStage(Guid stageId, string userId)
+        public async Task<APIResponse<GetListCandidateStageResponse>> GetListCandidatStage(Guid stageId, string userId)
         {
             APIResponse<GetListCandidateStageResponse> response = new APIResponse<GetListCandidateStageResponse>();
             var checkStage = await dbContext.Stages.Where(p => p.StageId == stageId && p.Status == true).SingleOrDefaultAsync();
@@ -336,6 +351,8 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 StageId = stageId,
                 CampaignId = checkStage.CampaignId,
                 FormId = checkStage.FormId,
+                StageName = checkStage.Title,
+                CampaignName = checkcam.Title,
             };
             List<ListCandidateVotedByUser> listVoted = new();
             var checkVote = await dbContext.Votings.Where(p => p.StageId == stageId && p.UserId == userId && p.Status == true).ToListAsync();
@@ -349,7 +366,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                     var groupCandidate = await dbContext.Groups.SingleOrDefaultAsync(p => p.GroupId == ratio.GroupCandidateId);
                     ListCandidateVotedByUser.CandidateId = item.CandidateId;
                     ListCandidateVotedByUser.GroupName = groupCandidate.Name;
-                    listVoted.Add(ListCandidateVotedByUser);
+                   // listVoted.Add(ListCandidateVotedByUser);
 
                 }
             }
@@ -385,7 +402,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 result.Add(candidate);
             }
             stage.Candidate = result;
-            stage.CandidateIsVoted = listVoted;
+           // stage.CandidateIsVoted = listVoted;
             response.Data = stage;
 
             if (response.Data == null)
