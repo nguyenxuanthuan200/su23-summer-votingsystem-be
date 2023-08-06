@@ -141,7 +141,7 @@ namespace Capstone_VotingSystem.Services.GroupService
             var result = new StatisticalGroupResponse();
             var listVoter = new List<StatisticalVoterInGroupResponse>();
             var listCandidate = new List<StatisticalCandidateInGroupResponse>();
-            var campaign = await dbContext.Campaigns.Where(p => p.CampaignId == campaignId && p.Status == true && p.IsApprove==true).SingleOrDefaultAsync();
+            var campaign = await dbContext.Campaigns.Where(p => p.CampaignId == campaignId && p.Status == true && p.IsApprove == true).SingleOrDefaultAsync();
             if (campaign == null)
             {
                 response.ToFailedResponse("Không thể thống kê chiến dịch đã bị xóa hoặc chưa cam kết ", StatusCodes.Status400BadRequest);
@@ -199,10 +199,10 @@ namespace Capstone_VotingSystem.Services.GroupService
                 response.ToFailedResponse("Nhóm không tồn tại hoặc đã bị xóa", StatusCodes.Status404NotFound);
                 return response;
             }
-            var typeNameCheck = await dbContext.Groups.SingleOrDefaultAsync(c => c.Name.ToUpper().Trim().Equals(request.Name.ToUpper().Trim()));
+            var typeNameCheck = await dbContext.Groups.SingleOrDefaultAsync(c => c.Name.ToUpper().Trim().Equals(request.Name.ToUpper().Trim()) && c.CampaignId == groupCheck.CampaignId);
             if (typeNameCheck != null)
             {
-                response.ToFailedResponse("Tên nhóm đã tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Tên nhóm đã tồn tại trong chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
             }
 

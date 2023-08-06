@@ -67,7 +67,7 @@ namespace Capstone_VotingSystem.Services.UserService
             await dbContext.SaveChangesAsync();
             response.ToSuccessResponse(imageRes, "ok", StatusCodes.Status200OK);
             return response;
-
+        }
         public async Task<APIResponse<IEnumerable<GetListUserResponse>>> GetAllUser()
         {
             APIResponse<IEnumerable<GetListUserResponse>> response = new();
@@ -221,7 +221,7 @@ namespace Capstone_VotingSystem.Services.UserService
                 response.ToFailedResponse("không tìm thấy người dùng", StatusCodes.Status404NotFound);
                 return response;
             }
-            var checkGroup = await dbContext.GroupUsers.Where(p => p.UserId == userId  && p.CampaignId == campaignId).SingleOrDefaultAsync();
+            var checkGroup = await dbContext.GroupUsers.Where(p => p.UserId == userId && p.CampaignId == campaignId).SingleOrDefaultAsync();
             if (checkGroup == null)
             {
                 var id = Guid.NewGuid();
@@ -283,5 +283,29 @@ namespace Capstone_VotingSystem.Services.UserService
 
             return 0;
         }
+
+        public async Task<APIResponse<GetUserByIdResponse>> GetUserById(string id)
+        {
+            APIResponse<GetUserByIdResponse> response = new();
+            // List<GetListUserResponse> result = new();
+            var users = await dbContext.Users.Where(p => p.Status == true && p.UserId == id).SingleOrDefaultAsync();
+            if (users == null)
+            {
+                response.ToFailedResponse("không tìm thấy người dùng hoặc người dùng đã bị xóa", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var account = await dbContext.Accounts.Where(p => p.Status == true && p.UserName == id).SingleOrDefaultAsync();
+            if (account == null)
+            {
+                response.ToFailedResponse("không tìm thấy tài khoản nào hoặc đã bị xóa", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var map = _mapper.Map<GetUserByIdResponse>(users);
+
+
+            response.ToSuccessResponse(response.Data = map, "Lấy chi tiết người dùng thành công", StatusCodes.Status200OK);
+            return response;
+        }
     }
 }
+

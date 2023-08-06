@@ -16,5 +16,6 @@
         public string? AvatarUrl { get; set; }
 
         public int? StageScore { get; set; }
+        public bool isVoted { get; set; } = false;
     }
 }

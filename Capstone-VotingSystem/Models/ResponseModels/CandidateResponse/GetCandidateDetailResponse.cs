@@ -11,5 +11,8 @@
         public DateTime? Dob { get; set; }
         public string? Email { get; set; }
         public string? AvatarUrl { get; set; }
+        public Guid StageId { get; set; }
+        public Guid CampaignId { get; set; }
+        public int Score { get; set; }
     }
 }
