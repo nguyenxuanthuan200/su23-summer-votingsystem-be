@@ -123,18 +123,24 @@ namespace Capstone_VotingSystem.Services.QuestionService
         public async Task<APIResponse<GetQuestionNoElementResponse>> CreateQuestionNoElement(CreateQuestionWithNoElementRequest request)
         {
             APIResponse<GetQuestionNoElementResponse> response = new();
-            var checkform = await dbContext.Forms.SingleOrDefaultAsync(c => c.FormId == request.FormId);
+            var checkform = await dbContext.Forms.SingleOrDefaultAsync(c => c.FormId == request.FormId && c.Status == true);
             if (checkform == null)
             {
-                response.ToFailedResponse("Form không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Biểu mẫu không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
             var checktype = await dbContext.Types.SingleOrDefaultAsync(c => c.TypeId == request.TypeId);
             if (checktype == null)
             {
-                response.ToFailedResponse("Type của question không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Kiểu của câu hỏi không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
+            if (!checktype.Name.Equals("Bình chọn sao"))
+            {
+                response.ToFailedResponse("Kiểu của câu hỏi phải là dạng đánh giá", StatusCodes.Status400BadRequest);
+                return response;
+            }
+
 
             var id = Guid.NewGuid();
             Question ques = new Question();
@@ -145,6 +151,22 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 ques.TypeId = request.TypeId;
                 ques.Status = true;
             }
+            var so = request.Score / 5;
+            for( var i = 1; i< 6; i++)
+            {
+                var idEle = Guid.NewGuid();
+                Element ele = new Element();
+                {
+                    ele.ElementId = idEle;
+                    ele.Content = i+" star";
+                    ele.Status = true;
+                    ele.QuestionId = id;
+                    ele.Score = so*i;
+                }
+                await dbContext.Elements.AddAsync(ele);
+               // await dbContext.SaveChangesAsync();
+            }
+
             await dbContext.Questions.AddAsync(ques);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<GetQuestionNoElementResponse>(ques);

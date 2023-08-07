@@ -356,20 +356,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
             };
             List<ListCandidateVotedByUser> listVoted = new();
             var checkVote = await dbContext.Votings.Where(p => p.StageId == stageId && p.UserId == userId && p.Status == true).ToListAsync();
-            //if (checkVote != null)
-            //{
-
-            //    foreach (var item in checkVote)
-            //    {
-            //        var ListCandidateVotedByUser = new ListCandidateVotedByUser();
-            //        var ratio = await dbContext.Ratios.SingleOrDefaultAsync(p => p.RatioGroupId == item.RatioGroupId);
-            //        var groupCandidate = await dbContext.Groups.SingleOrDefaultAsync(p => p.GroupId == ratio.GroupCandidateId);
-            //        ListCandidateVotedByUser.CandidateId = item.CandidateId;
-            //        ListCandidateVotedByUser.GroupName = groupCandidate.Name;
-            //        // listVoted.Add(ListCandidateVotedByUser);
-
-            //    }
-            //}
+           
             var listCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CampaignId == checkcam.CampaignId).ToListAsync();
             List<ListCandidateStageResponse> result = new List<ListCandidateStageResponse>();
             foreach (var item in listCandidate)
@@ -413,7 +400,11 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 }
                 result.Add(candidate);
             }
-            stage.Candidate = result;
+            string gr = "Kỹ thuật phần mềm";
+            IQueryable<ListCandidateStageResponse> queryableResult = result.AsQueryable();
+            queryableResult = queryableResult.OrderByDescending(obj => obj.GroupName==gr);
+            
+            stage.Candidate = queryableResult.ToList();
             // stage.CandidateIsVoted = listVoted;
             response.Data = stage;
 
@@ -425,5 +416,6 @@ namespace Capstone_VotingSystem.Services.CandidateService
             response.ToSuccessResponse(response.Data, "Lấy danh sách thành công", StatusCodes.Status200OK);
             return response;
         }
+
     }
 }
