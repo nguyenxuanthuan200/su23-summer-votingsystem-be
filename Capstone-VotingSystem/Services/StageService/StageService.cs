@@ -48,7 +48,7 @@ namespace Capstone_VotingSystem.Services.StageService
 
             if (DateTime.Compare(newEndTime, newStartTime) <= 0)
             {
-                response.ToFailedResponse("Thời gian bắt đầu không sau thời gian hiện tại hoặc thời gian kết thúc không sau thời gian bắt đầu.", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Thời gian bắt đầu phải sau thời gian hiện tại và thời gian kết thúc phải sau thời gian bắt đầu.", StatusCodes.Status400BadRequest);
                 return response;
             }
             // Kiểm tra giá trị của hai biến DateTime mới
@@ -180,16 +180,26 @@ namespace Capstone_VotingSystem.Services.StageService
         public async Task<APIResponse<GetStageResponse>> UpdateCampaignStage(Guid id, UpdateStageRequest request)
         {
             APIResponse<GetStageResponse> response = new();
-            var upStage = await dbContext.Stages.SingleOrDefaultAsync(c => c.StageId == id);
+            var upStage = await dbContext.Stages.SingleOrDefaultAsync(c => c.StageId == id && c.Status == true);
             if (upStage == null)
             {
-                response.ToFailedResponse("Stage không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Giai đôạn không tồn tại không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
             var checkcampaign = await dbContext.Campaigns.SingleOrDefaultAsync(c => c.CampaignId == request.CampaignId);
             if (checkcampaign == null)
             {
-                response.ToFailedResponse("Campaign không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Chiến dịch không tồn tại", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            if (checkcampaign.Status == false)
+            {
+                response.ToFailedResponse("Chiến dịch đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            if (checkcampaign.Process != "Chưa diễn ra" && checkcampaign.IsApprove == true)
+            {
+                response.ToFailedResponse("Bạn chỉ có thể chỉnh sửa khi chiến dịch chưa diễn ra và khi chưa xác nhận điều khoản", StatusCodes.Status400BadRequest);
                 return response;
             }
             if (request.FormId != null)
@@ -201,9 +211,29 @@ namespace Capstone_VotingSystem.Services.StageService
                     return response;
                 }
             }
-            if (!request.Process.Equals("Chưa diễn ra") && !request.Process.Equals("Đang diễn ra") && !request.Process.Equals("Đã kết thúc"))
+            //if (!request.Process.Equals("Chưa diễn ra") && !request.Process.Equals("Đang diễn ra") && !request.Process.Equals("Đã kết thúc"))
+            //{
+            //    response.ToFailedResponse("Process không đúng định dạng!! (Chưa diễn ra hoặc Đang diễn ra hoặc Đã kết thúc )", StatusCodes.Status400BadRequest);
+            //    return response;
+            //}
+            DateTime startTime = (DateTime)checkcampaign.StartTime;
+            DateTime endTime = (DateTime)checkcampaign.EndTime;
+            DateTime newStartTime = (DateTime)request.StartTime;
+            DateTime newEndTime = (DateTime)request.EndTime;
+            TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+
+            if (DateTime.Compare(newEndTime, newStartTime) <= 0)
             {
-                response.ToFailedResponse("Process không đúng định dạng!! (Chưa diễn ra hoặc Đang diễn ra hoặc Đã kết thúc )", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Thời gian bắt đầu phải sau thời gian hiện tại và thời gian kết thúc phải sau thời gian bắt đầu.", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            // Kiểm tra giá trị của hai biến DateTime mới
+            if (DateTime.Compare(newStartTime, startTime) >= 0 && DateTime.Compare(newEndTime, endTime) <= 0)
+            {
+            }
+            else
+            {
+                response.ToFailedResponse("Thời gian bắt đầu của giai đoạn và thời gian kết thúc của giai đoạn không nằm trong phạm vi của thời gian bắt đầu và thời gian kết thúc của chiến dịch.", StatusCodes.Status400BadRequest);
                 return response;
             }
 
@@ -213,7 +243,7 @@ namespace Capstone_VotingSystem.Services.StageService
             upStage.EndTime = request.EndTime;
             upStage.Content = request.Content;
             upStage.LimitVote = request.LimitVote;
-            upStage.Process = request.Process;
+            //upStage.Process = request.Process;
             upStage.FormId = request.FormId;
             dbContext.Stages.Update(upStage);
             await dbContext.SaveChangesAsync();

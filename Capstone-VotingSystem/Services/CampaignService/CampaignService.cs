@@ -37,14 +37,14 @@ namespace Capstone_VotingSystem.Services.CampaignService
             var cam = await dbContext.Campaigns.Where(p => p.Status == true && p.IsApprove == false && p.CampaignId == id).SingleOrDefaultAsync();
             if (cam == null)
             {
-                response.ToFailedResponse("Chiến dịch đã bị xóa hoặc đã được duyệt", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Chiến dịch đã bị xóa hoặc đã xác nhận", StatusCodes.Status400BadRequest);
                 return response;
             }
             cam.IsApprove = true;
             dbContext.Campaigns.Update(cam);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<GetCampaignResponse>(cam);
-            response.ToSuccessResponse("Duyệt chiến dịch thành công", StatusCodes.Status200OK);
+            response.ToSuccessResponse("Xác nhận chiến dịch thành công", StatusCodes.Status200OK);
             response.Data = map;
             return response;
         }
@@ -109,7 +109,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
             }
             else
             {
-                response.ToFailedResponse("Thời gian bắt đầu không sau thời gian hiện tại hoặc thời gian kết thúc không sau thời gian bắt đầu.", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Thời gian bắt đầu phải sau thời gian hiện tại và thời gian kết thúc phải sau thời gian bắt đầu.", StatusCodes.Status400BadRequest);
                 return response;
             }
             var uploadResult = new ImageUploadResult();
@@ -381,15 +381,20 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var category = await dbContext.Categories.SingleOrDefaultAsync(c => c.CategoryId == request.CategoryId);
-            if (cam == null)
+            if (cam.Process != "Chưa diễn ra" && cam.IsApprove == true)
             {
-                response.ToFailedResponse("Thể loại không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Bạn chỉ có thể chỉnh sửa khi chiến dịch chưa diễn ra và khi chưa xác nhận điều khoản", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var category = await dbContext.Categories.SingleOrDefaultAsync(c => c.CategoryId == request.CategoryId);
+            if (category == null)
+            {
+                response.ToFailedResponse("Thể loại của chiến dịch không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
             if (!request.Visibility.Equals("public") && !request.Visibility.Equals("private"))
             {
-                response.ToFailedResponse("Visibility không đúng định dạng!! (public or private)", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Trạng thái không đúng định dạng!! (public or private)", StatusCodes.Status400BadRequest);
                 return response;
             }
             var uploadResult = new ImageUploadResult();
@@ -416,7 +421,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
             }
             else
             {
-                response.ToFailedResponse("Thời gian bắt đầu không sau thời gian hiện tại hoặc thời gian kết thúc không sau thời gian bắt đầu.", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Thời gian bắt đầu phải sau thời gian hiện tại và thời gian kết thúc phải sau thời gian bắt đầu.", StatusCodes.Status400BadRequest);
                 return response;
             }
             cam.StartTime = request.StartTime;
@@ -440,7 +445,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
             var checkCampaign = await dbContext.Campaigns.Where(p => p.CampaignId.Equals(campaignId)).SingleOrDefaultAsync();
             if (checkCampaign == null)
             {
-                response.ToFailedResponse("chiến dịch không tồn tại", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Chiến dịch không tồn tại", StatusCodes.Status404NotFound);
                 return response;
             }
             var uploadResult = new ImageUploadResult();
