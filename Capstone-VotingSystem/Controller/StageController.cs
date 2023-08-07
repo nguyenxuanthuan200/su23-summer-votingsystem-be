@@ -39,6 +39,25 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
+        [SwaggerOperation(summary: "Get Stage By Id")]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetStageById(Guid id)
+        {
+            try
+            {
+                var result = await campaignStageService.GetStageById(id);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
 
         //[Authorize(Roles = "User")]
         [HttpPost]
@@ -60,14 +79,14 @@ namespace Capstone_VotingSystem.Controller
                      "Error retrieving data from the database.");
             }
         }
-       // [Authorize(Roles = "User")]
+        // [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Stage")]
-        public async Task<IActionResult> UpdateCampaignStage(Guid id,UpdateStageRequest request)
+        public async Task<IActionResult> UpdateCampaignStage(Guid id, UpdateStageRequest request)
         {
             try
             {
-                var result = await campaignStageService.UpdateCampaignStage(id,request);
+                var result = await campaignStageService.UpdateCampaignStage(id, request);
 
                 if (result.Success == false)
                 {
