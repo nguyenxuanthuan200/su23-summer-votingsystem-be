@@ -179,7 +179,7 @@ namespace Capstone_VotingSystem.Services.UserService
             }
 
             var uploadResult = new ImageUploadResult();
-            if (request.ImageFile.Length > 0)
+            if (request.ImageFile != null && request.ImageFile.Length > 0)
             {
                 var uploadParams = new ImageUploadParams()
                 {
@@ -190,12 +190,12 @@ namespace Capstone_VotingSystem.Services.UserService
                 uploadResult = await _cloudinary.UploadAsync(uploadParams);
 
             }
-            checkUser.FullName = request.FullName;
-            checkUser.Phone = request.Phone;
-            checkUser.AvatarUrl = uploadResult.SecureUrl.AbsoluteUri;
-            checkUser.Gender = request.Gender;
-            checkUser.Address = request.Address;
-            checkUser.Dob = request.Dob;
+            checkUser.FullName = request.FullName ?? checkUser.FullName;
+            checkUser.Phone = request.Phone ?? checkUser.Phone;
+            checkUser.AvatarUrl = uploadResult.SecureUrl?.AbsoluteUri ?? checkUser.AvatarUrl;
+            checkUser.Gender = request.Gender ?? checkUser.Gender;
+            checkUser.Address = request.Address ?? checkUser.Address;
+            checkUser.Dob = request.Dob ?? checkUser.Dob;
 
             dbContext.Users.Update(checkUser);
             await dbContext.SaveChangesAsync();

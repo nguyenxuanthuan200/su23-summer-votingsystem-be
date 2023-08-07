@@ -4,6 +4,7 @@ using Capstone_VotingSystem.Entities;
 using Capstone_VotingSystem.Models.RequestModels.StageRequest;
 using Capstone_VotingSystem.Models.ResponseModels.StageResponse;
 using Microsoft.EntityFrameworkCore;
+using Octokit.Internal;
 
 namespace Capstone_VotingSystem.Services.StageService
 {
@@ -29,7 +30,7 @@ namespace Capstone_VotingSystem.Services.StageService
                 response.ToFailedResponse("Chiến dịch không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
-            if (request.FormId !=null && request.FormId != Guid.Empty)
+            if (request.FormId != null && request.FormId != Guid.Empty)
             {
                 var checkForm = await dbContext.Forms.Where(p => p.FormId == request.FormId).SingleOrDefaultAsync();
                 if (checkForm == null)
@@ -153,6 +154,27 @@ namespace Capstone_VotingSystem.Services.StageService
             response.ToSuccessResponse(response.Data = result, "Lấy danh sách thành công", StatusCodes.Status200OK);
             return response;
 
+        }
+
+        public async Task<APIResponse<GetStageResponse>> GetStageById(Guid stageId)
+        {
+            APIResponse<GetStageResponse> response = new();
+            var checkStage = await dbContext.Stages.SingleOrDefaultAsync(p => p.StageId == stageId);
+            if (checkStage == null)
+            {
+                response.ToFailedResponse("Stage không tồn tại", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var checkcampaign = await dbContext.Campaigns.SingleOrDefaultAsync(c => c.CampaignId == checkStage.CampaignId);
+            if (checkcampaign == null)
+            {
+                response.ToFailedResponse("Campaign không tồn tại", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var map = _mapper.Map<GetStageResponse>(checkStage);
+            response.ToSuccessResponse("lấy thông tin thành công", StatusCodes.Status200OK);
+            response.Data = map;
+            return response;
         }
 
         public async Task<APIResponse<GetStageResponse>> UpdateCampaignStage(Guid id, UpdateStageRequest request)
