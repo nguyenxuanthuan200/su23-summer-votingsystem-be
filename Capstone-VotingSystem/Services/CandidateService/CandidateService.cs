@@ -356,20 +356,20 @@ namespace Capstone_VotingSystem.Services.CandidateService
             };
             List<ListCandidateVotedByUser> listVoted = new();
             var checkVote = await dbContext.Votings.Where(p => p.StageId == stageId && p.UserId == userId && p.Status == true).ToListAsync();
-            if (checkVote != null)
-            {
+            //if (checkVote != null)
+            //{
 
-                foreach (var item in checkVote)
-                {
-                    var ListCandidateVotedByUser = new ListCandidateVotedByUser();
-                    var ratio = await dbContext.Ratios.SingleOrDefaultAsync(p => p.RatioGroupId == item.RatioGroupId);
-                    var groupCandidate = await dbContext.Groups.SingleOrDefaultAsync(p => p.GroupId == ratio.GroupCandidateId);
-                    ListCandidateVotedByUser.CandidateId = item.CandidateId;
-                    ListCandidateVotedByUser.GroupName = groupCandidate.Name;
-                   // listVoted.Add(ListCandidateVotedByUser);
+            //    foreach (var item in checkVote)
+            //    {
+            //        var ListCandidateVotedByUser = new ListCandidateVotedByUser();
+            //        var ratio = await dbContext.Ratios.SingleOrDefaultAsync(p => p.RatioGroupId == item.RatioGroupId);
+            //        var groupCandidate = await dbContext.Groups.SingleOrDefaultAsync(p => p.GroupId == ratio.GroupCandidateId);
+            //        ListCandidateVotedByUser.CandidateId = item.CandidateId;
+            //        ListCandidateVotedByUser.GroupName = groupCandidate.Name;
+            //        // listVoted.Add(ListCandidateVotedByUser);
 
-                }
-            }
+            //    }
+            //}
             var listCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CampaignId == checkcam.CampaignId).ToListAsync();
             List<ListCandidateStageResponse> result = new List<ListCandidateStageResponse>();
             foreach (var item in listCandidate)
@@ -383,6 +383,17 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 if (scoreStage != null)
                 {
                     score = (int)scoreStage.Point;
+                }
+                bool voted = false;
+                if (checkVote != null)
+                {
+
+                    foreach (var a in checkVote)
+                    {
+                        if (a.CandidateId == item.CandidateId)
+                            voted = true;
+
+                    }
                 }
                 var candidate = new ListCandidateStageResponse();
                 {
@@ -398,11 +409,12 @@ namespace Capstone_VotingSystem.Services.CandidateService
                     candidate.Email = checkuser.Email;
                     candidate.AvatarUrl = item.AvatarUrl;
                     candidate.StageScore = score;
+                    candidate.isVoted = voted;
                 }
                 result.Add(candidate);
             }
             stage.Candidate = result;
-           // stage.CandidateIsVoted = listVoted;
+            // stage.CandidateIsVoted = listVoted;
             response.Data = stage;
 
             if (response.Data == null)
