@@ -197,9 +197,9 @@ namespace Capstone_VotingSystem.Services.StageService
                 response.ToFailedResponse("Chiến dịch đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            if (checkcampaign.Process != "Chưa diễn ra" && checkcampaign.IsApprove == true)
+            if (checkcampaign.Process != "Chưa bắt đầu" && checkcampaign.IsApprove == true)
             {
-                response.ToFailedResponse("Bạn chỉ có thể chỉnh sửa khi chiến dịch chưa diễn ra và khi chưa xác nhận điều khoản", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Bạn chỉ có thể chỉnh sửa khi chiến dịch chưa bắt đầu và khi chưa xác nhận điều khoản", StatusCodes.Status400BadRequest);
                 return response;
             }
             if (request.FormId != null)
