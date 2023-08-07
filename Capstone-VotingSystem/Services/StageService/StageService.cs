@@ -211,11 +211,6 @@ namespace Capstone_VotingSystem.Services.StageService
                     return response;
                 }
             }
-            //if (!request.Process.Equals("Chưa diễn ra") && !request.Process.Equals("Đang diễn ra") && !request.Process.Equals("Đã kết thúc"))
-            //{
-            //    response.ToFailedResponse("Process không đúng định dạng!! (Chưa diễn ra hoặc Đang diễn ra hoặc Đã kết thúc )", StatusCodes.Status400BadRequest);
-            //    return response;
-            //}
             DateTime startTime = (DateTime)checkcampaign.StartTime;
             DateTime endTime = (DateTime)checkcampaign.EndTime;
             DateTime newStartTime = (DateTime)request.StartTime;
