@@ -151,6 +151,11 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 ques.TypeId = request.TypeId;
                 ques.Status = true;
             }
+            if (request.Score % 5 != 0)
+            {
+                response.ToFailedResponse("Điểm phải chia hết cho 5", StatusCodes.Status400BadRequest);
+                return response;
+            }
             var so = request.Score / 5;
             for( var i = 1; i< 6; i++)
             {
