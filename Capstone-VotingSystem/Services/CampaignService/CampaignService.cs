@@ -393,7 +393,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 return response;
             }
             var uploadResult = new ImageUploadResult();
-            if (request.ImageFile.Length > 0)
+            if (request.ImageFile != null && request.ImageFile.Length > 0)
             {
                 var uploadParams = new ImageUploadParams()
                 {
@@ -425,7 +425,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
             cam.Visibility = request.Visibility;
             cam.Title = request.Title;
             cam.CategoryId = request.CategoryId;
-            cam.ImgUrl = uploadResult.SecureUrl.AbsoluteUri;
+            cam.ImgUrl = uploadResult.SecureUrl?.AbsoluteUri ?? cam.ImgUrl;
             dbContext.Campaigns.Update(cam);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<GetCampaignResponse>(cam);
