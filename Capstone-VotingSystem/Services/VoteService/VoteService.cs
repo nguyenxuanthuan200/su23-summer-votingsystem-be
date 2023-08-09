@@ -152,7 +152,7 @@ namespace Capstone_VotingSystem.Services.VoteService
             HistoryAction hisAc = new HistoryAction()
             {
                 HistoryActionId = idHis,
-                Description = "Đã bình chọn cho ứng viên " + checkCandidate.FullName + " trong chiến dịch" + getCampaignName.Title,
+                Description = "Đã bình chọn cho ứng viên " + checkCandidate.FullName + " trong chiến dịch - " + getCampaignName.Title,
                 Time = currentDateTimeVn,
                 TypeActionId = getTypeAction.TypeActionId,
                 UserId = request.UserId,
@@ -215,12 +215,16 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToFailedResponse("Bạn đã hết phiếu để bình chọn cho giai đoạn này rồi", StatusCodes.Status400BadRequest);
                 return response;
             }
-            //var check = await checkVoteSuccess(request.UserId, request.CandidateId, ratioGroup.CampaignId, request.StageId);
-            //if (check.Equals("false"))
-            //{
-            //    response.ToFailedResponse("Bạn không thể bình chọn cho ứng viên này do thể lệ của chiến dịch đề ra", StatusCodes.Status400BadRequest);
-            //    return response;
-            //}
+            Guid cam = Guid.Parse("6097a517-11ad-4105-b26a-0e93bea2cb43");
+            if (ratioGroup.CampaignId == cam)
+            {
+                var check = await checkVoteSuccess(request.UserId, request.CandidateId, ratioGroup.CampaignId, request.StageId);
+                if (check.Equals("false"))
+                {
+                    response.ToFailedResponse("Bạn không thể bình chọn cho giảng viên này do thể lệ của chiến dịch đề ra. Để biết thêm bạn vui lòng đọc thể lệ ở phía trên", StatusCodes.Status400BadRequest);
+                    return response;
+                }
+            }
 
             TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
@@ -264,7 +268,7 @@ namespace Capstone_VotingSystem.Services.VoteService
             HistoryAction hisAc = new HistoryAction()
             {
                 HistoryActionId = idHis,
-                Description = "Đã bình chọn cho ứng viên " + checkCandidate.FullName + " trong chiến dịch" + getCampaignName.Title,
+                Description = "Đã bình chọn cho ứng viên " + checkCandidate.FullName + " trong chiến dịch - " + getCampaignName.Title,
                 Time = currentDateTimeVn,
                 TypeActionId = getTypeAction.TypeActionId,
                 UserId = request.UserId,
@@ -300,7 +304,7 @@ namespace Capstone_VotingSystem.Services.VoteService
 
             int groupCategoryOfCandidate = 0;
 
-            if (groupOfCandidate.Equals("Nhạc cụ dân tộc") || groupOfCandidate.Equals("Tiếng Anh dự bị") || groupOfCandidate.Equals("Võ"))
+            if (groupOfCandidate.Equals("Nhạc cụ dân tộc") || groupOfCandidate.Equals("Tiếng anh dự bị") || groupOfCandidate.Equals("Giáo dục thể chất"))
                 groupCategoryOfCandidate = 1;
 
             var listVoteOfUser = await dbContext.Votings.Where(p => p.UserId == userId && p.StageId == stageid && p.Status == true).ToListAsync();
@@ -311,7 +315,7 @@ namespace Capstone_VotingSystem.Services.VoteService
             {
                 var checkCandidateOfVote = await dbContext.Candidates.Where(p => p.CandidateId == vote.CandidateId && p.CampaignId == campaignId && p.Status == true).SingleOrDefaultAsync();
                 var checkGroupCandidateOfVote = await dbContext.Groups.Where(p => p.GroupId == checkCandidateOfVote.GroupId && p.CampaignId == campaignId && p.IsVoter == false).SingleOrDefaultAsync();
-                if (checkGroupCandidateOfVote.Name.Equals("Nhạc cụ dân tộc") || checkGroupCandidateOfVote.Name.Equals("Tiếng Anh dự bị") || checkGroupCandidateOfVote.Name.Equals("Võ"))
+                if (checkGroupCandidateOfVote.Name.Equals("Nhạc cụ dân tộc") || checkGroupCandidateOfVote.Name.Equals("Tiếng anh dự bị") || checkGroupCandidateOfVote.Name.Equals("Giáo dục thể chất"))
                     countdb = countdb + 1;
                 else
                     countcn = countcn + 1;

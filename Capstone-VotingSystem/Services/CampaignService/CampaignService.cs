@@ -49,6 +49,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
                 var listUser = dbContext.Users.Where(p => p.Status == true).AsQueryable();
                 listUser = listUser.Where(p => p.Permission == 0 || p.Permission == 3 || p.Permission == 5 || p.Permission == 6);
+                listUser = listUser.Where(p => p.UserId != cam.UserId);
                 foreach (var user in listUser)
                 {
                     Guid idNoti = Guid.NewGuid();
@@ -56,7 +57,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                     {
                         NotificationId = idNoti,
                         Title = "Thông báo chiến dịch mới",
-                        Message = "Có một chiến dịch " + cam.Title + " vừa được tạo, mời bạn tham gia bình chọn. Chiến dịch bắt đầu vào ngày:"+cam.StartTime.ToString("dd/MM/yy") + "hãy nhớ tham gia nhé!!",
+                        Message = "Có một chiến dịch - " + cam.Title + " vừa được tạo, mời bạn tham gia bình chọn. Chiến dịch bắt đầu vào ngày:"+cam.StartTime.ToString("dd/MM/yy") + " hãy nhớ tham gia nhé!!",
                         CreateDate= currentDateTimeVn,
                         IsRead = false,
                         Status = true,
