@@ -57,8 +57,8 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         [HttpPut("{id}")]
-        [SwaggerOperation(summary: "Update Notification")]
-        public async Task<IActionResult> CreateNotification(Guid? id)
+        [SwaggerOperation(summary: "Update isRead Notification")]
+        public async Task<IActionResult> CreateNotification(Guid id)
         {
             try
             {

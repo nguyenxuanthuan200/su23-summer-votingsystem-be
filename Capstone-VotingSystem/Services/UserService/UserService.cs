@@ -159,6 +159,12 @@ namespace Capstone_VotingSystem.Services.UserService
                 list.Candidate = false;
                 list.Moderator = false;
             }
+            if (a == 7)
+            {
+                list.Voter = false;
+                list.Candidate = false;
+                list.Moderator = false;
+            }
             return list;
 
         }

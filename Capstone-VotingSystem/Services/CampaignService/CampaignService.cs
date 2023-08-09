@@ -42,6 +42,31 @@ namespace Capstone_VotingSystem.Services.CampaignService
             }
             cam.IsApprove = true;
             dbContext.Campaigns.Update(cam);
+            //gui thong bao cho toan bo nguoi dung trong he thong khi co chien dich moi
+            if (cam.Visibility == "public")
+            {
+                TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
+                var listUser = dbContext.Users.Where(p => p.Status == true).AsQueryable();
+                listUser = listUser.Where(p => p.Permission == 0 || p.Permission == 3 || p.Permission == 5 || p.Permission == 6);
+                foreach (var user in listUser)
+                {
+                    Guid idNoti = Guid.NewGuid();
+                    Notification noti = new Notification()
+                    {
+                        NotificationId = idNoti,
+                        Title = "Thông báo chiến dịch mới",
+                        Message = "Có một chiến dịch " + cam.Title + " vừa được tạo, mời bạn tham gia bình chọn. Chiến dịch bắt đầu vào ngày:"+cam.StartTime.ToString("dd/MM/yy") + "hãy nhớ tham gia nhé!!",
+                        CreateDate= currentDateTimeVn,
+                        IsRead = false,
+                        Status = true,
+                        Username = user.UserId,
+                    };
+                    await dbContext.Notifications.AddAsync(noti);
+                    await dbContext.SaveChangesAsync();
+
+                }
+            }
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<GetCampaignResponse>(cam);
             response.ToSuccessResponse("Xác nhận chiến dịch thành công", StatusCodes.Status200OK);
