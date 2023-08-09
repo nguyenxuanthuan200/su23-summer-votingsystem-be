@@ -34,14 +34,19 @@ namespace Capstone_VotingSystem.Services.CampaignService
         public async Task<APIResponse<GetCampaignResponse>> ApproveCampaign(Guid id)
         {
             APIResponse<GetCampaignResponse> response = new();
-            var cam = await dbContext.Campaigns.Where(p => p.Status == true && p.IsApprove == false && p.CampaignId == id).SingleOrDefaultAsync();
+            var cam = await dbContext.Campaigns.Where(p => p.Status == true && p.CampaignId == id).SingleOrDefaultAsync();
             if (cam == null)
             {
-                response.ToFailedResponse("Chiến dịch đã bị xóa hoặc đã xác nhận", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status404NotFound);
                 return response;
             }
-            cam.IsApprove = true;
-            dbContext.Campaigns.Update(cam);
+            if (cam.IsApprove == true)
+            {
+                response.ToFailedResponse("Chiến dịch đã được xác nhận", StatusCodes.Status400BadRequest);
+                return response;
+            }
+
+            await dbContext.SaveChangesAsync();
             //gui thong bao cho toan bo nguoi dung trong he thong khi co chien dich moi
             if (cam.Visibility == "public")
             {
@@ -57,17 +62,19 @@ namespace Capstone_VotingSystem.Services.CampaignService
                     {
                         NotificationId = idNoti,
                         Title = "Thông báo chiến dịch mới",
-                        Message = "Có một chiến dịch - " + cam.Title + " vừa được tạo, mời bạn tham gia bình chọn. Chiến dịch bắt đầu vào ngày:"+cam.StartTime.ToString("dd/MM/yy") + " hãy nhớ tham gia nhé!!",
-                        CreateDate= currentDateTimeVn,
+                        Message = "Có một chiến dịch mới - " + cam.Title + " vừa được tạo, mời bạn tham gia bình chọn. Chiến dịch bắt đầu vào ngày:" + cam.StartTime.ToString("dd/MM/yy") + " hãy nhớ tham gia nhé!!",
+                        CreateDate = currentDateTimeVn,
                         IsRead = false,
                         Status = true,
                         Username = user.UserId,
                     };
                     await dbContext.Notifications.AddAsync(noti);
-                    await dbContext.SaveChangesAsync();
+                    // await dbContext.SaveChangesAsync();
 
                 }
             }
+            cam.IsApprove = true;
+            dbContext.Campaigns.Update(cam);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<GetCampaignResponse>(cam);
             response.ToSuccessResponse("Xác nhận chiến dịch thành công", StatusCodes.Status200OK);
@@ -277,7 +284,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                        Visibility = x.Visibility,
                        ImgUrl = x.ImgUrl,
                        Process = x.Process,
-                       IsApporve = x.IsApprove,
+                       IsApprove = x.IsApprove,
                        Status = x.Status,
                        UserId = x.UserId,
                        CampaignId = x.CampaignId,
@@ -361,7 +368,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                        Visibility = x.Visibility,
                        ImgUrl = x.ImgUrl,
                        Process = x.Process,
-                       IsApporve = x.IsApprove,
+                       IsApprove = x.IsApprove,
                        Status = x.Status,
                        UserId = x.UserId,
                        CampaignId = x.CampaignId,
@@ -500,6 +507,66 @@ namespace Capstone_VotingSystem.Services.CampaignService
             dbContext.Campaigns.Update(checkCampaign);
             await dbContext.SaveChangesAsync();
             response.ToSuccessResponse(imageRes, "Cập nhật thành công", StatusCodes.Status200OK);
+            return response;
+        }
+
+        public async Task<APIResponse<string>> UpdateProcess()
+        {
+            APIResponse<string> response = new();
+            var listCampaign = await dbContext.Campaigns.Where(p => p.Status == true && p.IsApprove == true).ToListAsync();
+            TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
+            foreach (var campaign in listCampaign)
+            {
+                var listStage = await dbContext.Stages.Where(p => p.CampaignId == campaign.CampaignId && p.Status == true).ToListAsync();
+                if (listStage.Count > 0)
+                {
+                    foreach (var stage in listStage)
+                    {
+                        if (stage.Process == "Chưa bắt đầu")
+                        {
+
+
+                            if (DateTime.Compare(stage.StartTime, currentDateTimeVn) <= 0)
+                            {
+                                stage.Process = "Đang diễn ra";
+                                dbContext.Stages.Update(stage);
+                            }
+
+                        }
+                        else if (stage.Process == "Đang diễn ra")
+                        {
+
+
+                            if (DateTime.Compare(stage.EndTime, currentDateTimeVn) <= 0)
+                            {
+                                stage.Process = "Đã kết thúc";
+                                dbContext.Stages.Update(stage);
+                            }
+
+                        }
+                    }
+                    if (campaign.Process == "Chưa bắt đầu")
+                    {
+                        if (DateTime.Compare(campaign.StartTime, currentDateTimeVn) <= 0)
+                        {
+                            campaign.Process = "Đang diễn ra";
+                            dbContext.Campaigns.Update(campaign);
+                        }
+                    }
+                    else if (campaign.Process == "Đang diễn ra")
+                    {
+                        if (DateTime.Compare(campaign.EndTime, currentDateTimeVn) <= 0)
+                        {
+                            campaign.Process = "Đã kết thúc";
+                            dbContext.Campaigns.Update(campaign);
+                        }
+                    }
+                }
+
+            }
+            await dbContext.SaveChangesAsync();
+            response.ToSuccessResponse("Cập nhật trạng thái thành công", StatusCodes.Status200OK);
             return response;
         }
     }

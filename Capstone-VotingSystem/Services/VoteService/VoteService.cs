@@ -324,11 +324,11 @@ namespace Capstone_VotingSystem.Services.VoteService
 
             if (groupOfUser.Equals("Chuyên ngành 0") && groupCategoryOfCandidate == 1)
                 return "success";
-            if (groupOfUser.Equals("Chuyên ngành(1 - 6)") && groupCategoryOfCandidate == 1 && countdb == 0)
+            if (groupOfUser.Equals("Chuyên ngành (1 - 6)") && groupCategoryOfCandidate == 1 && countdb == 0)
                 return "success";
-            if (groupOfUser.Equals("Chuyên ngành(1 - 6)") && groupCategoryOfCandidate == 0 && countcn <= 1)
+            if (groupOfUser.Equals("Chuyên ngành (1 - 6)") && groupCategoryOfCandidate == 0 && countcn <= 1)
                 return "success";
-            if (groupOfUser.Equals("Chuyên ngành(7 - 9)") && groupCategoryOfCandidate == 0 && countcn <= 2)
+            if (groupOfUser.Equals("Chuyên ngành (7 - 9)") && groupCategoryOfCandidate == 0 && countcn <= 2)
                 return "success";
 
             return "false";

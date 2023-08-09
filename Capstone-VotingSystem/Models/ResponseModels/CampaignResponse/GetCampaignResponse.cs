@@ -9,7 +9,7 @@
         public string Visibility { get; set; } = null!;
         public string? ImgUrl { get; set; }
         public string? Process { get; set; }
-        public bool IsApporve { get; set; }
+        public bool IsApprove { get; set; }
         public bool Status { get; set; }
         public string UserId { get; set; } = null!;
         public Guid CategoryId { get; set; }
