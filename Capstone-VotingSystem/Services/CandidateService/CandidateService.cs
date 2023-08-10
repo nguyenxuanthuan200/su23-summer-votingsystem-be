@@ -356,7 +356,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
             };
             List<ListCandidateVotedByUser> listVoted = new();
             var checkVote = await dbContext.Votings.Where(p => p.StageId == stageId && p.UserId == userId && p.Status == true).ToListAsync();
-           
+
             var listCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CampaignId == checkcam.CampaignId).ToListAsync();
             List<ListCandidateStageResponse> result = new List<ListCandidateStageResponse>();
             foreach (var item in listCandidate)
@@ -400,12 +400,13 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 }
                 result.Add(candidate);
             }
-            string gr = "Kỹ thuật phần mềm";
-            IQueryable<ListCandidateStageResponse> queryableResult = result.AsQueryable();
-            queryableResult = queryableResult.OrderByDescending(obj => obj.GroupName==gr);
-            
-            stage.Candidate = queryableResult.ToList();
-            // stage.CandidateIsVoted = listVoted;
+            //string gr = "Kỹ thuật phần mềm";
+            //IQueryable<ListCandidateStageResponse> queryableResult = result.AsQueryable();
+            //queryableResult = queryableResult.OrderByDescending(obj => obj.GroupName == gr);
+
+            //stage.Candidate = queryableResult.ToList();
+            stage.Candidate = result;
+            //stage.CandidateIsVoted = listVoted;
             response.Data = stage;
 
             if (response.Data == null)

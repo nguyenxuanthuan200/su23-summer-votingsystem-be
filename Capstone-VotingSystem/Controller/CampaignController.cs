@@ -60,7 +60,7 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         // [Authorize(Roles = "User,Admin")]
-        [HttpGet("update-process")]
+        [HttpPut("update-process")]
         [SwaggerOperation(summary: "update process campaign and stage ")]
         public async Task<IActionResult> UpdateProcess()
         {

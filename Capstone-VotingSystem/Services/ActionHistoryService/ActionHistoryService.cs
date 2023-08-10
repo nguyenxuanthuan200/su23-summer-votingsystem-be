@@ -40,6 +40,7 @@ namespace Capstone_VotingSystem.Services.ActionHistoryService
                 {
                     actions.HistoryActionId = item.HistoryActionId;
                     actions.Description = item.Description;
+                    actions.Time=item.Time;
                     actions.UserId = item.UserId;
                     actions.TypeActionId = item.TypeActionId;
                     actions.ActionTypeName = checkTypeAction.Name;
