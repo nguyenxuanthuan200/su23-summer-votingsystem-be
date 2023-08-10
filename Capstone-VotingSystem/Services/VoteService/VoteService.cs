@@ -57,24 +57,30 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToFailedResponse("Bạn chưa chọn nhóm của mình khi tham gia chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupVoterId == checkGroupUser.GroupId && p.GroupCandidateId == checkCandidate.GroupId && p.CampaignId == checkStateId.CampaignId);
-            if (ratioGroup == null)
-            {
-                response.ToFailedResponse("Tỷ trọng chưa được tạo", StatusCodes.Status400BadRequest);
-                return response;
-            }
+            
             var checkLimitVote = await dbContext.Votings.Where(p => p.UserId == request.UserId && p.StageId == request.StageId && p.Status == true).ToListAsync();
             if (checkLimitVote.Count >= checkStateId.LimitVote)
             {
                 response.ToFailedResponse("Bạn đã hết phiếu để bình chọn cho giai đoạn này rồi", StatusCodes.Status400BadRequest);
                 return response;
             }
-            //var check = await checkVoteSuccess(request.UserId, request.CandidateId, ratioGroup.CampaignId, request.StageId);
-            //if (check.Equals("false"))
-            //{
-            //    response.ToFailedResponse("Bạn không thể bình chọn cho ứng viên này do thể lệ của chiến dịch đề ra", StatusCodes.Status400BadRequest);
-            //    return response;
-            //}
+            Guid cam = Guid.Parse("6097a517-11ad-4105-b26a-0e93bea2cb43");
+            if (checkStateId.CampaignId == cam)
+            {
+                var check = await checkVoteSuccess(request.UserId, request.CandidateId, checkStateId.CampaignId, request.StageId);
+                if (check.Equals("false"))
+                {
+                    response.ToFailedResponse("Bạn không t hể bình chọn cho giảng viên này do thể lệ của chiến dịch đề ra. Để biết thêm bạn vui lòng đọc thể lệ ở phía trên", StatusCodes.Status400BadRequest);
+                    return response;
+                }
+            }
+            var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupVoterId == checkGroupUser.GroupId && p.GroupCandidateId == checkCandidate.GroupId && p.CampaignId == checkStateId.CampaignId);
+
+            if (ratioGroup == null)
+            {
+                response.ToFailedResponse("Tỷ trọng chưa được tạo", StatusCodes.Status400BadRequest);
+                return response;
+            }
             TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
             var id = Guid.NewGuid();
@@ -142,6 +148,21 @@ namespace Capstone_VotingSystem.Services.VoteService
                 await dbContext.SaveChangesAsync();
             }
             //create history, notification
+            var getTypeAction = await dbContext.TypeActions.SingleOrDefaultAsync(p => p.Name == "voted");
+            var getCampaignName = await dbContext.Campaigns.SingleOrDefaultAsync(p => p.CampaignId == checkStateId.CampaignId);
+            var idHis = Guid.NewGuid();
+            HistoryAction hisAc = new HistoryAction()
+            {
+                HistoryActionId = idHis,
+                Description = "Đã bình chọn cho ứng viên " + checkCandidate.FullName + " trong chiến dịch - " + getCampaignName.Title,
+                Time = currentDateTimeVn,
+                TypeActionId = getTypeAction.TypeActionId,
+                UserId = request.UserId,
+
+            };
+            await dbContext.HistoryActions.AddAsync(hisAc);
+            await dbContext.SaveChangesAsync();
+
             response.ToSuccessResponse("Bình chọn thành công", StatusCodes.Status200OK);
             return response;
         }
@@ -184,25 +205,30 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToFailedResponse("Bạn chưa chọn nhóm của mình khi tham gia chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupVoterId == checkGroupUser.GroupId && p.GroupCandidateId == checkCandidate.GroupId && p.CampaignId == checkStateId.CampaignId);
-            if (ratioGroup == null)
-            {
-                response.ToFailedResponse("Tỷ trọng chưa được tạo", StatusCodes.Status400BadRequest);
-                return response;
-            }
+           
             var checkLimitVote = await dbContext.Votings.Where(p => p.UserId == request.UserId && p.StageId == request.StageId && p.Status == true).ToListAsync();
             if (checkLimitVote.Count >= checkStateId.LimitVote)
             {
                 response.ToFailedResponse("Bạn đã hết phiếu để bình chọn cho giai đoạn này rồi", StatusCodes.Status400BadRequest);
                 return response;
             }
-            //var check = await checkVoteSuccess(request.UserId, request.CandidateId, ratioGroup.CampaignId, request.StageId);
-            //if (check.Equals("false"))
-            //{
-            //    response.ToFailedResponse("Bạn không thể bình chọn cho ứng viên này do thể lệ của chiến dịch đề ra", StatusCodes.Status400BadRequest);
-            //    return response;
-            //}
+            Guid cam = Guid.Parse("6097a517-11ad-4105-b26a-0e93bea2cb43");
+            if (checkStateId.CampaignId == cam)
+            {
+                var check = await checkVoteSuccess(request.UserId, request.CandidateId, checkStateId.CampaignId, request.StageId);
+                if (check.Equals("false"))
+                {
+                    response.ToFailedResponse("Bạn không thể bình chọn cho giảng viên này do thể lệ của chiến dịch đề ra. Để biết thêm bạn vui lòng đọc thể lệ ở phía trên", StatusCodes.Status400BadRequest);
+                    return response;
+                }
+            }
+            var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupVoterId == checkGroupUser.GroupId && p.GroupCandidateId == checkCandidate.GroupId && p.CampaignId == checkStateId.CampaignId);
 
+            if (ratioGroup == null)
+            {
+                response.ToFailedResponse("Tỷ trọng chưa được tạo", StatusCodes.Status400BadRequest);
+                return response;
+            }
             TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
             var id = Guid.NewGuid();
@@ -236,13 +262,28 @@ namespace Capstone_VotingSystem.Services.VoteService
                 dbContext.Scores.Update(checkscore);
                 await dbContext.SaveChangesAsync();
             }
+
             await dbContext.Votings.AddAsync(vote);
+            //create history, notification
+            var getTypeAction = await dbContext.TypeActions.SingleOrDefaultAsync(p => p.Name == "voted");
+            var getCampaignName = await dbContext.Campaigns.SingleOrDefaultAsync(p => p.CampaignId == checkStateId.CampaignId);
+            var idHis = Guid.NewGuid();
+            HistoryAction hisAc = new HistoryAction()
+            {
+                HistoryActionId = idHis,
+                Description = "Đã bình chọn cho ứng viên " + checkCandidate.FullName + " trong chiến dịch - " + getCampaignName.Title,
+                Time = currentDateTimeVn,
+                TypeActionId = getTypeAction.TypeActionId,
+                UserId = request.UserId,
+
+            };
+            await dbContext.HistoryActions.AddAsync(hisAc);
             await dbContext.SaveChangesAsync();
             response.ToSuccessResponse("Bình chọn thành công", StatusCodes.Status200OK);
             return response;
         }
 
-        private async Task<string> checkVoteSuccess(string userId, Guid candidateId, Guid campaignId,Guid stageid)
+        private async Task<string> checkVoteSuccess(string userId, Guid candidateId, Guid campaignId, Guid stageid)
         {
             string groupOfUser = "";
             var checkGroupUser = await dbContext.GroupUsers.Where(p => p.UserId == userId && p.CampaignId == campaignId).ToListAsync();
@@ -262,35 +303,35 @@ namespace Capstone_VotingSystem.Services.VoteService
             {
                 return "Nhóm của ứng cử viên này không thuộc chiến dịch này hoặc đã bị loại bỏ khỏi chiến dịch";
             }
-            groupOfCandidate= checkGroupCandidate.Name;
+            groupOfCandidate = checkGroupCandidate.Name;
 
             int groupCategoryOfCandidate = 0;
 
-            if (groupOfCandidate.Equals("Nhạc cụ dân tộc") || groupOfCandidate.Equals("Tiếng Anh dự bị") || groupOfCandidate.Equals("Võ"))
-                 groupCategoryOfCandidate = 1;
+            if (groupOfCandidate.Equals("Nhạc cụ dân tộc") || groupOfCandidate.Equals("Tiếng anh dự bị") || groupOfCandidate.Equals("Giáo dục thể chất"))
+                groupCategoryOfCandidate = 1;
 
             var listVoteOfUser = await dbContext.Votings.Where(p => p.UserId == userId && p.StageId == stageid && p.Status == true).ToListAsync();
 
-            int countdb= 0;
-            int countcn= 0;
+            int countdb = 0;
+            int countcn = 0;
             foreach (var vote in listVoteOfUser)
             {
                 var checkCandidateOfVote = await dbContext.Candidates.Where(p => p.CandidateId == vote.CandidateId && p.CampaignId == campaignId && p.Status == true).SingleOrDefaultAsync();
                 var checkGroupCandidateOfVote = await dbContext.Groups.Where(p => p.GroupId == checkCandidateOfVote.GroupId && p.CampaignId == campaignId && p.IsVoter == false).SingleOrDefaultAsync();
-                if (checkGroupCandidateOfVote.Name.Equals("Nhạc cụ dân tộc") || checkGroupCandidateOfVote.Name.Equals("Tiếng Anh dự bị") || checkGroupCandidateOfVote.Name.Equals("Võ"))
-                    countdb= countdb+1;
+                if (checkGroupCandidateOfVote.Name.Equals("Nhạc cụ dân tộc") || checkGroupCandidateOfVote.Name.Equals("Tiếng anh dự bị") || checkGroupCandidateOfVote.Name.Equals("Giáo dục thể chất"))
+                    countdb = countdb + 1;
                 else
-                    countcn= countcn+1;
+                    countcn = countcn + 1;
 
             }
 
-            if (groupOfUser.Equals("Chuyên ngành dự bị") && groupCategoryOfCandidate==1)
-                return  "success";
-            if (groupOfUser.Equals("Chuyên ngành(1 tới 6)") && groupCategoryOfCandidate == 1 && countdb==0)
+            if (groupOfUser.Equals("Chuyên ngành 0") && groupCategoryOfCandidate == 1)
                 return "success";
-            if (groupOfUser.Equals("Chuyên ngành(1 tới 6)") && groupCategoryOfCandidate == 0 && countcn <=1)
+            if (groupOfUser.Equals("Chuyên ngành (1 - 6)") && groupCategoryOfCandidate == 1 && countdb == 0)
                 return "success";
-            if (groupOfUser.Equals("Chuyên ngành(7 tới 9)") && groupCategoryOfCandidate == 0 && countcn <= 2)
+            if (groupOfUser.Equals("Chuyên ngành (1 - 6)") && groupCategoryOfCandidate == 0 && countcn <= 1)
+                return "success";
+            if (groupOfUser.Equals("Chuyên ngành (7 - 9)") && groupCategoryOfCandidate == 0 && countcn <= 2)
                 return "success";
 
             return "false";

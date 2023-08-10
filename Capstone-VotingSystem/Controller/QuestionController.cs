@@ -37,10 +37,29 @@ namespace Capstone_VotingSystem.Controller
                 return BadRequest();
             }
         }
-       // [Authorize(Roles = "User")]
+        // [Authorize(Roles = "User")]
+        [HttpGet("form/{id}/total-question")]
+        [SwaggerOperation(summary: "Get number question in form by form id")]
+        public async Task<IActionResult> GetNumberQuestionInForm(Guid id)
+        {
+            try
+            {
+                var result = await questionService.GetNumberQuestionInForm(id);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+        // [Authorize(Roles = "User")]
         [HttpPost("elements")]
-        [SwaggerOperation(summary: "Create new question and element")]
-        public async Task<IActionResult> CreateQuestion(CreateQuestionRequest request)
+        [SwaggerOperation(summary: "Create new list question and element")]
+        public async Task<IActionResult> CreateQuestion(CreateListQuestionRequest request)
         {
             try
             {

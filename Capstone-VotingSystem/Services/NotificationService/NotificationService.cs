@@ -24,19 +24,21 @@ namespace Capstone_VotingSystem.Services.NotificationService
         public async Task<APIResponse<NotificationResponse>> CreateNotification(NotificationRequest request)
         {
             APIResponse<NotificationResponse> response = new();
-            var checkAccout = await dbContext.Accounts.SingleOrDefaultAsync(p => p.UserName == request.Username);
+            var checkAccout = await dbContext.Accounts.SingleOrDefaultAsync(p => p.UserName == request.Username && p.Status == true);
             if (checkAccout == null)
             {
-                response.ToFailedResponse("không tồn tại user", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Người dùng không tồn tại hoặc đã bị xóa", StatusCodes.Status404NotFound);
                 return response;
             }
+            TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
             var id = Guid.NewGuid();
             Notification notification = new Notification();
             {
                 notification.NotificationId = id;
                 notification.Title = request.Title;
                 notification.Message = request.Message;
-                notification.CreateDate = DateTime.UtcNow;
+                notification.CreateDate = currentDateTimeVn;
                 notification.IsRead = false;
                 notification.Status = true;
                 notification.Username = request.Username;
@@ -51,19 +53,19 @@ namespace Capstone_VotingSystem.Services.NotificationService
 
         }
 
-        public async Task<APIResponse<IEnumerable<NotificationResponse>>> GetNotificationId(string? username)
+        public async Task<APIResponse<IEnumerable<NotificationResponse>>> GetNotificationId(string username)
         {
             APIResponse<IEnumerable<NotificationResponse>> response = new();
-            var checkId = await dbContext.Accounts.Where(p => p.UserName == username).SingleOrDefaultAsync();
+            var checkId = await dbContext.Accounts.Where(p => p.UserName == username && p.Status == true).SingleOrDefaultAsync();
             if (checkId == null)
             {
-                response.ToFailedResponse("tài khoản Không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Tài khoản Không tồn tại", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var checkStatus = await dbContext.Notifications.Where(p => p.Status == true).ToListAsync();
-            if (checkStatus == null)
+            var checkStatus = await dbContext.Notifications.Where(p => p.Status == true && p.Username == username).ToListAsync();
+            if (checkStatus.Count() == 0)
             {
-                response.ToFailedResponse("Không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Không có thông báo nào", StatusCodes.Status400BadRequest);
                 return response;
             }
             IEnumerable<NotificationResponse> result = checkStatus.Select(
@@ -81,25 +83,25 @@ namespace Capstone_VotingSystem.Services.NotificationService
                      };
                  }
                  ).ToList();
-            response.Data = result;
-            response.ToSuccessResponse(response.Data, "Lấy danh sách thành công", StatusCodes.Status200OK);
+            response.Data = result.OrderByDescending(c => c.CreateDate);
+            response.ToSuccessResponse(response.Data, "Lấy danh sách thông báo thành công", StatusCodes.Status200OK);
             return response;
         }
 
-        public async Task<APIResponse<NotificationResponse>> UpdateNotification(Guid? id)
+        public async Task<APIResponse<NotificationResponse>> UpdateNotification(Guid id)
         {
             APIResponse<NotificationResponse> response = new();
-            var checkAccout = await dbContext.Notifications.SingleOrDefaultAsync(p => p.NotificationId == id);
-            if (checkAccout == null)
+            var checkNoti = await dbContext.Notifications.SingleOrDefaultAsync(p => p.NotificationId == id && p.Status == true);
+            if (checkNoti == null)
             {
-                response.ToFailedResponse("không tồn tại user", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Không tồn tại thông báo này", StatusCodes.Status400BadRequest);
                 return response;
             }
-            checkAccout.IsRead = true;
-            dbContext.Update(checkAccout);
+            checkNoti.IsRead = true;
+            dbContext.Update(checkNoti);
             await dbContext.SaveChangesAsync();
-            var map = _mapper.Map<NotificationResponse>(checkAccout);
-            response.ToSuccessResponse("Tạo thành công", StatusCodes.Status200OK);
+            var map = _mapper.Map<NotificationResponse>(checkNoti);
+            response.ToSuccessResponse("Cập nhật thành công", StatusCodes.Status200OK);
             response.Data = map;
             return response;
         }
