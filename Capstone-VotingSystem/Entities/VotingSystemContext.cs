@@ -44,7 +44,8 @@ namespace Capstone_VotingSystem.Entities
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Data Source=sql5110.site4now.net;Initial Catalog=db_a9d259_votingsystem;Persist Security Info=True;User ID=db_a9d259_votingsystem_admin;Password=votingsystem123");
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer("Data Source=DESKTOP-NNLOED3;Initial Catalog=VotingSystem;User ID=sa;Password=123456");
             }
         }
 
@@ -159,6 +160,8 @@ namespace Capstone_VotingSystem.Entities
                     .HasMaxLength(50)
                     .HasColumnName("process");
 
+                entity.Property(e => e.Representative).HasColumnName("representative");
+
                 entity.Property(e => e.StartTime)
                     .HasColumnType("datetime")
                     .HasColumnName("startTime");
@@ -178,6 +181,8 @@ namespace Capstone_VotingSystem.Entities
                     .HasMaxLength(10)
                     .IsUnicode(false)
                     .HasColumnName("visibility");
+
+                entity.Property(e => e.VisibilityCandidate).HasColumnName("visibilityCandidate");
 
                 entity.HasOne(d => d.Category)
                     .WithMany(p => p.Campaigns)
@@ -379,6 +384,8 @@ namespace Capstone_VotingSystem.Entities
                     .HasMaxLength(200)
                     .HasColumnName("description");
 
+                entity.Property(e => e.IsStudentMajor).HasColumnName("isStudentMajor");
+
                 entity.Property(e => e.IsVoter).HasColumnName("isVoter");
 
                 entity.Property(e => e.Name)
@@ -472,6 +479,8 @@ namespace Capstone_VotingSystem.Entities
                     .ValueGeneratedNever()
                     .HasColumnName("notificationId");
 
+                entity.Property(e => e.CampaignId).HasColumnName("campaignId");
+
                 entity.Property(e => e.CreateDate)
                     .HasColumnType("date")
                     .HasColumnName("createDate");
@@ -492,6 +501,11 @@ namespace Capstone_VotingSystem.Entities
                     .HasMaxLength(36)
                     .IsUnicode(false)
                     .HasColumnName("username");
+
+                entity.HasOne(d => d.Campaign)
+                    .WithMany(p => p.Notifications)
+                    .HasForeignKey(d => d.CampaignId)
+                    .HasConstraintName("FK_Notification_Campaign");
 
                 entity.HasOne(d => d.UsernameNavigation)
                     .WithMany(p => p.Notifications)

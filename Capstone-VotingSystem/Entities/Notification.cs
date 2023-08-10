@@ -12,7 +12,9 @@ namespace Capstone_VotingSystem.Entities
         public bool IsRead { get; set; }
         public bool Status { get; set; }
         public string Username { get; set; } = null!;
+        public Guid? CampaignId { get; set; }
 
+        public virtual Campaign? Campaign { get; set; }
         public virtual Account UsernameNavigation { get; set; } = null!;
     }
 }
