@@ -18,6 +18,7 @@ namespace Capstone_VotingSystem.Entities
         public bool IsVoter { get; set; }
         public string? Description { get; set; }
         public Guid CampaignId { get; set; }
+        public bool IsStudentMajor { get; set; }
 
         public virtual Campaign Campaign { get; set; } = null!;
         public virtual ICollection<Candidate> Candidates { get; set; }
