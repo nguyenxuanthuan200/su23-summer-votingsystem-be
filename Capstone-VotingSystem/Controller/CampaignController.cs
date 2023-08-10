@@ -33,10 +33,10 @@ namespace Capstone_VotingSystem.Controller
                 }
                 return Ok(result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database.");
+                    e.Message);
             }
         }
         // [Authorize(Roles = "User,Admin")]
@@ -99,14 +99,14 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        //[Authorize(Roles = "Admin")]
-        [HttpGet("list-approve")]
-        [SwaggerOperation(summary: "Get Campaign Need Approve")]
-        public async Task<IActionResult> GetCampaignNeedApprove()
+        //[Authorize(Roles = "User,Admin")]
+        [HttpGet("representative")]
+        [SwaggerOperation(summary: "Get campaign Representative")]
+        public async Task<IActionResult> GetCampaignRepresentative()
         {
             try
             {
-                var result = await campaignService.GetCampaignNeedApprove();
+                var result = await campaignService.GetCampaignRepresentative();
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -119,7 +119,6 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        // [Authorize(Roles = "User")]
         [HttpPost]
         [SwaggerOperation(summary: "Create new Campaign")]
         public async Task<IActionResult> CreateCampaign([FromForm] CreateCampaignRequest request)
@@ -154,6 +153,26 @@ namespace Capstone_VotingSystem.Controller
                 return Ok(result);
 
 
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        // [Authorize(Roles = "Admin")]
+        [HttpPut("representative/{campaignid}")]
+        [SwaggerOperation(summary: "Update Campaign Representative")]
+        public async Task<IActionResult> UpdateCampaignRepresentative(Guid campaignid)
+        {
+            try
+            {
+                var result = await campaignService.UpdateCampaignRepresentative(campaignid);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
             }
             catch (Exception)
             {

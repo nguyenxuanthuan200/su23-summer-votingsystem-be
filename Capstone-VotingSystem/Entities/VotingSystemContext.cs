@@ -45,7 +45,7 @@ namespace Capstone_VotingSystem.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=DESKTOP-NNLOED3;Initial Catalog=VotingSystem;User ID=sa;Password=123456");
+                optionsBuilder.UseSqlServer("Data Source=sql5110.site4now.net;Initial Catalog=db_a9d259_votingsystem;Persist Security Info=True;User ID=db_a9d259_votingsystem_admin;Password=votingsystem123");
             }
         }
 

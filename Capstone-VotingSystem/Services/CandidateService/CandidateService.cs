@@ -181,23 +181,26 @@ namespace Capstone_VotingSystem.Services.CandidateService
             foreach (var item in listCandidate)
             {
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
-                var checkGroup = await dbContext.Groups.Where(p => p.GroupId == item.GroupId).SingleOrDefaultAsync();
-                var candidate = new GetListCandidateCampaignResponse();
+                if (checkuser != null)
                 {
-                    candidate.CandidateId = item.CandidateId;
-                    candidate.CampaignId = item.CampaignId;
-                    candidate.Description = item.Description;
-                    candidate.UserId = item.UserId;
-                    candidate.GroupId = checkGroup != null ? checkGroup.GroupId : null;
-                    candidate.FullName = checkuser.FullName;
-                    candidate.Phone = checkuser.Phone;
-                    candidate.Status = checkuser.Status;
-                    candidate.Gender = checkuser.Gender;
-                    candidate.Dob = checkuser.Dob;
-                    candidate.Email = checkuser.Email;
-                    candidate.AvatarUrl = checkuser.AvatarUrl;
+                    var checkGroup = await dbContext.Groups.Where(p => p.GroupId == item.GroupId).SingleOrDefaultAsync();
+                    var candidate = new GetListCandidateCampaignResponse();
+                    {
+                        candidate.CandidateId = item.CandidateId;
+                        candidate.CampaignId = item.CampaignId;
+                        candidate.Description = item.Description;
+                        candidate.UserId = item.UserId;
+                        candidate.GroupId = checkGroup != null ? checkGroup.GroupId : null;
+                        candidate.FullName = checkuser.FullName;
+                        candidate.Phone = checkuser.Phone;
+                        candidate.Status = checkuser.Status;
+                        candidate.Gender = checkuser.Gender;
+                        candidate.Dob = checkuser.Dob;
+                        candidate.Email = checkuser.Email;
+                        candidate.AvatarUrl = checkuser.AvatarUrl;
+                    }
+                    result.Add(candidate);
                 }
-                result.Add(candidate);
             }
             if (result == null)
             {
@@ -208,40 +211,40 @@ namespace Capstone_VotingSystem.Services.CandidateService
             return response;
         }
 
-        public async Task<APIResponse<IEnumerable<GetListCandidateCampaignResponse>>> GetAllCandidate()
-        {
-            APIResponse<IEnumerable<GetListCandidateCampaignResponse>> response = new();
-            var listCandidate = await dbContext.Candidates.Where(p => p.Status == true).ToListAsync();
-            List<GetListCandidateCampaignResponse> result = new List<GetListCandidateCampaignResponse>();
-            foreach (var item in listCandidate)
-            {
-                var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
-                var candidate = new GetListCandidateCampaignResponse();
-                {
-                    candidate.CandidateId = item.CandidateId;
-                    candidate.CampaignId = item.CampaignId;
-                    candidate.Description = item.Description;
-                    candidate.UserId = item.UserId;
-                    candidate.GroupId = item.GroupId;
-                    candidate.FullName = checkuser.FullName;
-                    candidate.Phone = checkuser.Phone;
-                    candidate.Gender = checkuser.Gender;
-                    candidate.Dob = checkuser.Dob;
-                    candidate.Email = checkuser.Email;
-                    candidate.AvatarUrl = checkuser.AvatarUrl;
-                }
-                var checkcam = await dbContext.Campaigns.Where(p => p.Status == true && p.CampaignId == item.CampaignId).SingleOrDefaultAsync();
-                if (checkcam != null)
-                    result.Add(candidate);
-            }
-            if (result == null)
-            {
-                response.ToFailedResponse("Không có Candidate nào trong Campaign", StatusCodes.Status400BadRequest);
-                return response;
-            }
-            response.ToSuccessResponse(response.Data = result, "Lấy danh sách thành công", StatusCodes.Status200OK);
-            return response;
-        }
+        //public async Task<APIResponse<IEnumerable<GetListCandidateCampaignResponse>>> GetAllCandidate()
+        //{
+        //    APIResponse<IEnumerable<GetListCandidateCampaignResponse>> response = new();
+        //    var listCandidate = await dbContext.Candidates.Where(p => p.Status == true).ToListAsync();
+        //    List<GetListCandidateCampaignResponse> result = new List<GetListCandidateCampaignResponse>();
+        //    foreach (var item in listCandidate)
+        //    {
+        //        var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
+        //        var candidate = new GetListCandidateCampaignResponse();
+        //        {
+        //            candidate.CandidateId = item.CandidateId;
+        //            candidate.CampaignId = item.CampaignId;
+        //            candidate.Description = item.Description;
+        //            candidate.UserId = item.UserId;
+        //            candidate.GroupId = item.GroupId;
+        //            candidate.FullName = checkuser.FullName;
+        //            candidate.Phone = checkuser.Phone;
+        //            candidate.Gender = checkuser.Gender;
+        //            candidate.Dob = checkuser.Dob;
+        //            candidate.Email = checkuser.Email;
+        //            candidate.AvatarUrl = checkuser.AvatarUrl;
+        //        }
+        //        var checkcam = await dbContext.Campaigns.Where(p => p.Status == true && p.CampaignId == item.CampaignId).SingleOrDefaultAsync();
+        //        if (checkcam != null)
+        //            result.Add(candidate);
+        //    }
+        //    if (result == null)
+        //    {
+        //        response.ToFailedResponse("Không có Candidate nào trong Campaign", StatusCodes.Status400BadRequest);
+        //        return response;
+        //    }
+        //    response.ToSuccessResponse(response.Data = result, "Lấy danh sách thành công", StatusCodes.Status200OK);
+        //    return response;
+        //}
 
         public async Task<APIResponse<string>> DeleteCandidateCampaign(Guid candidateId, DeleteCandidateRequest request)
         {
@@ -363,50 +366,49 @@ namespace Capstone_VotingSystem.Services.CandidateService
             {
 
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
-                var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId && p.CampaignId == checkcam.CampaignId);
-                var group = await dbContext.Groups.SingleOrDefaultAsync(p => p.GroupId == item.GroupId);
-                var scoreStage = await dbContext.Scores.Where(p => p.StageId == stage.StageId && p.CandidateId == item.CandidateId).SingleOrDefaultAsync();
-                var score = 0;
-                if (scoreStage != null)
+                if (checkuser != null)
                 {
-                    score = (int)scoreStage.Point;
-                }
-                bool voted = false;
-                if (checkVote != null)
-                {
-
-                    foreach (var a in checkVote)
+                    var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId && p.CampaignId == checkcam.CampaignId);
+                    var group = await dbContext.Groups.SingleOrDefaultAsync(p => p.GroupId == item.GroupId);
+                    var scoreStage = await dbContext.Scores.Where(p => p.StageId == stage.StageId && p.CandidateId == item.CandidateId).SingleOrDefaultAsync();
+                    var score = 0;
+                    if (scoreStage != null)
                     {
-                        if (a.CandidateId == item.CandidateId)
-                            voted = true;
-
+                        score = (int)scoreStage.Point;
                     }
-                }
-                var candidate = new ListCandidateStageResponse();
-                {
-                    candidate.CandidateId = item.CandidateId;
-                    candidate.Description = item.Description;
-                    candidate.UserId = item.UserId;
-                    candidate.GroupId = item.GroupId;
-                    candidate.GroupName = group != null ? group.Name : null;
-                    candidate.FullName = item.FullName;
-                    candidate.Phone = checkuser.Phone;
-                    candidate.Gender = checkuser.Gender;
-                    candidate.Dob = checkuser.Dob;
-                    candidate.Email = checkuser.Email;
-                    candidate.AvatarUrl = item.AvatarUrl;
-                    candidate.StageScore = score;
-                    candidate.isVoted = voted;
-                }
-                result.Add(candidate);
-            }
-            //string gr = "Kỹ thuật phần mềm";
-            //IQueryable<ListCandidateStageResponse> queryableResult = result.AsQueryable();
-            //queryableResult = queryableResult.OrderByDescending(obj => obj.GroupName == gr);
+                    bool voted = false;
+                    if (checkVote != null)
+                    {
 
-            //stage.Candidate = queryableResult.ToList();
+                        foreach (var a in checkVote)
+                        {
+                            if (a.CandidateId == item.CandidateId)
+                                voted = true;
+
+                        }
+                    }
+                    var candidate = new ListCandidateStageResponse();
+                    {
+                        candidate.CandidateId = item.CandidateId;
+                        candidate.Description = item.Description;
+                        candidate.UserId = item.UserId;
+                        candidate.GroupId = item.GroupId;
+                        candidate.GroupName = group != null ? group.Name : null;
+                        candidate.FullName = item.FullName;
+                        candidate.Phone = checkuser.Phone;
+                        candidate.Gender = checkuser.Gender;
+                        candidate.Dob = checkuser.Dob;
+                        candidate.Email = checkuser.Email;
+                        candidate.AvatarUrl = item.AvatarUrl;
+                        candidate.StageScore = score;
+                        candidate.isVoted = voted;
+                    }
+                    result.Add(candidate);
+                }
+
+            }
+
             stage.Candidate = result;
-            //stage.CandidateIsVoted = listVoted;
             response.Data = stage;
 
             if (response.Data == null)

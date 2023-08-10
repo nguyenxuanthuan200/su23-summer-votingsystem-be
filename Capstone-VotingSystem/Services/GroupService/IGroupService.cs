@@ -6,7 +6,6 @@ namespace Capstone_VotingSystem.Services.GroupService
 {
     public interface IGroupService
     {
-        Task<APIResponse<IEnumerable<GroupResponse>>> GetListGroup();
         Task<APIResponse<IEnumerable<GroupResponse>>> GetListGroupByCampaign(Guid campaignId);
         Task<APIResponse<StatisticalGroupResponse>> StatisticalGroupByCampaign(Guid campaignId);
         Task<APIResponse<GroupResponse>> CreateGroup(CreateGroupRequest request);
