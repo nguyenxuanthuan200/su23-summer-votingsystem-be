@@ -57,13 +57,15 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToFailedResponse("Bạn chưa chọn nhóm của mình khi tham gia chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
             }
-            
+
             var checkLimitVote = await dbContext.Votings.Where(p => p.UserId == request.UserId && p.StageId == request.StageId && p.Status == true).ToListAsync();
             if (checkLimitVote.Count >= checkStateId.LimitVote)
             {
                 response.ToFailedResponse("Bạn đã hết phiếu để bình chọn cho giai đoạn này rồi", StatusCodes.Status400BadRequest);
                 return response;
             }
+            int remainingVotes = 0;
+            remainingVotes = checkStateId.LimitVote - checkLimitVote.Count - 1;
             Guid cam = Guid.Parse("6097a517-11ad-4105-b26a-0e93bea2cb43");
             if (checkStateId.CampaignId == cam)
             {
@@ -163,7 +165,7 @@ namespace Capstone_VotingSystem.Services.VoteService
             await dbContext.HistoryActions.AddAsync(hisAc);
             await dbContext.SaveChangesAsync();
 
-            response.ToSuccessResponse("Bình chọn thành công", StatusCodes.Status200OK);
+            response.ToSuccessResponse("Bình chọn thành công. Bạn còn " + remainingVotes + " phiếu còn lại", StatusCodes.Status200OK);
             return response;
         }
 
@@ -205,13 +207,15 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToFailedResponse("Bạn chưa chọn nhóm của mình khi tham gia chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
             }
-           
+
             var checkLimitVote = await dbContext.Votings.Where(p => p.UserId == request.UserId && p.StageId == request.StageId && p.Status == true).ToListAsync();
             if (checkLimitVote.Count >= checkStateId.LimitVote)
             {
                 response.ToFailedResponse("Bạn đã hết phiếu để bình chọn cho giai đoạn này rồi", StatusCodes.Status400BadRequest);
                 return response;
             }
+            int remainingVotes = 0;
+            remainingVotes = checkStateId.LimitVote - checkLimitVote.Count - 1;
             Guid cam = Guid.Parse("6097a517-11ad-4105-b26a-0e93bea2cb43");
             if (checkStateId.CampaignId == cam)
             {
@@ -279,7 +283,7 @@ namespace Capstone_VotingSystem.Services.VoteService
             };
             await dbContext.HistoryActions.AddAsync(hisAc);
             await dbContext.SaveChangesAsync();
-            response.ToSuccessResponse("Bình chọn thành công", StatusCodes.Status200OK);
+            response.ToSuccessResponse("Bình chọn thành công. Bạn còn " + remainingVotes + " phiếu còn lại", StatusCodes.Status200OK);
             return response;
         }
 
@@ -384,7 +388,15 @@ namespace Capstone_VotingSystem.Services.VoteService
                     foreach (var e in CountVoteInGroup)
                     {
                         var checkGroup = await dbContext.Groups.Where(p => p.GroupId == e.GroupId && p.IsVoter == true).SingleOrDefaultAsync();
-                        if (checkGroup != null)
+                        if (checkGroup != null && checkGroup.IsStudentMajor == false)
+                        {
+                            var index = ListSaInGroup.FindIndex(p => p is TotalVoteOfGroupInCampaignResponse && ((TotalVoteOfGroupInCampaignResponse)p).GroupId == checkGroup.GroupId);
+                            if (index != -1)
+                            {
+                                ((TotalVoteOfGroupInCampaignResponse)ListSaInGroup[index]).TotalVote += 1;
+                            }
+                        }
+                        else if (checkGroup != null && checkGroup.IsStudentMajor == true)
                         {
                             var index = ListSaInGroup.FindIndex(p => p is TotalVoteOfGroupInCampaignResponse && ((TotalVoteOfGroupInCampaignResponse)p).GroupId == checkGroup.GroupId);
                             if (index != -1)
@@ -404,7 +416,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                 listSaInStage.Add(SaInStage);
                 SaInCam = new();
                 SaInCam.VoteOfGroupInStage = listSaInStage;
-                SaInCam.Date = request.DateAt;
+                SaInCam.Date = request.DateAt.ToString("dd/MM/yyyy");
                 SaInCam.TotalVoteInCampaign = TotalVoteInCampaign;
                 result.Add(SaInCam);
 

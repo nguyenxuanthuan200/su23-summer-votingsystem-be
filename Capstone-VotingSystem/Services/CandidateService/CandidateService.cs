@@ -129,11 +129,27 @@ namespace Capstone_VotingSystem.Services.CandidateService
                         response.ToFailedResponse("Group ứng cử viên" + i.UserId + " không tồn tại", StatusCodes.Status400BadRequest);
                         return response;
                     }
+                    TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                    DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
                     var check4 = await dbContext.Candidates.Where(p => p.CampaignId == request.CampaignId && p.UserId == i.UserId && p.Status == false).SingleOrDefaultAsync();
                     if (check4 != null)
                     {
                         check4.Status = true;
                         dbContext.Candidates.Update(check4);
+
+                        Guid idNoti = Guid.NewGuid();
+                        Notification noti = new Notification()
+                        {
+                            NotificationId = idNoti,
+                            Title = "Thông báo chiến dịch",
+                            Message = "Bạn vừa được thêm vào chiến dịch - " + checkCam.Title + " để làm ứng cử viên của chiến dịch đó, hãy kiểm tra thông tin cũng như chuẩn bị hồ sơ của mình để có được điểm số cao nhé!!!!!",
+                            CreateDate = currentDateTimeVn,
+                            IsRead = false,
+                            Status = true,
+                            Username = checkuser.UserId,
+                            CampaignId = checkCam.CampaignId,
+                        };
+                        await dbContext.Notifications.AddAsync(noti);
                         await dbContext.SaveChangesAsync();
                     }
                     else
@@ -150,16 +166,30 @@ namespace Capstone_VotingSystem.Services.CandidateService
 
                         }
                         await dbContext.Candidates.AddAsync(can);
+                        Guid idNoti = Guid.NewGuid();
+                        Notification noti = new Notification()
+                        {
+                            NotificationId = idNoti,
+                            Title = "Thông báo chiến dịch",
+                            Message = "Bạn vừa được thêm vào chiến dịch - " + checkCam.Title + " để làm ứng cử viên của chiến dịch đó, hãy kiểm tra thông tin cũng như chuẩn bị hồ sơ của mình để có được điểm số cao nhé!!!!!",
+                            CreateDate = currentDateTimeVn,
+                            IsRead = false,
+                            Status = true,
+                            Username = checkuser.UserId,
+                            CampaignId = checkCam.CampaignId,
+                        };
+                        await dbContext.Notifications.AddAsync(noti);
                         await dbContext.SaveChangesAsync();
                     }
                 }
             }
+            else
+            {
+                response.ToFailedResponse("Danh sách ứng cử viên trống!!", StatusCodes.Status400BadRequest);
+                return response;
+            }
 
-
-
-            //var map = _mapper.Map<CreateCandidateCampaignResponse>(can);
-            response.ToSuccessResponse("Thêm ứng cử viên thành công!!", StatusCodes.Status200OK);
-            // response.Data = map;
+            response.ToSuccessResponse("Thêm danh sách ứng cử viên thành công.", StatusCodes.Status200OK);
             return response;
 
         }

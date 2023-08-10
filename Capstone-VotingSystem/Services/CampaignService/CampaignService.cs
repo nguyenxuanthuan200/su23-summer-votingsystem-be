@@ -62,7 +62,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                     {
                         NotificationId = idNoti,
                         Title = "Thông báo chiến dịch mới",
-                        Message = "Có một chiến dịch mới - " + cam.Title + " vừa được tạo, mời bạn tham gia bình chọn. Chiến dịch bắt đầu vào ngày:" + cam.StartTime.ToString("dd/MM/yy") + " hãy nhớ tham gia nhé!!",
+                        Message = "Có một chiến dịch mới - " + cam.Title + " vừa được tạo, mời bạn tham gia bình chọn. Chiến dịch bắt đầu vào ngày:" + cam.StartTime.ToString("dd/MM/yyyy") + " hãy nhớ tham gia nhé!!",
                         CreateDate = currentDateTimeVn,
                         IsRead = false,
                         Status = true,

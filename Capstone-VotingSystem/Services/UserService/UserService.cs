@@ -240,13 +240,13 @@ namespace Capstone_VotingSystem.Services.UserService
                 }
                 await dbContext.GroupUsers.AddAsync(groupUser);
                 await dbContext.SaveChangesAsync();
-                response.ToSuccessResponse("Cập nhật thành công", StatusCodes.Status200OK);
+                response.ToSuccessResponse("Chọn nhóm thành công", StatusCodes.Status200OK);
                 return response;
             }
             checkGroup.GroupId = groupId;
             dbContext.Update(checkGroup);
             await dbContext.SaveChangesAsync();
-            response.ToSuccessResponse("Cập nhật thành công", StatusCodes.Status200OK);
+            response.ToSuccessResponse("Chọn nhóm thành công", StatusCodes.Status200OK);
             return response;
         }
 
