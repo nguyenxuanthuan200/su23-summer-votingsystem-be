@@ -70,6 +70,51 @@ namespace Capstone_VotingSystem.Services.GroupService
             }
             await dbContext.Groups.AddAsync(gr);
             await dbContext.SaveChangesAsync();
+            if (gr.IsVoter == true && gr.IsStudentMajor == false)
+            {
+                var listGroup = await dbContext.Groups.Where(p => p.IsVoter == false && p.CampaignId == checkCam.CampaignId).ToListAsync();
+                if (listGroup.Count > 0)
+                {
+                    foreach (var group in listGroup)
+                    {
+                        var idRa = Guid.NewGuid();
+                        Ratio ratio = new Ratio();
+                        {
+                            ratio.RatioGroupId = idRa;
+                            ratio.Proportion = 1;
+                            ratio.GroupVoterId = gr.GroupId;
+                            ratio.CampaignId = checkCam.CampaignId;
+                            ratio.GroupCandidateId = group.GroupId;
+                        };
+                        await dbContext.Ratios.AddAsync(ratio);
+
+                    }
+                    await dbContext.SaveChangesAsync();
+                }
+            }
+            else if (gr.IsVoter == false)
+            {
+                var listGroup = await dbContext.Groups.Where(p => p.IsVoter == true && p.CampaignId == checkCam.CampaignId).ToListAsync();
+                if (listGroup.Count > 0)
+                {
+                    foreach (var group in listGroup)
+                    {
+                        var idRa = Guid.NewGuid();
+                        Ratio ratio = new Ratio();
+                        {
+                            ratio.RatioGroupId = idRa;
+                            ratio.Proportion = 1;
+                            ratio.GroupVoterId = group.GroupId;
+                            ratio.CampaignId = checkCam.CampaignId;
+                            ratio.GroupCandidateId = gr.GroupId;
+                        };
+                        await dbContext.Ratios.AddAsync(ratio);
+
+                    }
+                    await dbContext.SaveChangesAsync();
+                }
+            }
+
             var map = _mapper.Map<GroupResponse>(gr);
             response.ToSuccessResponse("Tạo nhóm thành công", StatusCodes.Status200OK);
             response.Data = map;
