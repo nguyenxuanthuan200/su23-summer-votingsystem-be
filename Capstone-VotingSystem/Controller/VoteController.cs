@@ -75,12 +75,11 @@ namespace Capstone_VotingSystem.Controller
                 }
                 return Ok(result);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                //return StatusCode(StatusCodes.Status500InternalServerError,
-                //    "Error retrieving data from the database.");
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    e.Message);
+                    "Error retrieving data from the database.");
+             
             }
         }
     }
