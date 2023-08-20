@@ -227,24 +227,34 @@ namespace Capstone_VotingSystem.Services.UserService
                 response.ToFailedResponse("không tìm thấy người dùng", StatusCodes.Status404NotFound);
                 return response;
             }
-            var checkGroup = await dbContext.GroupUsers.Where(p => p.UserId == userId && p.CampaignId == campaignId).SingleOrDefaultAsync();
-            if (checkGroup == null)
+            var checkGroupRequest = await dbContext.Groups.Where(p => p.GroupId == groupId && p.CampaignId == campaignId).SingleOrDefaultAsync();
+            if (checkGroupRequest == null)
             {
-                var id = Guid.NewGuid();
-                GroupUser groupUser = new GroupUser();
-                {
-                    groupUser.GroupUserId = id;
-                    groupUser.GroupId = groupId;
-                    groupUser.UserId = userId;
-                    groupUser.CampaignId = campaignId;
-                }
-                await dbContext.GroupUsers.AddAsync(groupUser);
-                await dbContext.SaveChangesAsync();
-                response.ToSuccessResponse("Chọn nhóm thành công", StatusCodes.Status200OK);
+                response.ToFailedResponse("không tìm thấy nhóm", StatusCodes.Status404NotFound);
                 return response;
             }
-            checkGroup.GroupId = groupId;
-            dbContext.Update(checkGroup);
+            var checkGroup = await dbContext.GroupUsers.Where(p => p.UserId == userId && p.CampaignId == campaignId).ToListAsync();
+            foreach (var item in checkGroup)
+            {
+                var checkGroupVoter = await dbContext.Groups.Where(p => p.GroupId == item.GroupId).SingleOrDefaultAsync();
+                if (checkGroupVoter.IsVoter == checkGroupRequest.IsVoter && checkGroupVoter.IsStudentMajor == checkGroupRequest.IsStudentMajor)
+                {
+                    item.GroupId = groupId;
+                    dbContext.Update(item);
+                    await dbContext.SaveChangesAsync();
+                    response.ToSuccessResponse("Chọn nhóm thành công", StatusCodes.Status200OK);
+                    return response;
+                }
+            }
+            var id = Guid.NewGuid();
+            GroupUser groupUser = new GroupUser();
+            {
+                groupUser.GroupUserId = id;
+                groupUser.GroupId = groupId;
+                groupUser.UserId = userId;
+                groupUser.CampaignId = campaignId;
+            }
+            await dbContext.GroupUsers.AddAsync(groupUser);
             await dbContext.SaveChangesAsync();
             response.ToSuccessResponse("Chọn nhóm thành công", StatusCodes.Status200OK);
             return response;

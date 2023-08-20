@@ -61,26 +61,6 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        //[Authorize(Roles = "Admin")]
-        //[HttpGet]
-        //[SwaggerOperation(summary: "Get All Candidate")]
-        //public async Task<IActionResult> GetAllCandidate()
-        //{
-        //    try
-        //    {
-        //        var result = await candidateService.GetAllCandidate();
-        //        if (result.Success == false)
-        //        {
-        //            return BadRequest(result);
-        //        }
-        //        return Ok(result);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return BadRequest();
-        //    }
-        //}
-        //[Authorize(Roles = "User,Admin")]
         [HttpPost("accounts")]
         [SwaggerOperation(summary: "Create list account Candidate to Campagin")]
         public async Task<IActionResult> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request)
@@ -88,6 +68,26 @@ namespace Capstone_VotingSystem.Controller
             try
             {
                 var response = await candidateService.CreateAccountCandidateCampaign(request);
+                if (response.Success == false)
+                {
+                    return BadRequest(response);
+                }
+                return Ok(response);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        //[Authorize(Roles = "User")]
+        [HttpPost("list-candidate/")]
+        [SwaggerOperation(summary: "Create list Candidate to Campagin")]
+        public async Task<IActionResult> CreateCandidateCampaign(CreateListCandidateRequest request)
+        {
+            try
+            {
+                var response = await candidateService.CreateListCandidate(request);
                 if (response.Success == false)
                 {
                     return BadRequest(response);

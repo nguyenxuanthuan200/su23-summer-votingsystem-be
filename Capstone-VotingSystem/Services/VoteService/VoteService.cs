@@ -483,6 +483,7 @@ namespace Capstone_VotingSystem.Services.VoteService
 
                         }
                         var CountVoteByStage = await dbContext.Votings.Where(p => p.StageId == item.StageId && p.Status == true && p.SendingTime.Date.Equals(request.DateAt.Date)).ToListAsync();
+                        CountVoteByStage = CountVoteByStage.DistinctBy(x => x.UserId).ToList();
                         foreach (var i in CountVoteByStage)
                         {
                             var CountVoteInGroup = await dbContext.GroupUsers.Where(p => p.CampaignId == item.CampaignId && p.UserId == i.UserId).ToListAsync();

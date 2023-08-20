@@ -9,6 +9,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
         //Task<APIResponse<IEnumerable<GetListCandidateCampaignResponse>>> GetAllCandidate();
         Task<APIResponse<GetCandidateDetailResponse>> GetCandidateById(Guid candidateId, Guid stageId);
         Task<APIResponse<string>> CreateCandidateCampaign(CreateCandidateCampaignRequest request);
+        Task<APIResponse<string>> CreateListCandidate(CreateListCandidateRequest request);
         Task<APIResponse<string>> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request);
         Task<APIResponse<string>> DeleteCandidateCampaign(Guid candidateId, DeleteCandidateRequest request);
         //Task<UpdateCandidateProfileResponse> UpdateCandidateProfile(Guid id, UpdateCandidateProfileRequesst request);
