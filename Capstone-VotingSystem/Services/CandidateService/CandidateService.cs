@@ -455,7 +455,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
             {
 
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
-                if (checkuser != null)
+                if (checkuser != null || item.UserId == null)
                 {
                     var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId && p.CampaignId == checkcam.CampaignId);
                     var group = await dbContext.Groups.SingleOrDefaultAsync(p => p.GroupId == item.GroupId);
@@ -484,10 +484,10 @@ namespace Capstone_VotingSystem.Services.CandidateService
                         candidate.GroupId = item.GroupId;
                         candidate.GroupName = group != null ? group.Name : null;
                         candidate.FullName = item.FullName;
-                        candidate.Phone = checkuser.Phone;
-                        candidate.Gender = checkuser.Gender;
-                        candidate.Dob = checkuser.Dob;
-                        candidate.Email = checkuser.Email;
+                        candidate.Phone = checkuser != null ? checkuser.Phone : null;
+                        candidate.Gender = checkuser != null ? checkuser.Gender : null;
+                        candidate.Dob = checkuser != null ? checkuser.Dob : null;
+                        candidate.Email = checkuser != null ? checkuser.Email : null;
                         candidate.AvatarUrl = item.AvatarUrl;
                         candidate.StageScore = score;
                         candidate.isVoted = voted;
@@ -552,7 +552,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
         private async Task<GetVoteResponse> checkVoteRemaining(string userId, Guid stageid)
         {
             var result = new GetVoteResponse();
-            var checkVote = await dbContext.Votings.Where(p => p.UserId == userId && p.StageId == stageid).ToListAsync();
+            var checkVote = await dbContext.Votings.Where(p => p.UserId == userId && p.StageId == stageid && p.Status == true).ToListAsync();
 
 
             var getStage = await dbContext.Stages.Where(p => p.StageId == stageid && p.Status == true).SingleOrDefaultAsync();
@@ -647,7 +647,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 Candidate candida = new Candidate();
                 {
                     candida.CandidateId = id;
-                  //  candida.UserId = us.UserId;
+                    //  candida.UserId = us.UserId;
                     candida.FullName = i.FullName;
                     candida.Status = true;
                     candida.CampaignId = request.CampaignId;
