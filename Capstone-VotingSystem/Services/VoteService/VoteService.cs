@@ -251,18 +251,18 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToFailedResponse("không tìm thấy ứng cử viên hoặc ứng cử viên không thuộc chiến dịch này", StatusCodes.Status404NotFound);
                 return response;
             }
-          //  var groupNames = dbContext.GroupUsers.Where(u => u.UserId == checkUser.UserId && checkStateId.CampaignId == checkStateId.CampaignId).Join(dbContext.Groups, u => u.GroupId, ug => ug.GroupId, (u, ug) => ug.GroupId)
-          //.Join(dbContext.Groups, gid => gid, g => g.GroupId, (gid, g) => g.Name);
+            //  var groupNames = dbContext.GroupUsers.Where(u => u.UserId == checkUser.UserId && checkStateId.CampaignId == checkStateId.CampaignId).Join(dbContext.Groups, u => u.GroupId, ug => ug.GroupId, (u, ug) => ug.GroupId)
+            //.Join(dbContext.Groups, gid => gid, g => g.GroupId, (gid, g) => g.Name);
             var checkGroupUser = await dbContext.GroupUsers.Where(p => p.UserId == checkUser.UserId && p.CampaignId == checkStateId.CampaignId).ToListAsync();
-            if (checkGroupUser.Count==0)
+            if (checkGroupUser.Count == 0)
             {
                 response.ToFailedResponse("Bạn chưa chọn nhóm của mình khi tham gia chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
             }
             var GroupUser = new Group();
-            foreach(var item in checkGroupUser)
+            foreach (var item in checkGroupUser)
             {
-                var group = await dbContext.Groups.Where(p => p.GroupId == item.GroupId &&p.IsVoter==true&& p.IsStudentMajor==false).SingleOrDefaultAsync();
+                var group = await dbContext.Groups.Where(p => p.GroupId == item.GroupId && p.IsVoter == true && p.IsStudentMajor == false).SingleOrDefaultAsync();
                 if (group != null)
                 {
                     GroupUser = group;
@@ -393,7 +393,8 @@ namespace Capstone_VotingSystem.Services.VoteService
             var checkGroupUser = await dbContext.GroupUsers.Where(p => p.UserId == userId && p.CampaignId == campaignId).ToListAsync();
             foreach (var i in checkGroupUser)
             {
-                var checkGroup = await dbContext.Groups.Where(p => p.GroupId == i.GroupId && p.CampaignId == campaignId && p.IsVoter == true).SingleOrDefaultAsync();
+                var checkGroup = await dbContext.Groups.Where(p => p.GroupId == i.GroupId && p.CampaignId == campaignId && p.IsVoter == true && p.IsStudentMajor == false).SingleOrDefaultAsync();
+                if(checkGroup!=null)
                 groupOfUser = checkGroup.Name;
             }
             string groupOfCandidate;
@@ -535,7 +536,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                         SaInStage.StageName = item.Title;
                         SaInStage.VoteOfGroup = ListSaInGroup;
                         SaInStage.VoteOfGroupMajor = ListGroupMajor;
-                        
+
                         listSaInStage.Add(SaInStage);
 
                     }
