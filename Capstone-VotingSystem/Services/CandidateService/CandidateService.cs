@@ -578,7 +578,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                         VoteBM = 0;
                         VoteAM = 3;
                     }
-                    else
+                    else if(item.Equals("Chuyên ngành 0"))
                     {
                         VoteBM = 3;
                         VoteAM = 0;
@@ -588,17 +588,24 @@ namespace Capstone_VotingSystem.Services.CandidateService
 
                 foreach (var item in checkVote)
                 {
-                    var groupGroup = dbContext.Votings.Where(u => u.CandidateId == item.CandidateId && u.Status == true).Join(dbContext.Candidates, u => u.CandidateId, ug => ug.CandidateId, (u, ug) => ug.GroupId)
-          .Join(dbContext.Groups, gid => gid, g => g.GroupId, (gid, g) => g.Name);
-                    if (item.Equals("Nhạc cụ dân tộc") || item.Equals("Giáo dục thể chất") || item.Equals("Tiếng anh dự bị"))
+                    //          var groupGroup = dbContext.Votings.Where(u => u.VotingId == item.VotingId && u.Status == true).Join(dbContext.Candidates, u => u.CandidateId, ug => ug.CandidateId, (u, ug) => ug.GroupId)
+                    //.Join(dbContext.Groups, gid => gid, g => g.GroupId , (gid, g) => g.Name);
+                    var groupGroup = dbContext.Votings.Where(u => u.VotingId == item.VotingId && u.Status == true)
+                .Join(dbContext.Candidates, v => v.CandidateId, c => c.CandidateId, (v, c) => new { v, c })
+                .Join(dbContext.Groups, vc => vc.c.GroupId, g => g.GroupId, (vc, g) => g.Name);
+                    foreach (var itemm in groupGroup)
                     {
-                        VoteBM--;
-                    }
-                    else
-                    {
+                        if (itemm.Equals("Nhạc cụ dân tộc") || itemm.Equals("Giáo dục thể chất") || itemm.Equals("Tiếng anh dự bị"))
+                        {
+                            VoteBM--;
+                        }
+                        else
+                        {
 
-                        VoteAM--;
+                            VoteAM--;
+                        }
                     }
+                        
                 }
             }
             result.voteAM = VoteAM;
