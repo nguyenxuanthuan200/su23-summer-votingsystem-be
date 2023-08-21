@@ -45,11 +45,20 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToFailedResponse("không tìm thấy ứng cử viên hoặc ứng cử viên không thuộc chiến dịch này", StatusCodes.Status404NotFound);
                 return response;
             }
-            var checkGroupUser = await dbContext.GroupUsers.SingleOrDefaultAsync(p => p.UserId == checkUser.UserId && p.CampaignId == checkStateId.CampaignId);
-            if (checkGroupUser == null)
+            var checkGroupUser = await dbContext.GroupUsers.Where(p => p.UserId == checkUser.UserId && p.CampaignId == checkStateId.CampaignId).ToListAsync();
+            if (checkGroupUser.Count == 0)
             {
                 response.ToFailedResponse("Bạn chưa chọn nhóm của mình khi tham gia chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
+            }
+            var GroupUser = new Group();
+            foreach (var item in checkGroupUser)
+            {
+                var group = await dbContext.Groups.Where(p => p.GroupId == item.GroupId && p.IsVoter == true && p.IsStudentMajor == false).SingleOrDefaultAsync();
+                if (group != null)
+                {
+                    GroupUser = group;
+                }
             }
             TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
@@ -123,7 +132,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                         return response;
                     }
                 }
-                var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupVoterId == checkGroupUser.GroupId && p.GroupCandidateId == checkCandidate.GroupId && p.CampaignId == checkStateId.CampaignId);
+                var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupVoterId == GroupUser.GroupId && p.GroupCandidateId == checkCandidate.GroupId && p.CampaignId == checkStateId.CampaignId);
 
                 if (ratioGroup == null)
                 {
@@ -242,11 +251,22 @@ namespace Capstone_VotingSystem.Services.VoteService
                 response.ToFailedResponse("không tìm thấy ứng cử viên hoặc ứng cử viên không thuộc chiến dịch này", StatusCodes.Status404NotFound);
                 return response;
             }
-            var checkGroupUser = await dbContext.GroupUsers.SingleOrDefaultAsync(p => p.UserId == checkUser.UserId && p.CampaignId == checkStateId.CampaignId);
-            if (checkGroupUser == null)
+          //  var groupNames = dbContext.GroupUsers.Where(u => u.UserId == checkUser.UserId && checkStateId.CampaignId == checkStateId.CampaignId).Join(dbContext.Groups, u => u.GroupId, ug => ug.GroupId, (u, ug) => ug.GroupId)
+          //.Join(dbContext.Groups, gid => gid, g => g.GroupId, (gid, g) => g.Name);
+            var checkGroupUser = await dbContext.GroupUsers.Where(p => p.UserId == checkUser.UserId && p.CampaignId == checkStateId.CampaignId).ToListAsync();
+            if (checkGroupUser.Count==0)
             {
                 response.ToFailedResponse("Bạn chưa chọn nhóm của mình khi tham gia chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
+            }
+            var GroupUser = new Group();
+            foreach(var item in checkGroupUser)
+            {
+                var group = await dbContext.Groups.Where(p => p.GroupId == item.GroupId &&p.IsVoter==true&& p.IsStudentMajor==false).SingleOrDefaultAsync();
+                if (group != null)
+                {
+                    GroupUser = group;
+                }
             }
             //getTimeNow()
             TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
@@ -306,7 +326,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                         return response;
                     }
                 }
-                var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupVoterId == checkGroupUser.GroupId && p.GroupCandidateId == checkCandidate.GroupId && p.CampaignId == checkStateId.CampaignId);
+                var ratioGroup = await dbContext.Ratios.SingleOrDefaultAsync(p => p.GroupVoterId == GroupUser.GroupId && p.GroupCandidateId == checkCandidate.GroupId && p.CampaignId == checkStateId.CampaignId);
 
                 if (ratioGroup == null)
                 {
