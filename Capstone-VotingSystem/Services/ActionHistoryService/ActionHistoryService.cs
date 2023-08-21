@@ -52,7 +52,7 @@ namespace Capstone_VotingSystem.Services.ActionHistoryService
                 response.ToFailedResponse("Không có History nào của User", StatusCodes.Status400BadRequest);
                 return response;
             }
-            response.ToSuccessResponse(response.Data = result, "Lấy danh sách thành công", StatusCodes.Status200OK);
+            response.ToSuccessResponse(response.Data = result.OrderByDescending(hh => hh.Time), "Lấy danh sách thành công", StatusCodes.Status200OK);
             return response;
         }
     }

@@ -412,9 +412,9 @@ namespace Capstone_VotingSystem.Services.VoteService
 
             int groupCategoryOfCandidate = 0;
 
-            if (groupOfCandidate.Equals("Nhạc cụ dân tộc") || groupOfCandidate.Equals("Tiếng anh dự bị") || groupOfCandidate.Equals("Giáo dục thể chất"))
+            if (groupOfCandidate.Equals("BM Nhạc") || groupOfCandidate.Equals("BM Soft Skill") || groupOfCandidate.Equals("BM Maths") || groupOfCandidate.Equals("BM Giáo dục thể chất"))
                 groupCategoryOfCandidate = 1;
-
+            
             var listVoteOfUser = await dbContext.Votings.Where(p => p.UserId == userId && p.StageId == stageid && p.Status == true).ToListAsync();
 
             int countdb = 0;
@@ -423,7 +423,7 @@ namespace Capstone_VotingSystem.Services.VoteService
             {
                 var checkCandidateOfVote = await dbContext.Candidates.Where(p => p.CandidateId == vote.CandidateId && p.CampaignId == campaignId && p.Status == true).SingleOrDefaultAsync();
                 var checkGroupCandidateOfVote = await dbContext.Groups.Where(p => p.GroupId == checkCandidateOfVote.GroupId && p.CampaignId == campaignId && p.IsVoter == false).SingleOrDefaultAsync();
-                if (checkGroupCandidateOfVote.Name.Equals("Nhạc cụ dân tộc") || checkGroupCandidateOfVote.Name.Equals("Tiếng anh dự bị") || checkGroupCandidateOfVote.Name.Equals("Giáo dục thể chất"))
+                if (checkGroupCandidateOfVote.Name.Equals("BM Nhạc") || checkGroupCandidateOfVote.Name.Equals("BM Soft Skill") || checkGroupCandidateOfVote.Name.Equals("BM Maths") || checkGroupCandidateOfVote.Name.Equals("BM Giáo dục thể chất"))
                     countdb = countdb + 1;
                 else
                     countcn = countcn + 1;
