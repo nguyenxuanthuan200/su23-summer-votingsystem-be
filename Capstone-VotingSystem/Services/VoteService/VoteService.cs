@@ -95,7 +95,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                 HistoryAction hisAc = new HistoryAction()
                 {
                     HistoryActionId = idHis,
-                    Description = "Đã bỏ bình chọn cho" + checkCandidate.FullName + " trong chiến dịch - " + getCampaignName.Title,
+                    Description = "Đã bỏ bình chọn cho " + checkCandidate.FullName + " trong chiến dịch - " + getCampaignName.Title,
                     Time = currentDateTimeVn,
                     TypeActionId = getTypeAction.TypeActionId,
                     UserId = request.UserId,
@@ -289,7 +289,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                 HistoryAction hisAc = new HistoryAction()
                 {
                     HistoryActionId = idHis,
-                    Description = "Đã bỏ bình chọn cho" + checkCandidate.FullName + " trong chiến dịch - " + getCampaignName.Title,
+                    Description = "Đã bỏ bình chọn cho " + checkCandidate.FullName + " trong chiến dịch - " + getCampaignName.Title,
                     Time = currentDateTimeVn,
                     TypeActionId = getTypeAction.TypeActionId,
                     UserId = request.UserId,

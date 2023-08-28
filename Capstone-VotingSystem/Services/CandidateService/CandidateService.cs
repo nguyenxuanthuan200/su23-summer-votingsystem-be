@@ -457,7 +457,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
                 if (checkuser != null || item.UserId == null)
                 {
-                    var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId && p.CampaignId == checkcam.CampaignId);
+                    var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.CandidateId == item.CandidateId && p.CampaignId == checkcam.CampaignId);
                     var group = await dbContext.Groups.SingleOrDefaultAsync(p => p.GroupId == item.GroupId);
                     var scoreStage = await dbContext.Scores.Where(p => p.StageId == stage.StageId && p.CandidateId == item.CandidateId).SingleOrDefaultAsync();
                     var score = 0;
@@ -595,7 +595,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 .Join(dbContext.Groups, vc => vc.c.GroupId, g => g.GroupId, (vc, g) => g.Name);
                     foreach (var itemm in groupGroup)
                     {
-                        if (itemm.Equals("Nhạc cụ dân tộc") || itemm.Equals("Giáo dục thể chất") || itemm.Equals("Tiếng anh dự bị"))
+                        if (itemm.Equals("BM Nhạc") || itemm.Equals("BM Soft Skill") || itemm.Equals("BM Maths") || itemm.Equals("BM Giáo dục thể chất"))
                         {
                             VoteBM--;
                         }
