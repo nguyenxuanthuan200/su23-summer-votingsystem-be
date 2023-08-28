@@ -203,7 +203,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
             var checkcam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.CampaignId == campaignId);
             if (checkcam == null)
             {
-                response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
 
@@ -212,8 +212,9 @@ namespace Capstone_VotingSystem.Services.CandidateService
             List<GetListCandidateCampaignResponse> result = new List<GetListCandidateCampaignResponse>();
             foreach (var item in listCandidate)
             {
+
                 var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
-                if (checkuser != null)
+                if (checkuser != null || item.UserId == null)
                 {
                     var checkGroup = await dbContext.Groups.Where(p => p.GroupId == item.GroupId).SingleOrDefaultAsync();
                     var candidate = new GetListCandidateCampaignResponse();
@@ -223,13 +224,12 @@ namespace Capstone_VotingSystem.Services.CandidateService
                         candidate.Description = item.Description;
                         candidate.UserId = item.UserId;
                         candidate.GroupId = checkGroup != null ? checkGroup.GroupId : null;
-                        candidate.FullName = checkuser.FullName;
-                        candidate.Phone = checkuser.Phone;
-                        candidate.Status = checkuser.Status;
-                        candidate.Gender = checkuser.Gender;
-                        candidate.Dob = checkuser.Dob;
-                        candidate.Email = checkuser.Email;
-                        candidate.AvatarUrl = checkuser.AvatarUrl;
+                        candidate.FullName = item.FullName;
+                        candidate.Phone = checkuser != null ? checkuser.Phone : null;
+                        candidate.Gender = checkuser != null ? checkuser.Gender : null;
+                        candidate.Dob = checkuser != null ? checkuser.Dob : null;
+                        candidate.Email = checkuser != null ? checkuser.Email : null;
+                        candidate.AvatarUrl = item.AvatarUrl; 
                     }
                     result.Add(candidate);
                 }
@@ -578,7 +578,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                         VoteBM = 0;
                         VoteAM = 3;
                     }
-                    else if(item.Equals("Chuyên ngành 0"))
+                    else if (item.Equals("Chuyên ngành 0"))
                     {
                         VoteBM = 3;
                         VoteAM = 0;
@@ -605,7 +605,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                             VoteAM--;
                         }
                     }
-                        
+
                 }
             }
             result.voteAM = VoteAM;
