@@ -103,8 +103,33 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 }
                 await dbContext.Questions.AddAsync(ques);
                 await dbContext.SaveChangesAsync();
+
+                if (checktype.Name == "Bình chọn sao")
+                {
+                    if (item.Score % 5 != 0)
+                    {
+                        response.ToFailedResponse("Điểm phải chia hết cho 5", StatusCodes.Status400BadRequest);
+                        return response;
+                    }
+                    var so = item.Score / 5;
+                    for (var i = 1; i < 6; i++)
+                    {
+                        var idEle = Guid.NewGuid();
+                        Element ele = new Element();
+                        {
+                            ele.ElementId = idEle;
+                            ele.Content = i + " star";
+                            ele.Status = true;
+                            ele.QuestionId = id;
+                            ele.Score = so * i;
+                        }
+                        await dbContext.Elements.AddAsync(ele);
+                        await dbContext.SaveChangesAsync();
+                    }
+
+                }
                 // var map = _mapper.Map<GetQuestionResponse>(ques);
-                if (item.Element != null)
+                else if (item.Element != null)
                 {
                     //  List<GetElementResponse> listelement = new List<GetElementResponse>();
                     foreach (var i in item.Element)

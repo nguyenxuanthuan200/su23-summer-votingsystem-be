@@ -119,17 +119,17 @@ namespace Capstone_VotingSystem.Services.StageService
         public async Task<APIResponse<IEnumerable<GetStageResponse>>> GetCampaignStageByCampaign(Guid campaignId)
         {
             APIResponse<IEnumerable<GetStageResponse>> response = new();
-            var campaign = await dbContext.Campaigns.Where(p => p.CampaignId == campaignId).ToListAsync();
+            var campaign = await dbContext.Campaigns.Where(p => p.CampaignId == campaignId && p.Status==true).SingleOrDefaultAsync();
             if (campaign == null)
             {
-                response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
 
             var campaignstage = await dbContext.Stages.Where(p => p.CampaignId == campaignId && p.Status == true).ToListAsync();
             if (campaignstage == null)
             {
-                response.ToFailedResponse("Không có Stage nào trong Campaign này", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Không có giai đoạn nào trong chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
             }
             IEnumerable<GetStageResponse> result = campaignstage.Select(
@@ -144,6 +144,7 @@ namespace Capstone_VotingSystem.Services.StageService
                         StartTime = x.StartTime,
                         EndTime = x.EndTime,
                         LimitVote = x.LimitVote,
+                        IsUseForm = x.IsUseForm,
                         Process = x.Process,
                         Content = x.Content,
                         FormId = x.FormId,
@@ -159,16 +160,16 @@ namespace Capstone_VotingSystem.Services.StageService
         public async Task<APIResponse<GetStageResponse>> GetStageById(Guid stageId)
         {
             APIResponse<GetStageResponse> response = new();
-            var checkStage = await dbContext.Stages.SingleOrDefaultAsync(p => p.StageId == stageId);
+            var checkStage = await dbContext.Stages.SingleOrDefaultAsync(p => p.StageId == stageId && p.Status == true);
             if (checkStage == null)
             {
-                response.ToFailedResponse("Stage không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Giai đoạn không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var checkcampaign = await dbContext.Campaigns.SingleOrDefaultAsync(c => c.CampaignId == checkStage.CampaignId);
+            var checkcampaign = await dbContext.Campaigns.SingleOrDefaultAsync(c => c.CampaignId == checkStage.CampaignId && c.Status == true);
             if (checkcampaign == null)
             {
-                response.ToFailedResponse("Campaign không tồn tại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
             var map = _mapper.Map<GetStageResponse>(checkStage);
@@ -183,7 +184,7 @@ namespace Capstone_VotingSystem.Services.StageService
             var upStage = await dbContext.Stages.SingleOrDefaultAsync(c => c.StageId == id && c.Status == true);
             if (upStage == null)
             {
-                response.ToFailedResponse("Giai đôạn không tồn tại không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Giai đoạn không tồn tại không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
             var checkcampaign = await dbContext.Campaigns.SingleOrDefaultAsync(c => c.CampaignId == request.CampaignId);
@@ -204,10 +205,10 @@ namespace Capstone_VotingSystem.Services.StageService
             }
             if (request.FormId != null)
             {
-                var checkform = await dbContext.Forms.SingleOrDefaultAsync(c => c.FormId == request.FormId);
+                var checkform = await dbContext.Forms.SingleOrDefaultAsync(c => c.FormId == request.FormId && c.Status == true);
                 if (checkform == null)
                 {
-                    response.ToFailedResponse("Form không tồn tại", StatusCodes.Status400BadRequest);
+                    response.ToFailedResponse("Biểu mẫu không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                     return response;
                 }
             }
@@ -238,6 +239,10 @@ namespace Capstone_VotingSystem.Services.StageService
             upStage.EndTime = request.EndTime;
             upStage.Content = request.Content;
             upStage.LimitVote = request.LimitVote;
+            if (request.FormId == null)
+                upStage.IsUseForm = false;
+            else
+                upStage.IsUseForm = true;
             //upStage.Process = request.Process;
             upStage.FormId = request.FormId;
             dbContext.Stages.Update(upStage);

@@ -80,6 +80,7 @@ namespace Capstone_VotingSystem.Services.NotificationService
                          IsRead = x.IsRead,
                          Status = x.Status,
                          Username = x.Username,
+                         CampaignId = x.CampaignId,
                      };
                  }
                  ).ToList();

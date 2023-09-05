@@ -9,6 +9,6 @@
         public bool? IsRead { get; set; }
         public bool? Status { get; set; }
         public string? Username { get; set; }
-        public Guid CampaignId { get; set; }
+        public Guid? CampaignId { get; set; }
     }
 }

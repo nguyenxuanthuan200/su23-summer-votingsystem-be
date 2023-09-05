@@ -6,6 +6,7 @@
         public int TotalCandiadteInCampaign { get; set; }
         public List<StatisticalVoterInGroupResponse> StatisticalVoterInGroup { get; set; }
         public List<StatisticalCandidateInGroupResponse> StatisticalCandidateInGroup { get; set; }
+        public List<StatisticalVoterMajorInGroupResponse>? StatisticalVoterMajorInGroup { get; set; }
 
     }
 }

@@ -10,9 +10,11 @@ namespace Capstone_VotingSystem.Services.CampaignService
         Task<APIResponse<GetCampaignResponse>> UpdateCampaign(Guid id, UpdateCampaignRequest request);
         Task<APIResponse<GetCampaignResponse>> CreateCampaign(CreateCampaignRequest request);
         Task<APIResponse<GetCampaignAndStageResponse>> GetCampaignById(Guid id);
+        Task<APIResponse<GetCampaignAndStageResponse>> GetCampaignRepresentative();
         Task<APIResponse<string>> UpdateProcess();
+        Task<APIResponse<string>> UpdateCampaignRepresentative(Guid id);
         Task<APIResponse<IEnumerable<GetCampaignResponse>>> GetCampaignByUserId(string uid);
-        Task<APIResponse<IEnumerable<GetCampaignResponse>>> GetCampaignNeedApprove();
+        //Task<APIResponse<IEnumerable<GetCampaignResponse>>> GetCampaignNeedApprove();
         Task<APIResponse<GetCampaignResponse>> ApproveCampaign(Guid id);
         Task<APIResponse<string>> DeleteCampaign(Guid CampaignId, DeleteCampaignRequest request);
         Task<APIResponse<ImageCampaignResponse>> AddImageCampaignAsync(IFormFile file, string folderName, Guid? campaignId);

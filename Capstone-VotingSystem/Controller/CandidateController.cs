@@ -37,7 +37,8 @@ namespace Capstone_VotingSystem.Controller
             }
             catch (Exception)
             {
-                return BadRequest();
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
             }
         }
         // [Authorize(Roles = "User,Admin")]
@@ -56,29 +57,10 @@ namespace Capstone_VotingSystem.Controller
             }
             catch (Exception)
             {
-                return BadRequest();
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
             }
         }
-        //[Authorize(Roles = "Admin")]
-        [HttpGet]
-        [SwaggerOperation(summary: "Get All Candidate with role admin")]
-        public async Task<IActionResult> GetAllCandidate()
-        {
-            try
-            {
-                var result = await candidateService.GetAllCandidate();
-                if (result.Success == false)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-        }
-        //[Authorize(Roles = "User,Admin")]
         [HttpPost("accounts")]
         [SwaggerOperation(summary: "Create list account Candidate to Campagin")]
         public async Task<IActionResult> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request)
@@ -94,9 +76,28 @@ namespace Capstone_VotingSystem.Controller
             }
             catch (Exception)
             {
-                return BadRequest();
-
-
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        //[Authorize(Roles = "User")]
+        [HttpPost("list-candidate/")]
+        [SwaggerOperation(summary: "Create list Candidate to Campagin")]
+        public async Task<IActionResult> CreateCandidateCampaign(CreateListCandidateRequest request)
+        {
+            try
+            {
+                var response = await candidateService.CreateListCandidate(request);
+                if (response.Success == false)
+                {
+                    return BadRequest(response);
+                }
+                return Ok(response);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
             }
         }
         //[Authorize(Roles = "User")]
@@ -113,10 +114,10 @@ namespace Capstone_VotingSystem.Controller
                 }
                 return Ok(response);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return BadRequest(ex);
-
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
             }
         }
         // [Authorize(Roles = "User")]

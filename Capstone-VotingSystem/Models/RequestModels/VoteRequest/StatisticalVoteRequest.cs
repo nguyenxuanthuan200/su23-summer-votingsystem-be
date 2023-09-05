@@ -2,7 +2,7 @@
 {
     public class StatisticalVoteRequest
     {
-        public Guid StageId { get; set; }
+        public Guid CampaignId { get; set; }
         public DateTime DateAt { get; set; }
         public DateTime ToDate { get; set; }
     }

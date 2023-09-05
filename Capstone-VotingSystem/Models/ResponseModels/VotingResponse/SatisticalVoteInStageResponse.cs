@@ -6,5 +6,6 @@
         public string StageName { get; set; }
         public int TotalVoteInStage { get; set; }
         public List<TotalVoteOfGroupInCampaignResponse> VoteOfGroup { get; set; }
+        public List<TotalVoteOfGroupMajorResponse> VoteOfGroupMajor { get; set; }
     }
 }

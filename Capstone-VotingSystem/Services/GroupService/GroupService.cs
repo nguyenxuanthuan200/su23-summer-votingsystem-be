@@ -22,8 +22,8 @@ namespace Capstone_VotingSystem.Services.GroupService
         {
             APIResponse<string> response = new();
 
-            var checkGroup = await dbContext.GroupUsers.Where(x => x.UserId == userName && x.CampaignId == campaignId).SingleOrDefaultAsync();
-            if (checkGroup == null)
+            var checkGroup = await dbContext.GroupUsers.Where(x => x.UserId == userName && x.CampaignId == campaignId).ToListAsync();
+            if (checkGroup.Count == 0)
             {
                 response.ToFailedResponse("Chưa chọn nhóm cho chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
@@ -41,11 +41,22 @@ namespace Capstone_VotingSystem.Services.GroupService
                 response.ToFailedResponse("Chiến dịch này không tồn tại hoặc đã bị xóa", StatusCodes.Status404NotFound);
                 return response;
             }
+            if (checkCam.IsApprove == true)
+            {
+                response.ToFailedResponse("Không thể thay đổi khi đã xác nhận điều khoản", StatusCodes.Status404NotFound);
+                return response;
+            }
             var checkGroup = await dbContext.Groups.Where(x => x.Name.ToUpper().Equals(request.Name.ToUpper()) && x.CampaignId == request.CampaignId).SingleOrDefaultAsync();
             if (checkGroup != null)
             {
                 response.ToFailedResponse("Tên của nhóm đã tồn tại trong chiến dịch này rồi", StatusCodes.Status400BadRequest);
                 return response;
+            }
+            bool studentMajor = false;
+            Guid cam = Guid.Parse("6097a517-11ad-4105-b26a-0e93bea2cb43");
+            if (request.IsStudentMajor != null && checkCam.CampaignId == cam)
+            {
+                studentMajor = request.IsStudentMajor ?? false;
             }
             var id = Guid.NewGuid();
             Group gr = new Group();
@@ -54,11 +65,56 @@ namespace Capstone_VotingSystem.Services.GroupService
                 gr.Name = request.Name;
                 gr.Description = request.Description;
                 gr.IsVoter = request.IsVoter;
+                gr.IsStudentMajor = studentMajor;
                 gr.CampaignId = request.CampaignId;
-
             }
             await dbContext.Groups.AddAsync(gr);
             await dbContext.SaveChangesAsync();
+            if (gr.IsVoter == true && gr.IsStudentMajor == false)
+            {
+                var listGroup = await dbContext.Groups.Where(p => p.IsVoter == false && p.CampaignId == checkCam.CampaignId).ToListAsync();
+                if (listGroup.Count > 0)
+                {
+                    foreach (var group in listGroup)
+                    {
+                        var idRa = Guid.NewGuid();
+                        Ratio ratio = new Ratio();
+                        {
+                            ratio.RatioGroupId = idRa;
+                            ratio.Proportion = 1;
+                            ratio.GroupVoterId = gr.GroupId;
+                            ratio.CampaignId = checkCam.CampaignId;
+                            ratio.GroupCandidateId = group.GroupId;
+                        };
+                        await dbContext.Ratios.AddAsync(ratio);
+
+                    }
+                    await dbContext.SaveChangesAsync();
+                }
+            }
+            else if (gr.IsVoter == false)
+            {
+                var listGroup = await dbContext.Groups.Where(p => p.IsVoter == true && p.CampaignId == checkCam.CampaignId).ToListAsync();
+                if (listGroup.Count > 0)
+                {
+                    foreach (var group in listGroup)
+                    {
+                        var idRa = Guid.NewGuid();
+                        Ratio ratio = new Ratio();
+                        {
+                            ratio.RatioGroupId = idRa;
+                            ratio.Proportion = 1;
+                            ratio.GroupVoterId = group.GroupId;
+                            ratio.CampaignId = checkCam.CampaignId;
+                            ratio.GroupCandidateId = gr.GroupId;
+                        };
+                        await dbContext.Ratios.AddAsync(ratio);
+
+                    }
+                    await dbContext.SaveChangesAsync();
+                }
+            }
+
             var map = _mapper.Map<GroupResponse>(gr);
             response.ToSuccessResponse("Tạo nhóm thành công", StatusCodes.Status200OK);
             response.Data = map;
@@ -97,24 +153,7 @@ namespace Capstone_VotingSystem.Services.GroupService
         //    return response;
         //}
 
-        public async Task<APIResponse<IEnumerable<GroupResponse>>> GetListGroup()
-        {
-            APIResponse<IEnumerable<GroupResponse>> response = new();
-            var type = await dbContext.Groups.ToListAsync();
-            IEnumerable<GroupResponse> result = type.Select(x =>
-            {
-                return new GroupResponse()
-                {
-                    GroupId = x.GroupId,
-                    Name = x.Name,
-                    Description = x.Description,
-                    IsVoter = x.IsVoter,
 
-                };
-            }).ToList();
-            response.ToSuccessResponse(response.Data = result, "Lấy danh sách Group thành công", StatusCodes.Status200OK);
-            return response;
-        }
 
         public async Task<APIResponse<IEnumerable<GroupResponse>>> GetListGroupByCampaign(Guid campaignId)
         {
@@ -128,6 +167,7 @@ namespace Capstone_VotingSystem.Services.GroupService
                     Name = x.Name,
                     Description = x.Description,
                     IsVoter = x.IsVoter,
+                    IsStudentMajor = x.IsStudentMajor,
 
                 };
             }).ToList();
@@ -140,6 +180,7 @@ namespace Capstone_VotingSystem.Services.GroupService
             APIResponse<StatisticalGroupResponse> response = new();
             var result = new StatisticalGroupResponse();
             var listVoter = new List<StatisticalVoterInGroupResponse>();
+            var listVoterMajor = new List<StatisticalVoterMajorInGroupResponse>();
             var listCandidate = new List<StatisticalCandidateInGroupResponse>();
             var campaign = await dbContext.Campaigns.Where(p => p.CampaignId == campaignId && p.Status == true && p.IsApprove == true).SingleOrDefaultAsync();
             if (campaign == null)
@@ -153,30 +194,72 @@ namespace Capstone_VotingSystem.Services.GroupService
                 response.ToFailedResponse("Không có nhóm cho người bình chọn nào trong chiến dịch tồn tại", StatusCodes.Status404NotFound);
                 return response;
             }
+            int totalVoterInCampaign = 0;
+            Guid camCtsv = Guid.Parse("6097a517-11ad-4105-b26a-0e93bea2cb43");
+            if (campaign.CampaignId == camCtsv)
+            {
+                var groupVoterMajor = await dbContext.Groups.Where(p => p.CampaignId == campaignId && p.IsVoter == true && p.IsStudentMajor == true).ToListAsync();
+                if (groupVoterMajor.Count() == 0)
+                {
+                    response.ToFailedResponse("Không có nhóm ngành của sinh viên nào trong chiến dịch tồn tại", StatusCodes.Status404NotFound);
+                    return response;
+                }
+                foreach (var i in groupVoterMajor)
+                {
+                    var ListVoterGroup = new StatisticalVoterMajorInGroupResponse();
+                    ListVoterGroup.GroupId = i.GroupId;
+                    ListVoterGroup.GroupName = i.Name;
+                    var groupUser = await dbContext.GroupUsers.Where(p => p.CampaignId == campaignId && p.GroupId == i.GroupId).ToListAsync();
+                    ListVoterGroup.TotalVoterMajorInGroup = groupUser.Count();
+                    listVoterMajor.Add(ListVoterGroup);
+                }
+
+
+                //groupVoter = groupVoter.Where(p => p.IsStudentMajor == false);
+                foreach (var i in groupVoter)
+                {
+                    if (i.IsStudentMajor == false)
+                    {
+                        var ListVoterGroup = new StatisticalVoterInGroupResponse();
+                        ListVoterGroup.GroupId = i.GroupId;
+                        ListVoterGroup.GroupName = i.Name;
+                        var groupUser = await dbContext.GroupUsers.Where(p => p.CampaignId == campaignId && p.GroupId == i.GroupId).ToListAsync();
+                        ListVoterGroup.TotalVoterInGroup = groupUser.Count();
+                        listVoter.Add(ListVoterGroup);
+                        totalVoterInCampaign += ListVoterGroup.TotalVoterInGroup;
+                    }
+                }
+
+            }
+            else
+            {
+                foreach (var i in groupVoter)
+                {
+                    var ListVoterGroup = new StatisticalVoterInGroupResponse();
+                    ListVoterGroup.GroupId = i.GroupId;
+                    ListVoterGroup.GroupName = i.Name;
+                    var groupUser = await dbContext.GroupUsers.Where(p => p.CampaignId == campaignId && p.GroupId == i.GroupId).ToListAsync();
+                    ListVoterGroup.TotalVoterInGroup = groupUser.Count();
+                    listVoter.Add(ListVoterGroup);
+                    totalVoterInCampaign += ListVoterGroup.TotalVoterInGroup;
+
+                }
+            }
+
             var groupCandidate = await dbContext.Groups.Where(p => p.CampaignId == campaignId && p.IsVoter == false).ToListAsync();
             if (groupCandidate.Count() == 0)
             {
                 response.ToFailedResponse("Không có nhóm cho người ứng cử nào trong chiến dịch tồn tại", StatusCodes.Status404NotFound);
                 return response;
             }
-            int totalVoterInCampaign = 0;
-            foreach (var i in groupVoter)
-            {
-                var ListVoterGroup = new StatisticalVoterInGroupResponse();
-                ListVoterGroup.GroupId = i.GroupId;
-                ListVoterGroup.GroupName = i.Name;
-                var groupUser = await dbContext.GroupUsers.Where(p => p.CampaignId == campaignId && p.GroupId == i.GroupId).ToListAsync();
-                ListVoterGroup.TotalVoterInGroup = groupUser.Count();
-                listVoter.Add(ListVoterGroup);
-                totalVoterInCampaign += ListVoterGroup.TotalVoterInGroup;
-            }
+
             int totalCandidateInCampaign = 0;
             foreach (var i in groupCandidate)
             {
                 var ListCandidateGroup = new StatisticalCandidateInGroupResponse();
                 ListCandidateGroup.GroupId = i.GroupId;
                 ListCandidateGroup.GroupName = i.Name;
-                var groupUser = await dbContext.GroupUsers.Where(p => p.CampaignId == campaignId && p.GroupId == i.GroupId).ToListAsync();
+                var groupUser = await dbContext.Candidates.Where(p => p.CampaignId == campaignId && p.GroupId == i.GroupId).ToListAsync();
                 ListCandidateGroup.TotalCandidateInGroup = groupUser.Count();
                 listCandidate.Add(ListCandidateGroup);
                 totalCandidateInCampaign += ListCandidateGroup.TotalCandidateInGroup;
@@ -184,6 +267,7 @@ namespace Capstone_VotingSystem.Services.GroupService
             result.TotalVoterInCampaign = totalVoterInCampaign;
             result.TotalCandiadteInCampaign = totalCandidateInCampaign;
             result.StatisticalVoterInGroup = listVoter;
+            result.StatisticalVoterMajorInGroup = listVoterMajor;
             result.StatisticalCandidateInGroup = listCandidate;
             response.ToSuccessResponse(response.Data = result, "Thống kê danh sách nhóm cho người bình chọn thành công", StatusCodes.Status200OK);
             response.Data = result;
@@ -209,7 +293,7 @@ namespace Capstone_VotingSystem.Services.GroupService
 
             groupCheck.Name = request.Name;
             groupCheck.Description = request.Description;
-            groupCheck.IsVoter = request.IsVoter;
+            //groupCheck.IsVoter = request.IsVoter;
             dbContext.Groups.Update(groupCheck);
             await dbContext.SaveChangesAsync();
             var map = _mapper.Map<GroupResponse>(groupCheck);
