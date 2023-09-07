@@ -247,7 +247,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
             }
             if (result == null)
             {
-                response.ToFailedResponse("Không có Candidate nào trong Campaign", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Không có ứng cử viên nào trong chiến dịch", StatusCodes.Status400BadRequest);
                 return response;
             }
             response.ToSuccessResponse(response.Data = result, "Lấy danh sách thành công", StatusCodes.Status200OK);
@@ -301,7 +301,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
             var deleteCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CandidateId == candidateId && p.CampaignId == request.campaignId).SingleOrDefaultAsync();
             if (deleteCandidate == null)
             {
-                response.ToFailedResponse("Không có Candidate nào phù hợp trong Campaign hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Không có ứng cử viên nào phù hợp trong Campaign hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
             deleteCandidate.Status = false;

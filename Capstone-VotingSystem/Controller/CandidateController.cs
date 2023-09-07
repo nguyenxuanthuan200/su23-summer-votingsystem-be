@@ -122,7 +122,7 @@ namespace Capstone_VotingSystem.Controller
         }
         // [Authorize(Roles = "User")]
         [HttpDelete("{id}")]
-        [SwaggerOperation(summary: "Delete Candidate trong Campaign")]
+        [SwaggerOperation(summary: "Delete Candidate in Campaign")]
         public async Task<IActionResult> DeleteCandidate(Guid id, DeleteCandidateRequest request)
         {
             try

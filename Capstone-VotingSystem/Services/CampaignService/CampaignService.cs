@@ -194,10 +194,16 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 response.ToFailedResponse("Người dùng không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var cam = await dbContext.Campaigns.Where(p => p.Status == true && p.UserId == request.UserName).SingleOrDefaultAsync(c => c.CampaignId == CampaignId);
+            var checkrole = await dbContext.Roles.Where(p => p.RoleId == checkus.RoleId).SingleOrDefaultAsync();
+            var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == CampaignId);
             if (cam == null)
             {
                 response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            if (cam.UserId != request.UserName || checkrole.Name != "admin")
+            {
+                response.ToFailedResponse("Bạn không đủ quyền để xóa chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
             }
             cam.Status = false;
