@@ -2,12 +2,8 @@
 {
     public class UpdateCandidateProfileRequest
     {
-        public string? NickName { get; set; }
-        public DateTime? Dob { get; set; }
-        public string? Image { get; set; }
-        public Guid? CampaignId { get; set; }
-        public string? Name { get; set; }
-        public string? Gender { get; set; }
-        public string? Address { get; set; }
+        public string? Description { get; set; }
+        public string? FullName { get; set; }
+        public IFormFile? ImageFile { get; set; }
     }
 }

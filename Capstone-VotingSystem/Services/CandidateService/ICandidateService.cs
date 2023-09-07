@@ -12,7 +12,8 @@ namespace Capstone_VotingSystem.Services.CandidateService
         Task<APIResponse<string>> CreateListCandidate(CreateListCandidateRequest request);
         Task<APIResponse<string>> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request);
         Task<APIResponse<string>> DeleteCandidateCampaign(Guid candidateId, DeleteCandidateRequest request);
-        //Task<UpdateCandidateProfileResponse> UpdateCandidateProfile(Guid id, UpdateCandidateProfileRequesst request);
+        Task<APIResponse<GetListCandidateByUserIdResponse>> UpdateCandidateProfile(Guid id, UpdateCandidateProfileRequest request);
         Task<APIResponse<GetListCandidateStageResponse>> GetListCandidatStage(Guid stageId, string userId);
+        Task<APIResponse<IEnumerable<GetListCandidateByUserIdResponse>>> GetListCandidateByUserId(string userId);
     }
 }

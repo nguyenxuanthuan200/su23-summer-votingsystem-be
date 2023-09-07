@@ -159,5 +159,47 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
+        //[Authorize(Roles = "User")]
+        [HttpGet("user/{userid}")]
+        [SwaggerOperation(summary: "Get List Candidate by UserId")]
+        public async Task<IActionResult> GetListCandidateByUserId(string userid)
+        {
+            try
+            {
+                var result = await candidateService.GetListCandidateByUserId(userid);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        // [Authorize(Roles = "User")]
+        [HttpPut("{id}")]
+        [SwaggerOperation(summary: "Update Candidate")]
+        public async Task<IActionResult> UpdateCampaign(Guid id, [FromForm] UpdateCandidateProfileRequest request)
+        {
+            try
+            {
+                var result = await candidateService.UpdateCandidateProfile(id, request);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
     }
 }
