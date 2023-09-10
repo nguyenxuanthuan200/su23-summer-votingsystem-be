@@ -201,7 +201,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            if (cam.UserId != request.UserName || checkrole.Name != "admin")
+            if (cam.UserId != request.UserName && checkrole.Name != "admin")
             {
                 response.ToFailedResponse("Bạn không đủ quyền để xóa chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
@@ -618,7 +618,8 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 }
             }
             var checkCamRe = await dbContext.Campaigns.Where(p => p.Status == true && p.Representative == true).SingleOrDefaultAsync();
-            if (checkCamRe != null){
+            if (checkCamRe != null)
+            {
                 checkCamRe.Representative = false;
                 cam.Representative = true;
                 dbContext.Campaigns.Update(checkCamRe);
@@ -635,6 +636,31 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 response.ToSuccessResponse("Thay đổi chiến dịch tiêu biểu thành công", StatusCodes.Status200OK);
                 return response;
             }
+        }
+
+        public async Task<APIResponse<IEnumerable<GetCampaignForAdminResponse>>> GetCampaignForAdmin()
+        {
+            APIResponse<IEnumerable<GetCampaignForAdminResponse>> response = new();
+
+            var getAll = await dbContext.Campaigns.ToListAsync();
+            if (getAll == null || getAll.Count == 0)
+            {
+                response.ToFailedResponse("Không có chiến dịch nào tồn tại", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            List<GetCampaignForAdminResponse> listCamn = new List<GetCampaignForAdminResponse>();
+            foreach (var item in getAll)
+            {
+                var map = _mapper.Map<GetCampaignForAdminResponse>(item);
+
+                //var totalCandidate = await dbContext.Candidates.Where(p => p.CampaignId == item.CampaignId && p.Status == true).ToListAsync();
+                //map.TotalCandidate = totalCandidate.Count();
+                listCamn.Add(map);
+            }
+
+            response.Data = listCamn;
+            response.ToSuccessResponse(response.Data, "Lấy danh sách thành công", StatusCodes.Status200OK);
+            return response;
         }
     }
 }

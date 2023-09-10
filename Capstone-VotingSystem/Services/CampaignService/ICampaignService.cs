@@ -14,6 +14,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
         Task<APIResponse<string>> UpdateProcess();
         Task<APIResponse<string>> UpdateCampaignRepresentative(Guid id);
         Task<APIResponse<IEnumerable<GetCampaignResponse>>> GetCampaignByUserId(string uid);
+        Task<APIResponse<IEnumerable<GetCampaignForAdminResponse>>> GetCampaignForAdmin();
         //Task<APIResponse<IEnumerable<GetCampaignResponse>>> GetCampaignNeedApprove();
         Task<APIResponse<GetCampaignResponse>> ApproveCampaign(Guid id);
         Task<APIResponse<string>> DeleteCampaign(Guid CampaignId, DeleteCampaignRequest request);

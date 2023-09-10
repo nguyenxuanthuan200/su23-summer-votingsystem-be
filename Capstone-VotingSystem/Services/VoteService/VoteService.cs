@@ -128,7 +128,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                     var check = await checkVoteSuccess(request.UserId, request.CandidateId, checkStateId.CampaignId, request.StageId);
                     if (check.Equals("false"))
                     {
-                        response.ToFailedResponse("Bạn không thể bình chọn cho giảng viên này do thể lệ của chiến dịch đề ra. Để biết thêm bạn vui lòng đọc thể lệ ở phía trên", StatusCodes.Status400BadRequest);
+                        response.ToFailedResponse("Bạn không thể bình chọn cho giảng viên này do thể lệ của chiến dịch đề ra.", StatusCodes.Status400BadRequest);
                         return response;
                     }
                 }
@@ -322,7 +322,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                     var check = await checkVoteSuccess(request.UserId, request.CandidateId, checkStateId.CampaignId, request.StageId);
                     if (check.Equals("false"))
                     {
-                        response.ToFailedResponse("Bạn không thể bình chọn cho giảng viên này do thể lệ của chiến dịch đề ra. Để biết thêm bạn vui lòng đọc thể lệ ở phía trên", StatusCodes.Status400BadRequest);
+                        response.ToFailedResponse("Bạn không thể bình chọn cho giảng viên này do thể lệ của chiến dịch đề ra.", StatusCodes.Status400BadRequest);
                         return response;
                     }
                 }
@@ -394,8 +394,8 @@ namespace Capstone_VotingSystem.Services.VoteService
             foreach (var i in checkGroupUser)
             {
                 var checkGroup = await dbContext.Groups.Where(p => p.GroupId == i.GroupId && p.CampaignId == campaignId && p.IsVoter == true && p.IsStudentMajor == false).SingleOrDefaultAsync();
-                if(checkGroup!=null)
-                groupOfUser = checkGroup.Name;
+                if (checkGroup != null)
+                    groupOfUser = checkGroup.Name;
             }
             string groupOfCandidate;
             var checkCandidate = await dbContext.Candidates.Where(p => p.CandidateId == candidateId && p.CampaignId == campaignId && p.Status == true).SingleOrDefaultAsync();
@@ -414,7 +414,7 @@ namespace Capstone_VotingSystem.Services.VoteService
 
             if (groupOfCandidate.Equals("BM Nhạc") || groupOfCandidate.Equals("BM Soft Skill") || groupOfCandidate.Equals("BM Maths") || groupOfCandidate.Equals("BM Giáo dục thể chất"))
                 groupCategoryOfCandidate = 1;
-            
+
             var listVoteOfUser = await dbContext.Votings.Where(p => p.UserId == userId && p.StageId == stageid && p.Status == true).ToListAsync();
 
             int countdb = 0;
@@ -459,6 +459,22 @@ namespace Capstone_VotingSystem.Services.VoteService
             var ListGroupMajor = new List<TotalVoteOfGroupMajorResponse>();
             int TotalVoteInCampaign = 0;
 
+            var checkCampaign = await dbContext.Campaigns.Where(p => p.CampaignId == request.CampaignId && p.Status == true).SingleOrDefaultAsync();
+            if (checkCampaign == null)
+            {
+                response.ToFailedResponse("Không thể thống kê chiến dịch không tồn tại hoặc bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            if (checkCampaign.StartTime.CompareTo(request.DateAt) >0)
+            {
+                response.ToFailedResponse("Không thể thống kê chiến dịch vào thời điểm chưa bắt đầu", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            if (request.DateAt.CompareTo(request.ToDate) > 0)
+            {
+                response.ToFailedResponse("Không thể thống kê chiến dịch vì đến ngày trước từ ngày", StatusCodes.Status400BadRequest);
+                return response;
+            }
             var GetListStage = await dbContext.Stages.Where(p => p.CampaignId == request.CampaignId && p.Status == true).ToListAsync();
             if (GetListStage.Count <= 0)
             {

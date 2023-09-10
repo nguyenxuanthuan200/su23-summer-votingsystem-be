@@ -72,13 +72,13 @@ namespace Capstone_VotingSystem.Services.UserService
         {
             APIResponse<IEnumerable<GetListUserResponse>> response = new();
             // List<GetListUserResponse> result = new();
-            var users = await dbContext.Users.Where(p => p.Status == true).ToListAsync();
+            var users = await dbContext.Users.ToListAsync();
             if (users.Count() == 0)
             {
                 response.ToFailedResponse("không tìm thấy người dùng nào", StatusCodes.Status404NotFound);
                 return response;
             }
-            var account = await dbContext.Accounts.Where(p => p.Status == true).ToListAsync();
+            var account = await dbContext.Accounts.ToListAsync();
             if (account.Count() == 0)
             {
                 response.ToFailedResponse("không tìm thấy tài khoản nào", StatusCodes.Status404NotFound);
@@ -93,6 +93,7 @@ namespace Capstone_VotingSystem.Services.UserService
                     UserName = a.UserName,
                     CreateAt = a.CreateAt,
                     RoleId = a.RoleId,
+                    Status = a.Status,
                     FullName = u.FullName,
                     Phone = u.Phone,
                     AvatarUrl = u.AvatarUrl,
