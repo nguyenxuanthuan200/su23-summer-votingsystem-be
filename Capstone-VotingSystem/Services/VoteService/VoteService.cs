@@ -25,13 +25,13 @@ namespace Capstone_VotingSystem.Services.VoteService
             var checkUser = await dbContext.Users.Where(p => p.UserId == request.UserId && p.Status == true).SingleOrDefaultAsync();
             if (checkUser == null)
             {
-                response.ToFailedResponse("không tìm thấy người dùng", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Không tìm thấy người dùng", StatusCodes.Status404NotFound);
                 return response;
             }
             var checkStateId = await dbContext.Stages.SingleOrDefaultAsync(p => p.StageId == request.StageId && p.Status == true);
             if (checkStateId == null)
             {
-                response.ToFailedResponse("không tìm thấy giai đoạn", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Không tìm thấy giai đoạn", StatusCodes.Status404NotFound);
                 return response;
             }
             if (!checkStateId.Process.Equals("Đang diễn ra"))
@@ -42,7 +42,7 @@ namespace Capstone_VotingSystem.Services.VoteService
             var checkCandidate = await dbContext.Candidates.SingleOrDefaultAsync(p => p.CandidateId == request.CandidateId && p.CampaignId == checkStateId.CampaignId);
             if (checkCandidate == null)
             {
-                response.ToFailedResponse("không tìm thấy ứng cử viên hoặc ứng cử viên không thuộc chiến dịch này", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Không tìm thấy ứng cử viên hoặc ứng cử viên không thuộc chiến dịch này", StatusCodes.Status404NotFound);
                 return response;
             }
             var checkGroupUser = await dbContext.GroupUsers.Where(p => p.UserId == checkUser.UserId && p.CampaignId == checkStateId.CampaignId).ToListAsync();
@@ -231,13 +231,13 @@ namespace Capstone_VotingSystem.Services.VoteService
             var checkUser = await dbContext.Users.Where(p => p.UserId == request.UserId).SingleOrDefaultAsync();
             if (checkUser == null)
             {
-                response.ToFailedResponse("không tìm thấy người dùng", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Không tìm thấy người dùng", StatusCodes.Status404NotFound);
                 return response;
             }
             var checkStateId = await dbContext.Stages.SingleOrDefaultAsync(p => p.StageId == request.StageId);
             if (checkStateId == null)
             {
-                response.ToFailedResponse("không tìm thấy giai đoạn", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Không tìm thấy giai đoạn", StatusCodes.Status404NotFound);
                 return response;
             }
             if (!checkStateId.Process.Equals("Đang diễn ra"))
@@ -412,7 +412,7 @@ namespace Capstone_VotingSystem.Services.VoteService
 
             int groupCategoryOfCandidate = 0;
 
-            if (groupOfCandidate.Equals("BM Nhạc") || groupOfCandidate.Equals("BM Soft Skill") || groupOfCandidate.Equals("BM Maths") || groupOfCandidate.Equals("BM Giáo dục thể chất"))
+            if (groupOfCandidate.Equals("Bộ môn Âm nhạc Truyền thống") || groupOfCandidate.Equals("Bộ môn Tiếng Anh dự bị") || groupOfCandidate.Equals("Bộ môn Kỹ năng mềm") || groupOfCandidate.Equals("Bộ môn Toán") || groupOfCandidate.Equals("Bộ môn Giáo dục thể chất"))
                 groupCategoryOfCandidate = 1;
 
             var listVoteOfUser = await dbContext.Votings.Where(p => p.UserId == userId && p.StageId == stageid && p.Status == true).ToListAsync();
@@ -423,20 +423,20 @@ namespace Capstone_VotingSystem.Services.VoteService
             {
                 var checkCandidateOfVote = await dbContext.Candidates.Where(p => p.CandidateId == vote.CandidateId && p.CampaignId == campaignId && p.Status == true).SingleOrDefaultAsync();
                 var checkGroupCandidateOfVote = await dbContext.Groups.Where(p => p.GroupId == checkCandidateOfVote.GroupId && p.CampaignId == campaignId && p.IsVoter == false).SingleOrDefaultAsync();
-                if (checkGroupCandidateOfVote.Name.Equals("BM Nhạc") || checkGroupCandidateOfVote.Name.Equals("BM Soft Skill") || checkGroupCandidateOfVote.Name.Equals("BM Maths") || checkGroupCandidateOfVote.Name.Equals("BM Giáo dục thể chất"))
+                if (checkGroupCandidateOfVote.Name.Equals("Bộ môn Âm nhạc Truyền thống") || checkGroupCandidateOfVote.Name.Equals("Bộ môn Tiếng Anh dự bị") || checkGroupCandidateOfVote.Name.Equals("Bộ môn Kỹ năng mềm") || checkGroupCandidateOfVote.Name.Equals("Bộ môn Toán") || checkGroupCandidateOfVote.Name.Equals("Bộ môn Giáo dục thể chất"))
                     countdb = countdb + 1;
                 else
                     countcn = countcn + 1;
 
             }
 
-            if (groupOfUser.Equals("Chuyên ngành 0") && groupCategoryOfCandidate == 1)
+            if (groupOfUser.Equals("Kỳ dự bị") && groupCategoryOfCandidate == 1)
                 return "success";
-            if (groupOfUser.Equals("Chuyên ngành (1 - 6)") && groupCategoryOfCandidate == 1 && countdb == 0)
+            if (groupOfUser.Equals("Kỳ chuyên ngành(HK1-HK6)") && groupCategoryOfCandidate == 1 && countdb == 0)
                 return "success";
-            if (groupOfUser.Equals("Chuyên ngành (1 - 6)") && groupCategoryOfCandidate == 0 && countcn <= 1)
+            if (groupOfUser.Equals("Kỳ chuyên ngành(HK1-HK6)") && groupCategoryOfCandidate == 0 && countcn <= 1)
                 return "success";
-            if (groupOfUser.Equals("Chuyên ngành (7 - 9)") && groupCategoryOfCandidate == 0 && countcn <= 2)
+            if (groupOfUser.Equals("Kỳ chuyên ngành(HK7-HK9)") && groupCategoryOfCandidate == 0 && countcn <= 2)
                 return "success";
 
             return "false";

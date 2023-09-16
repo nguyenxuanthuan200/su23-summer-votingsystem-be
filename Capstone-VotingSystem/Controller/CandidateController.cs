@@ -61,25 +61,25 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [HttpPost("accounts")]
-        [SwaggerOperation(summary: "Create list account Candidate to Campagin")]
-        public async Task<IActionResult> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request)
-        {
-            try
-            {
-                var response = await candidateService.CreateAccountCandidateCampaign(request);
-                if (response.Success == false)
-                {
-                    return BadRequest(response);
-                }
-                return Ok(response);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database.");
-            }
-        }
+        //[HttpPost("accounts")]
+        //[SwaggerOperation(summary: "Create list account Candidate to Campagin")]
+        //public async Task<IActionResult> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request)
+        //{
+        //    try
+        //    {
+        //        var response = await candidateService.CreateAccountCandidateCampaign(request);
+        //        if (response.Success == false)
+        //        {
+        //            return BadRequest(response);
+        //        }
+        //        return Ok(response);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError,
+        //            "Error retrieving data from the database.");
+        //    }
+        //}
         //[Authorize(Roles = "User")]
         [HttpPost("list-candidate/")]
         [SwaggerOperation(summary: "Create list Candidate to Campagin")]

@@ -23,6 +23,17 @@ namespace Capstone_VotingSystem.Services.GroupService
             APIResponse<string> response = new();
 
             var checkGroup = await dbContext.GroupUsers.Where(x => x.UserId == userName && x.CampaignId == campaignId).ToListAsync();
+
+            foreach (var item in checkGroup)
+            {
+                var group = await dbContext.Groups.Where(p => p.GroupId == item.GroupId && p.IsVoter == true && p.IsStudentMajor == false).SingleOrDefaultAsync();
+                if (group == null)
+                {
+                    response.ToFailedResponse("Chưa chọn nhóm cho chiến dịch này", StatusCodes.Status400BadRequest);
+                    return response;
+                }
+            }
+
             if (checkGroup.Count == 0)
             {
                 response.ToFailedResponse("Chưa chọn nhóm cho chiến dịch này", StatusCodes.Status400BadRequest);

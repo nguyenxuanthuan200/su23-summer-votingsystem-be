@@ -45,8 +45,31 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 response.ToFailedResponse("Chiến dịch đã được xác nhận", StatusCodes.Status400BadRequest);
                 return response;
             }
-
-            await dbContext.SaveChangesAsync();
+            //check campaign du dieu kien chua
+            var checkCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CampaignId == id).ToListAsync();
+            if (checkCandidate.Count <= 1)
+            {
+                response.ToFailedResponse("Số lượng ứng viên của chiến dịch không thể ít hơn 2", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var checkStage = await dbContext.Stages.Where(p => p.Status == true && p.CampaignId == id).ToListAsync();
+            if (checkStage.Count <= 0)
+            {
+                response.ToFailedResponse("Số giai đoạn của chiến dịch không thể ít hơn 1", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var checkGroupCandidate = await dbContext.Groups.Where(p => p.CampaignId == id && p.IsVoter == false).ToListAsync();
+            if (checkGroupCandidate.Count <= 0)
+            {
+                response.ToFailedResponse("Nhóm của ứng cử viên không thể trống", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var checkGroupVoter = await dbContext.Groups.Where(p => p.CampaignId == id && p.IsVoter == true && p.IsStudentMajor == false).ToListAsync();
+            if (checkGroupVoter.Count <= 0)
+            {
+                response.ToFailedResponse("Nhóm của người bình chọn không thể trống", StatusCodes.Status400BadRequest);
+                return response;
+            }
             //gui thong bao cho toan bo nguoi dung trong he thong khi co chien dich moi
             if (cam.Visibility == "public")
             {
@@ -206,6 +229,25 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 response.ToFailedResponse("Bạn không đủ quyền để xóa chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
             }
+            if (checkrole.Name == "admin")
+            {
+                TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
+                Guid idNoti = Guid.NewGuid();
+                Notification noti = new Notification()
+                {
+                    NotificationId = idNoti,
+                    Title = "Thông báo chiến dịch",
+                    Message = "Chiến dịch - " + cam.Title + "của bạn vừa bị xóa bởi admin vì vi phạm điều lệ, vui lòng liên hệ để biết thêm thông tin chi tiết.",
+                    CreateDate = currentDateTimeVn,
+                    IsRead = false,
+                    Status = true,
+                    Username = cam.UserId,
+                    CampaignId = cam.CampaignId,
+                };
+                await dbContext.Notifications.AddAsync(noti);
+            }
+
             cam.Status = false;
             dbContext.Campaigns.Update(cam);
             await dbContext.SaveChangesAsync();

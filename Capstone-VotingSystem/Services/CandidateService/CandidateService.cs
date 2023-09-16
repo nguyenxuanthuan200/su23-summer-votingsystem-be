@@ -173,7 +173,8 @@ namespace Capstone_VotingSystem.Services.CandidateService
                             can.CandidateId = id;
                             can.UserId = i.UserId;
                             can.Status = true;
-                            can.Description = i.Description;
+                            can.FullName = checkuser.FullName;
+                            can.Description = "";
                             can.CampaignId = request.CampaignId;
                             can.GroupId = i.GroupId;
 
@@ -235,7 +236,9 @@ namespace Capstone_VotingSystem.Services.CandidateService
                         candidate.Description = item.Description;
                         candidate.UserId = item.UserId;
                         candidate.GroupId = checkGroup != null ? checkGroup.GroupId : null;
+                        candidate.GroupName = checkGroup != null ? checkGroup.Name : null;
                         candidate.FullName = item.FullName;
+                        candidate.Status = item.Status;
                         candidate.Phone = checkuser != null ? checkuser.Phone : null;
                         candidate.Gender = checkuser != null ? checkuser.Gender : null;
                         candidate.Dob = checkuser != null ? checkuser.Dob : null;
@@ -492,7 +495,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                     #endregion
                     candidatee.ListActivity = listActivity;
                 }
-              
+
             }
             else if (checkcam == null)
             {
@@ -648,19 +651,19 @@ namespace Capstone_VotingSystem.Services.CandidateService
 
                 foreach (var item in groupNames)
                 {
-                    if (item.Equals("Chuyên ngành (1 - 6)"))
+                    if (item.Equals("Kỳ chuyên ngành(HK1-HK6)"))
                     {
                         VoteBM = 1;
                         VoteAM = 2;
                         result.GroupNameOfVoter = item;
                     }
-                    else if (item.Equals("Chuyên ngành (7 - 9)"))
+                    else if (item.Equals("Kỳ chuyên ngành(HK7-HK9)"))
                     {
                         VoteBM = 0;
                         VoteAM = 3;
                         result.GroupNameOfVoter = item;
                     }
-                    else if (item.Equals("Chuyên ngành 0"))
+                    else if (item.Equals("Kỳ dự bị"))
                     {
                         VoteBM = 3;
                         VoteAM = 0;
@@ -678,7 +681,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 .Join(dbContext.Groups, vc => vc.c.GroupId, g => g.GroupId, (vc, g) => g.Name);
                     foreach (var itemm in groupGroup)
                     {
-                        if (itemm.Equals("BM Nhạc") || itemm.Equals("BM Soft Skill") || itemm.Equals("BM Maths") || itemm.Equals("BM Giáo dục thể chất"))
+                        if (itemm.Equals("Bộ môn Âm nhạc Truyền thống") || itemm.Equals("Bộ môn Tiếng Anh dự bị") || itemm.Equals("Bộ môn Kỹ năng mềm") || itemm.Equals("Bộ môn Toán") || itemm.Equals("Bộ môn Giáo dục thể chất"))
                         {
                             VoteBM--;
                         }
@@ -693,7 +696,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
             }
             result.voteAM = VoteAM;
             result.voteBM = VoteBM;
-            
+
             result.voteRemaining = getStage.LimitVote - checkVote.Count();
 
 
