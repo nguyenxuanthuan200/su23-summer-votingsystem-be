@@ -19,11 +19,31 @@ namespace Capstone_VotingSystem.Controller
        // [Authorize(Roles = "Admin")]
         [HttpGet("campaign/{campaignId}/stage/{stageId}")]
         [SwaggerOperation(summary: "Scrip demo vote")]
-        public async Task<IActionResult> GetScore(Guid campaignId,Guid stageId)
+        public async Task<IActionResult> ScripVote(Guid campaignId,Guid stageId)
         {
             try
             {
                 var result = await scripDemoService.ScripVote(campaignId,stageId);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        // [Authorize(Roles = "Admin")]
+        [HttpGet("campaign/{campaignId}")]
+        [SwaggerOperation(summary: "Scrip end process of campaign")]
+        public async Task<IActionResult> ScripEndProcess(Guid campaignId)
+        {
+            try
+            {
+                var result = await scripDemoService.ScripEndCampaign(campaignId);
                 if (result.Success == false)
                 {
                     return BadRequest(result);

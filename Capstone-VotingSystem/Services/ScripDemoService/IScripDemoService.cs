@@ -6,5 +6,6 @@ namespace Capstone_VotingSystem.Services.ScripDemoService
     {
         Task<APIResponse<string>> ScripVote(Guid CampaignId,Guid StageId);
         Task<APIResponse<string>> ScripUnVote(Guid CampaignId, Guid StageId);
+        Task<APIResponse<string>> ScripEndCampaign(Guid CampaignId);
     }
 }

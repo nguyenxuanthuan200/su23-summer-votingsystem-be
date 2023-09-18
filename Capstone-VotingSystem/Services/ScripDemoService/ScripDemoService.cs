@@ -15,6 +15,53 @@ namespace Capstone_VotingSystem.Services.ScripDemoService
             _mapper = mapper;
         }
 
+        public async Task<APIResponse<string>> ScripEndCampaign(Guid CampaignId)
+        {
+            APIResponse<string> response = new();
+            var campaign = await dbContext.Campaigns.Where(p => p.CampaignId == CampaignId && p.Status == true).SingleOrDefaultAsync();
+
+            var listStage = await dbContext.Stages.Where(p => p.CampaignId == campaign.CampaignId && p.Status == true).ToListAsync();
+            if (listStage.Count > 0)
+            {
+                foreach (var stage in listStage)
+                {
+                    if (stage.Process == "Chưa bắt đầu")
+                    {
+                            stage.Process = "Đã kết thúc";
+                        dbContext.Stages.Update(stage);
+
+                    }
+                    else if (stage.Process == "Đang diễn ra")
+                    {
+                            stage.Process = "Đã kết thúc";
+                            dbContext.Stages.Update(stage);
+                    }
+                }
+                if (campaign.Process == "Chưa bắt đầu")
+                {
+                        campaign.Process = "Đã kết thúc";
+                        dbContext.Campaigns.Update(campaign);
+              
+                }
+                else if (campaign.Process == "Đang diễn ra")
+                {
+                
+                        campaign.Process = "Đã kết thúc";
+                        dbContext.Campaigns.Update(campaign);
+              
+                }
+            }
+            else
+            {
+                response.ToFailedResponse("Chạy scrip kết thúc chiến dịch không thành công vì chiến dịch không có giai đoạn nào", StatusCodes.Status400BadRequest);
+                return response;
+
+            }
+            await dbContext.SaveChangesAsync();
+            response.ToSuccessResponse("Chạy scrip kết thúc chiến dịch thành công", StatusCodes.Status200OK);
+            return response;
+        }
+
         public Task<APIResponse<string>> ScripUnVote(Guid CampaignId, Guid StageId)
         {
             throw new NotImplementedException();
