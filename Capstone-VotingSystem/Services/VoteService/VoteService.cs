@@ -59,6 +59,11 @@ namespace Capstone_VotingSystem.Services.VoteService
                 {
                     GroupUser = group;
                 }
+                if (group == null)
+                {
+                    response.ToFailedResponse("Bạn chưa chọn nhóm của mình khi tham gia chiến dịch này", StatusCodes.Status400BadRequest);
+                    return response;
+                }
             }
             TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
@@ -228,13 +233,13 @@ namespace Capstone_VotingSystem.Services.VoteService
         public async Task<APIResponse<string>> CreateVoteLike(CreateVoteLikeRequest request)
         {
             APIResponse<string> response = new();
-            var checkUser = await dbContext.Users.Where(p => p.UserId == request.UserId).SingleOrDefaultAsync();
+            var checkUser = await dbContext.Users.Where(p => p.UserId == request.UserId && p.Status == true).SingleOrDefaultAsync();
             if (checkUser == null)
             {
                 response.ToFailedResponse("Không tìm thấy người dùng", StatusCodes.Status404NotFound);
                 return response;
             }
-            var checkStateId = await dbContext.Stages.SingleOrDefaultAsync(p => p.StageId == request.StageId);
+            var checkStateId = await dbContext.Stages.SingleOrDefaultAsync(p => p.StageId == request.StageId && p.Status == true);
             if (checkStateId == null)
             {
                 response.ToFailedResponse("Không tìm thấy giai đoạn", StatusCodes.Status404NotFound);
@@ -266,6 +271,11 @@ namespace Capstone_VotingSystem.Services.VoteService
                 if (group != null)
                 {
                     GroupUser = group;
+                }
+                if (group == null)
+                {
+                    response.ToFailedResponse("Bạn chưa chọn nhóm của mình khi tham gia chiến dịch này", StatusCodes.Status400BadRequest);
+                    return response;
                 }
             }
             //getTimeNow()
@@ -639,10 +649,10 @@ namespace Capstone_VotingSystem.Services.VoteService
                     ListGroupMajor.Add(GroupMajor);
 
                 }
-                
+
                 foreach (var item in GetListStage)
                 {
-                    
+
                     var CountTotalVoteInCampaign = await dbContext.Votings.Where(p => p.StageId == item.StageId && p.Status == true).ToListAsync();
                     CountTotalVoteInCampaign = CountTotalVoteInCampaign.DistinctBy(x => x.UserId).ToList();
                     TotalVoteInCampaign += CountTotalVoteInCampaign.Count();
@@ -676,7 +686,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                                 }
                             }
                         }
-                        totalVoteInStage+= CountVoteByStage.Count();
+                        totalVoteInStage += CountVoteByStage.Count();
 
 
 
@@ -692,7 +702,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                     SaInStage.VoteOfGroupMajor = ListGroupMajor;
                     listSaInStage.Add(SaInStage);
                     TotalVoteInCampaignByFilter += SaInStage.TotalVoteInStage;
-                   
+
                 }
             }
             SaInCam = new();
