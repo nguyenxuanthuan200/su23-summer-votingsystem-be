@@ -77,7 +77,7 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                     new Claim("Username", account.UserName),
                     new Claim("RoleId", roleName.RoleId.ToString()),
                     new Claim("RoleName", roleName.Name),
-                     new Claim("Avatar", user.AvatarUrl),
+                    new Claim("Avatar", user.AvatarUrl),
                     new Claim("Permission", user.Permission.ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                     };
