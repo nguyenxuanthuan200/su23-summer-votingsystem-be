@@ -27,6 +27,13 @@ namespace Capstone_VotingSystem.Services.FormService
                 response.ToFailedResponse("Biểu mẫu đã bị xóa hoặc đã được duyệt", StatusCodes.Status400BadRequest);
                 return response;
             }
+            //check condition form 
+            var checkQuestion = await dbContext.Questions.Where(p => p.Status == true && p.FormId == id).ToListAsync();
+            if (checkQuestion.Count <= 0)
+            {
+                response.ToFailedResponse("Biểu mẫu phải có ít nhất 1 câu hỏi", StatusCodes.Status400BadRequest);
+                return response;
+            }
             form.IsApprove = true;
             dbContext.Forms.Update(form);
             await dbContext.SaveChangesAsync();
@@ -51,7 +58,7 @@ namespace Capstone_VotingSystem.Services.FormService
             }
             if (!request.Visibility.Equals("public") && !request.Visibility.Equals("private"))
             {
-                response.ToFailedResponse("Visibility không đúng định dạng!! (public or private)", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Hiển thị không đúng định dạng!! (công khai hoặc riêng tư)", StatusCodes.Status400BadRequest);
                 return response;
             }
             var id = Guid.NewGuid();
@@ -77,22 +84,22 @@ namespace Capstone_VotingSystem.Services.FormService
         public async Task<APIResponse<string>> DeleteForm(Guid formId, DeleteFormRequest request)
         {
             APIResponse<String> response = new();
-            var user = await dbContext.Users.SingleOrDefaultAsync(c => c.UserId == request.UserId && c.Status == true);
+            var user = await dbContext.Accounts.SingleOrDefaultAsync(c => c.UserName == request.UserId && c.Status == true);
             if (user == null)
             {
-                response.ToFailedResponse("User không tồn tại hoặc đã bị xóa ", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Người dùng không tồn tại hoặc đã bị xóa ", StatusCodes.Status400BadRequest);
                 return response;
             }
             var checkform = await dbContext.Forms.SingleOrDefaultAsync(c => c.FormId == formId && c.Status == true);
             if (checkform == null)
             {
-                response.ToFailedResponse("Form không tồn tại hoặc bị xóa", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Biểu mẫu không tồn tại hoặc bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-
-            if (!checkform.UserId.Equals(request.UserId))
+            var checkrole = await dbContext.Roles.Where(p => p.RoleId == user.RoleId).SingleOrDefaultAsync();
+            if (checkform.UserId != request.UserId && checkrole.Name != "admin")
             {
-                response.ToFailedResponse("Người dùng không đủ quyền hạn để thực hiện ", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Bạn không đủ quyền để xóa chiến dịch này", StatusCodes.Status400BadRequest);
                 return response;
             }
             if (checkform.IsApprove == true)
@@ -100,6 +107,25 @@ namespace Capstone_VotingSystem.Services.FormService
                 response.ToFailedResponse("Không thể thực hiện khi biểu mẫu đã được duyệt", StatusCodes.Status400BadRequest);
                 return response;
             }
+            if (checkrole.Name == "admin")
+            {
+                TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
+                Guid idNoti = Guid.NewGuid();
+                Notification noti = new Notification()
+                {
+                    NotificationId = idNoti,
+                    Title = "Thông báo biểu mẫu",
+                    Message = "Biểu mẫu - " + checkform.Name + "của bạn vừa bị xóa bởi admin vì vi phạm điều lệ, vui lòng liên hệ để biết thêm thông tin chi tiết.",
+                    CreateDate = currentDateTimeVn,
+                    IsRead = false,
+                    Status = true,
+                    Username = checkform.UserId,
+                    CampaignId = null,
+                };
+                await dbContext.Notifications.AddAsync(noti);
+            }
+
             checkform.Status = false;
             dbContext.Forms.Update(checkform);
             await dbContext.SaveChangesAsync();

@@ -1,21 +1,32 @@
 ﻿using AutoMapper;
 using Capstone_VotingSystem.Core.CoreModel;
 using Capstone_VotingSystem.Entities;
+using Capstone_VotingSystem.Helpers;
 using Capstone_VotingSystem.Models.RequestModels.CandidateRequest;
 using Capstone_VotingSystem.Models.ResponseModels.ActivityResponse;
 using Capstone_VotingSystem.Models.ResponseModels.CandidateResponse;
-using Capstone_VotingSystem.Services.ActivityService;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Capstone_VotingSystem.Services.CandidateService
 {
     public class CandidateService : ICandidateService
     {
+        private readonly Cloudinary _cloudinary;
         private readonly VotingSystemContext dbContext;
         private readonly IMapper _mapper;
 
-        public CandidateService(VotingSystemContext dbContext, IMapper mapper)
+        public CandidateService(VotingSystemContext dbContext, IMapper mapper, IOptions<CloudinarySettings> config)
         {
+            var acc = new CloudinaryDotNet.Account(
+           config.Value.CloundName,
+           config.Value.ApiKey,
+           config.Value.ApiSecret
+           );
+
+            _cloudinary = new Cloudinary(acc);
             this.dbContext = dbContext;
             this._mapper = mapper;
         }
@@ -61,7 +72,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 var role = await dbContext.Roles.Where(p => p.Name.Equals("user")).SingleOrDefaultAsync();
                 TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
                 DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
-                Account acc = new Account();
+                Entities.Account acc = new Entities.Account();
                 {
                     acc.UserName = i.UserName;
                     acc.Password = i.Password;
@@ -115,20 +126,20 @@ namespace Capstone_VotingSystem.Services.CandidateService
                     var checkuser = await dbContext.Users.Where(p => p.UserId == i.UserId && p.Status == true).SingleOrDefaultAsync();
                     if (checkuser == null)
                     {
-                        response.ToFailedResponse("UserName " + i.UserId + "không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
+                        response.ToFailedResponse("Người dùng " + i.UserId + "không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
                         return response;
                     }
 
                     var check3 = await dbContext.Candidates.Where(p => p.CampaignId == request.CampaignId && p.UserId == i.UserId && p.Status == true).SingleOrDefaultAsync();
                     if (check3 != null)
                     {
-                        response.ToFailedResponse("Candidate " + check3.UserId + " đã được thêm vào trước đó rồi!!!!", StatusCodes.Status400BadRequest);
+                        response.ToFailedResponse("Ứng cử viên " + check3.UserId + " đã được thêm vào trước đó rồi!!!!", StatusCodes.Status400BadRequest);
                         return response;
                     }
-                    var checkGroup = await dbContext.Groups.Where(p => p.GroupId == i.GroupId && p.IsVoter == false).SingleOrDefaultAsync();
+                    var checkGroup = await dbContext.Groups.Where(p => p.Name == i.GroupName && p.CampaignId == checkCam.CampaignId && p.IsVoter == false).SingleOrDefaultAsync();
                     if (checkGroup == null)
                     {
-                        response.ToFailedResponse("Group ứng cử viên" + i.UserId + " không tồn tại", StatusCodes.Status400BadRequest);
+                        response.ToFailedResponse("Nhóm ứng cử viên" + i.UserId + " không tồn tại", StatusCodes.Status400BadRequest);
                         return response;
                     }
                     TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
@@ -162,9 +173,10 @@ namespace Capstone_VotingSystem.Services.CandidateService
                             can.CandidateId = id;
                             can.UserId = i.UserId;
                             can.Status = true;
-                            can.Description = i.Description;
+                            can.FullName = checkuser.FullName;
+                            can.Description = "";
                             can.CampaignId = request.CampaignId;
-                            can.GroupId = i.GroupId;
+                            can.GroupId = checkGroup.GroupId;
 
                         }
                         await dbContext.Candidates.AddAsync(can);
@@ -224,19 +236,21 @@ namespace Capstone_VotingSystem.Services.CandidateService
                         candidate.Description = item.Description;
                         candidate.UserId = item.UserId;
                         candidate.GroupId = checkGroup != null ? checkGroup.GroupId : null;
+                        candidate.GroupName = checkGroup != null ? checkGroup.Name : null;
                         candidate.FullName = item.FullName;
+                        candidate.Status = item.Status;
                         candidate.Phone = checkuser != null ? checkuser.Phone : null;
                         candidate.Gender = checkuser != null ? checkuser.Gender : null;
                         candidate.Dob = checkuser != null ? checkuser.Dob : null;
                         candidate.Email = checkuser != null ? checkuser.Email : null;
-                        candidate.AvatarUrl = item.AvatarUrl; 
+                        candidate.AvatarUrl = item.AvatarUrl;
                     }
                     result.Add(candidate);
                 }
             }
             if (result == null)
             {
-                response.ToFailedResponse("Không có Candidate nào trong Campaign", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Không có ứng cử viên nào trong chiến dịch", StatusCodes.Status400BadRequest);
                 return response;
             }
             response.ToSuccessResponse(response.Data = result, "Lấy danh sách thành công", StatusCodes.Status200OK);
@@ -290,7 +304,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
             var deleteCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CandidateId == candidateId && p.CampaignId == request.campaignId).SingleOrDefaultAsync();
             if (deleteCandidate == null)
             {
-                response.ToFailedResponse("Không có Candidate nào phù hợp trong Campaign hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Không có ứng cử viên nào phù hợp trong Campaign hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
             deleteCandidate.Status = false;
@@ -300,7 +314,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
             return response;
         }
 
-        public async Task<APIResponse<GetCandidateDetailResponse>> GetCandidateById(Guid candidateId, Guid stageId)
+        public async Task<APIResponse<GetCandidateDetailResponse>> GetCandidateByStageId(Guid candidateId, Guid stageId)
         {
             APIResponse<GetCandidateDetailResponse> response = new();
             var checkcandi = await dbContext.Candidates.Where(p => p.CandidateId == candidateId && p.Status == true).SingleOrDefaultAsync();
@@ -310,29 +324,39 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 return response;
             }
             var checkuser = await dbContext.Users.Where(p => p.UserId == checkcandi.UserId && p.Status == true).SingleOrDefaultAsync();
-            if (checkuser == null)
-            {
-                response.ToFailedResponse("Candidate không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
-                return response;
-            }
-            var checkCampaign = await dbContext.Stages.Where(p => p.StageId == stageId && p.Status == true).SingleOrDefaultAsync();
-            if (checkCampaign == null)
+
+            var checkStage = await dbContext.Stages.Where(p => p.StageId == stageId && p.Status == true).SingleOrDefaultAsync();
+            if (checkStage == null)
             {
                 response.ToFailedResponse("Giai đoạn không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
                 return response;
             }
+            var checkForm = await dbContext.Forms.Where(p => p.FormId == checkStage.FormId && p.Status == true).SingleOrDefaultAsync();
+
             var scoreStage = await dbContext.Scores.Where(p => p.StageId == stageId && p.CandidateId == candidateId).SingleOrDefaultAsync();
             var score = 0;
             if (scoreStage != null)
             {
                 score = (int)scoreStage.Point;
             }
-            var map = _mapper.Map<GetCandidateDetailResponse>(checkuser);
+            var map = new GetCandidateDetailResponse();
+            if (checkuser != null)
+            {
+                map = _mapper.Map<GetCandidateDetailResponse>(checkuser);
+            }
+
             map.CandidateId = checkcandi.CandidateId;
             map.Description = checkcandi.Description;
             map.StageId = stageId;
-            map.CampaignId = checkCampaign.CampaignId;
+            map.CampaignId = checkStage.CampaignId;
             map.Score = score;
+            map.FullName = checkcandi.FullName;
+            map.AvatarUrl = checkcandi.AvatarUrl;
+            if (checkForm != null)
+            {
+                map.FormId = checkForm.FormId;
+            }
+
             //Get Activity
             #region
             var listActivity = new List<GetActivityByCandidateResponse>();
@@ -341,53 +365,49 @@ namespace Capstone_VotingSystem.Services.CandidateService
             var listContent = new List<GetActivityContentResponse>();
             var content = new GetActivityContentResponse();
 
-            var checkCandidate = await dbContext.Candidates.Where(p => p.CandidateId == candidateId && p.Status == true).SingleOrDefaultAsync();
-            if (checkCandidate == null)
+            var checkAccount = await dbContext.Users.Where(p => p.UserId == checkcandi.UserId).SingleOrDefaultAsync();
+            if (checkAccount != null)
             {
-                response.ToFailedResponse("Ứng cử viên không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
-                return response;
-            }
-            var checkAccount = await dbContext.Users.Where(p => p.UserId == checkCandidate.UserId).SingleOrDefaultAsync();
-            if (checkAccount == null || checkAccount.Status == false)
-            {
-                response.ToFailedResponse("Ứng cử viên không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
-                return response;
+                if (checkAccount.Status == false)
+                {
+                    response.ToFailedResponse("Ứng cử viên không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                    return response;
+                }
             }
 
             var getActivityContent = await dbContext.ActivityContents.Where(p => p.CandidateId == candidateId)
                 .ToListAsync();
-            if (getActivityContent == null || getActivityContent.Count <= 0)
+            if (getActivityContent != null || getActivityContent.Count > 0)
             {
-                response.ToFailedResponse(" Không có hoạt động nào tồn tại hoặc đã bị xóa", StatusCodes.Status404NotFound);
-                return response;
-            }
-
-            var getActivity = await dbContext.Activities.ToListAsync();
-            foreach (var i in getActivity)
-            {
-                activity = new();
-                listContent = new();
-                foreach (var item in getActivityContent)
+                var getActivity = await dbContext.Activities.ToListAsync();
+                foreach (var i in getActivity)
                 {
-
-                    if (i.ActivityId == item.ActivityId)
+                    activity = new();
+                    listContent = new();
+                    foreach (var item in getActivityContent)
                     {
-                        content = new();
-                        content.ActivityContentId = item.ActivityContentId;
-                        content.Content = item.Content;
 
-                        listContent.Add(content);
+                        if (i.ActivityId == item.ActivityId)
+                        {
+                            content = new();
+                            content.ActivityContentId = item.ActivityContentId;
+                            content.Content = item.Content;
+
+                            listContent.Add(content);
+                        }
                     }
-                }
-                if (listContent.Count > 0)
-                {
-                    activity.ListContent = listContent;
-                    activity.Title = i.Title;
-                    activity.ActivityId = i.ActivityId;
-                    listActivity.Add(activity);
-                }
+                    if (listContent.Count > 0)
+                    {
+                        activity.ListContent = listContent;
+                        activity.Title = i.Title;
+                        activity.ActivityId = i.ActivityId;
+                        listActivity.Add(activity);
+                    }
 
+                }
             }
+
+
             #endregion
             map.ListActivity = listActivity;
             response.ToSuccessResponse("Xem chi tiết ứng cử viên thành công!!", StatusCodes.Status200OK);
@@ -395,33 +415,109 @@ namespace Capstone_VotingSystem.Services.CandidateService
             return response;
         }
 
-        //public async Task<UpdateCandidateProfileResponse> UpdateCandidateProfile(Guid id, UpdateCandidateProfileRequesst request)
-        //{
-        //    //var updateProfile = await dbContext.CandidateProfiles.Where(p => p.CandidateProfileId.Equals(id)).SingleOrDefaultAsync();
-        //    //if (updateProfile == null)
-        //    //{
-        //    //    return null;
-        //    //}
-        //    //updateProfile.NickName = request.NickName;
-        //    //updateProfile.Dob = request.Dob;
-        //    //updateProfile.Image = request.Image;
+        public async Task<APIResponse<GetCandidateByIdResponse>> UpdateCandidateProfile(Guid id, UpdateCandidateProfileRequest request)
+        {
+            APIResponse<GetCandidateByIdResponse> response = new();
+            var candidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CandidateId == id);
+            if (candidate == null)
+            {
+                response.ToFailedResponse("Ứng cử viên không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var uploadResult = new ImageUploadResult();
+            if (request.ImageFile != null && request.ImageFile.Length > 0)
+            {
+                var uploadParams = new ImageUploadParams()
+                {
+                    //PublicId = "existing_public_id",
+                    //Overwrite = true,
+                    File = new FileDescription(request.ImageFile.FileName, request.ImageFile.OpenReadStream()),
+                    Transformation = new Transformation().Crop("fill").Gravity("face"),
+                };
 
-        //    //var user = await dbContext.Users.Where(p => p.UserName.Equals(updateProfile.UserName)).SingleOrDefaultAsync();
-        //    //user.Name = request.Name;
-        //    //user.Gender = request.Gender;
-        //    //user.Address = request.Address;
-        //    //dbContext.CandidateProfiles.Update(updateProfile);
-        //    //dbContext.Users.Add(user);
-        //    //await dbContext.SaveChangesAsync();
+                uploadResult = await _cloudinary.UploadAsync(uploadParams);
 
-        //    //var map = _mapper.Map<UpdateCandidateProfileResponse>(updateProfile);
-        //    //map.Name = user.Name;
-        //    //map.Gender = user.Gender;
-        //    //map.Address = user.Address;
+            }
+            var checkGroup = await dbContext.Groups.Where(p => p.GroupId == request.GroupId && p.IsVoter == false && p.CampaignId == candidate.CampaignId).SingleOrDefaultAsync();
+            if (checkGroup == null)
+            {
+                response.ToFailedResponse("Nhóm của ứng cử viên không tồn tại trong chiến dịch. Vui lòng kiểm tra lại!!", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            candidate.FullName = request.FullName;
+            candidate.Description = request.Description;
+            candidate.GroupId = request.GroupId;
+            candidate.AvatarUrl = uploadResult.SecureUrl?.AbsoluteUri ?? candidate.AvatarUrl;
+            dbContext.Candidates.Update(candidate);
+            await dbContext.SaveChangesAsync();
 
-        //    //return map;
-        //    return null;
-        //}
+            var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == candidate.UserId);
+            var group = await dbContext.Groups.SingleOrDefaultAsync(p => p.GroupId == candidate.GroupId);
+            var checkcam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.CampaignId == candidate.CampaignId);
+            if (checkcam != null)
+            {
+                var candidatee = new GetListCandidateByUserIdResponse();
+                {
+                    candidatee.CampaignId = checkcam.CampaignId;
+                    candidatee.CampaignName = checkcam.Title;
+                    candidatee.CandidateId = candidate.CandidateId;
+                    candidatee.Description = candidate.Description;
+                    candidatee.GroupName = group != null ? group.Name : null;
+                    candidatee.FullName = candidate.FullName;
+                    candidatee.Phone = checkuser != null ? checkuser.Phone : null;
+                    candidatee.Gender = checkuser != null ? checkuser.Gender : null;
+                    candidatee.Dob = checkuser != null ? checkuser.Dob : null;
+                    candidatee.Email = checkuser != null ? checkuser.Email : null;
+                    candidatee.AvatarUrl = candidate.AvatarUrl;
+                    //Get Activity
+                    #region
+                    var listActivity = new List<GetActivityByCandidateResponse>();
+                    var activity = new GetActivityByCandidateResponse();
+
+                    var listContent = new List<GetActivityContentResponse>();
+                    var content = new GetActivityContentResponse();
+
+                    var getActivityContent = await dbContext.ActivityContents.Where(p => p.CandidateId == candidate.CandidateId)
+                        .ToListAsync();
+                    var getActivity = await dbContext.Activities.ToListAsync();
+                    foreach (var i in getActivity)
+                    {
+                        activity = new();
+                        listContent = new();
+                        foreach (var itemContent in getActivityContent)
+                        {
+
+                            if (i.ActivityId == itemContent.ActivityId)
+                            {
+                                content = new();
+                                content.ActivityContentId = itemContent.ActivityContentId;
+                                content.Content = itemContent.Content;
+
+                                listContent.Add(content);
+                            }
+                        }
+                        if (listContent.Count > 0)
+                        {
+                            activity.ListContent = listContent;
+                            activity.Title = i.Title;
+                            activity.ActivityId = i.ActivityId;
+                            listActivity.Add(activity);
+                        }
+
+                    }
+                    #endregion
+                    candidatee.ListActivity = listActivity;
+                }
+
+            }
+            else if (checkcam == null)
+            {
+                response.ToFailedResponse("Chiến dịch của ứng cử viên tham gia không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            response.ToSuccessResponse(response.Data, "Cập nhật thành công", StatusCodes.Status200OK);
+            return response;
+        }
 
         public async Task<APIResponse<GetListCandidateStageResponse>> GetListCandidatStage(Guid stageId, string userId)
         {
@@ -568,20 +664,23 @@ namespace Capstone_VotingSystem.Services.CandidateService
 
                 foreach (var item in groupNames)
                 {
-                    if (item.Equals("Chuyên ngành (1 - 6)"))
+                    if (item.Equals("8307dd09-2299-49b4-85ad-5aba6e5c474a"))
                     {
                         VoteBM = 1;
                         VoteAM = 2;
+                        result.GroupNameOfVoter = item;
                     }
-                    else if (item.Equals("Chuyên ngành (7 - 9)"))
+                    else if (item.Equals("04fa2169-155c-4b42-8a9a-48aa3336d461"))
                     {
                         VoteBM = 0;
                         VoteAM = 3;
+                        result.GroupNameOfVoter = item;
                     }
-                    else if (item.Equals("Chuyên ngành 0"))
+                    else if (item.Equals("647be514-4a6a-4298-991d-912af5d16921"))
                     {
                         VoteBM = 3;
                         VoteAM = 0;
+                        result.GroupNameOfVoter = item;
                     }
 
                 }
@@ -595,7 +694,9 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 .Join(dbContext.Groups, vc => vc.c.GroupId, g => g.GroupId, (vc, g) => g.Name);
                     foreach (var itemm in groupGroup)
                     {
-                        if (itemm.Equals("BM Nhạc") || itemm.Equals("BM Soft Skill") || itemm.Equals("BM Maths") || itemm.Equals("BM Giáo dục thể chất"))
+                        if (item.Equals("566fa89f-5730-45cc-b97d-2842ba1199e7") || item.Equals("6101f9ff-55e1-4785-914f-216dadfbfae5")
+                || item.Equals("98d60b6d-5c5e-4cdb-b289-be92ffc77206") || item.Equals("c5a820f6-1093-4355-80be-d814ae0dfad0")
+                || item.Equals("d8111aba-574e-4c2f-837a-e9a1cbfd36d2"))
                         {
                             VoteBM--;
                         }
@@ -610,6 +711,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
             }
             result.voteAM = VoteAM;
             result.voteBM = VoteBM;
+
             result.voteRemaining = getStage.LimitVote - checkVote.Count();
 
 
@@ -644,7 +746,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
             }
             foreach (var i in request.listCandidate)
             {
-                var checkGroup = await dbContext.Groups.Where(p => p.Name.ToUpper().Equals(i.GroupName.ToUpper()) && p.IsVoter == false).SingleOrDefaultAsync();
+                var checkGroup = await dbContext.Groups.Where(p => p.Name.ToUpper().Equals(i.GroupName.ToUpper()) && p.IsVoter == false && p.CampaignId == request.CampaignId).SingleOrDefaultAsync();
                 if (checkGroup == null)
                 {
                     response.ToFailedResponse("Nhóm của ứng cử viên " + i.FullName + " không tồn tại trong chiến dịch. Vui lòng kiểm tra lại!!", StatusCodes.Status400BadRequest);
@@ -654,7 +756,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 Candidate candida = new Candidate();
                 {
                     candida.CandidateId = id;
-                    //  candida.UserId = us.UserId;
+                    candida.Description = i.Description;
                     candida.FullName = i.FullName;
                     candida.Status = true;
                     candida.CampaignId = request.CampaignId;
@@ -664,6 +766,98 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 await dbContext.SaveChangesAsync();
             }
             response.ToSuccessResponse("Thêm ứng cử viên thành công", StatusCodes.Status200OK);
+            return response;
+        }
+
+        public async Task<APIResponse<IEnumerable<GetListCandidateByUserIdResponse>>> GetListCandidateByUserId(string userId)
+        {
+            APIResponse<IEnumerable<GetListCandidateByUserIdResponse>> response = new();
+            List<GetListCandidateByUserIdResponse> result = new List<GetListCandidateByUserIdResponse>();
+            var listCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.UserId == userId).ToListAsync();
+            foreach (var item in listCandidate)
+            {
+
+                var checkuser = await dbContext.Users.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.UserId == item.UserId);
+                var group = await dbContext.Groups.SingleOrDefaultAsync(p => p.GroupId == item.GroupId);
+                var checkcam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.CampaignId == item.CampaignId);
+                if (checkcam != null)
+                {
+                    var candidate = new GetListCandidateByUserIdResponse();
+                    {
+                        candidate.CampaignId = checkcam.CampaignId;
+                        candidate.CampaignName = checkcam.Title;
+                        candidate.CandidateId = item.CandidateId;
+                        candidate.Description = item.Description;
+                        candidate.GroupName = group != null ? group.Name : null;
+                        candidate.FullName = item.FullName;
+                        candidate.Phone = checkuser != null ? checkuser.Phone : null;
+                        candidate.Gender = checkuser != null ? checkuser.Gender : null;
+                        candidate.Dob = checkuser != null ? checkuser.Dob : null;
+                        candidate.Email = checkuser != null ? checkuser.Email : null;
+                        candidate.AvatarUrl = item.AvatarUrl;
+                        //Get Activity
+                        #region
+                        var listActivity = new List<GetActivityByCandidateResponse>();
+                        var activity = new GetActivityByCandidateResponse();
+
+                        var listContent = new List<GetActivityContentResponse>();
+                        var content = new GetActivityContentResponse();
+
+                        var getActivityContent = await dbContext.ActivityContents.Where(p => p.CandidateId == item.CandidateId)
+                            .ToListAsync();
+                        var getActivity = await dbContext.Activities.ToListAsync();
+                        foreach (var i in getActivity)
+                        {
+                            activity = new();
+                            listContent = new();
+                            foreach (var itemContent in getActivityContent)
+                            {
+
+                                if (i.ActivityId == itemContent.ActivityId)
+                                {
+                                    content = new();
+                                    content.ActivityContentId = itemContent.ActivityContentId;
+                                    content.Content = itemContent.Content;
+
+                                    listContent.Add(content);
+                                }
+                            }
+                            if (listContent.Count > 0)
+                            {
+                                activity.ListContent = listContent;
+                                activity.Title = i.Title;
+                                activity.ActivityId = i.ActivityId;
+                                listActivity.Add(activity);
+                            }
+
+                        }
+                        #endregion
+                        candidate.ListActivity = listActivity;
+                    }
+                    result.Add(candidate);
+                }
+            }
+            if (result == null || result.Count == 0)
+            {
+                response.ToFailedResponse("Danh sách hồ sơ trống", StatusCodes.Status404NotFound);
+                return response;
+            }
+            response.ToSuccessResponse(response.Data = result, "Lấy danh sách thành công", StatusCodes.Status200OK);
+            return response;
+
+        }
+
+        public async Task<APIResponse<GetCandidateByIdResponse>> GetCandidateById(Guid candidateId)
+        {
+            APIResponse<GetCandidateByIdResponse> response = new();
+            var getCandidate = await dbContext.Candidates.Where(p => p.CandidateId == candidateId && p.Status == true).SingleOrDefaultAsync();
+            if (getCandidate == null)
+            {
+                response.ToFailedResponse("Ứng cử viên không tồn tại hoặc đã bị xóa!!", StatusCodes.Status404NotFound);
+                return response;
+            }
+            var map = _mapper.Map<GetCandidateByIdResponse>(getCandidate);
+            response.ToSuccessResponse(response.Data = map, "Lấy chi tiết thành công", StatusCodes.Status200OK);
             return response;
         }
     }

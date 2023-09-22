@@ -37,7 +37,7 @@ namespace Capstone_VotingSystem.Services.UserService
             var checkUser = await dbContext.Users.Where(p => p.UserId.Equals(userId)).SingleOrDefaultAsync();
             if (checkUser == null)
             {
-                response.ToFailedResponse("user không tồn tại", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Người dùng không tồn tại", StatusCodes.Status404NotFound);
                 return response;
             }
             var uploadResult = new ImageUploadResult();
@@ -65,23 +65,23 @@ namespace Capstone_VotingSystem.Services.UserService
             }
             dbContext.Users.Update(checkUser);
             await dbContext.SaveChangesAsync();
-            response.ToSuccessResponse(imageRes, "ok", StatusCodes.Status200OK);
+            response.ToSuccessResponse(imageRes, "Thành công", StatusCodes.Status200OK);
             return response;
         }
         public async Task<APIResponse<IEnumerable<GetListUserResponse>>> GetAllUser()
         {
             APIResponse<IEnumerable<GetListUserResponse>> response = new();
             // List<GetListUserResponse> result = new();
-            var users = await dbContext.Users.Where(p => p.Status == true).ToListAsync();
+            var users = await dbContext.Users.ToListAsync();
             if (users.Count() == 0)
             {
-                response.ToFailedResponse("không tìm thấy người dùng nào", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Không tìm thấy người dùng nào", StatusCodes.Status404NotFound);
                 return response;
             }
-            var account = await dbContext.Accounts.Where(p => p.Status == true).ToListAsync();
+            var account = await dbContext.Accounts.ToListAsync();
             if (account.Count() == 0)
             {
-                response.ToFailedResponse("không tìm thấy tài khoản nào", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Không tìm thấy tài khoản nào", StatusCodes.Status404NotFound);
                 return response;
             }
 
@@ -93,6 +93,7 @@ namespace Capstone_VotingSystem.Services.UserService
                     UserName = a.UserName,
                     CreateAt = a.CreateAt,
                     RoleId = a.RoleId,
+                    Status = a.Status,
                     FullName = u.FullName,
                     Phone = u.Phone,
                     AvatarUrl = u.AvatarUrl,
@@ -106,7 +107,7 @@ namespace Capstone_VotingSystem.Services.UserService
                 ).ToList();
             if (result.Count() == 0)
             {
-                response.ToFailedResponse("không tìm thấy người dùng nào", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Không tìm thấy người dùng nào", StatusCodes.Status400BadRequest);
                 return response;
             }
             response.ToSuccessResponse(response.Data = result, "Lấy danh sách thành công", StatusCodes.Status200OK);
@@ -180,7 +181,7 @@ namespace Capstone_VotingSystem.Services.UserService
             var checkUser = await dbContext.Users.Where(p => p.UserId == userId && p.Status == true).SingleOrDefaultAsync();
             if (checkUser == null)
             {
-                response.ToFailedResponse("không tìm thấy người dùng", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Không tìm thấy người dùng", StatusCodes.Status404NotFound);
                 return response;
             }
 
@@ -224,13 +225,13 @@ namespace Capstone_VotingSystem.Services.UserService
             var checkUser = await dbContext.Users.Where(p => p.UserId == userId && p.Status == true).SingleOrDefaultAsync();
             if (checkUser == null)
             {
-                response.ToFailedResponse("không tìm thấy người dùng", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Không tìm thấy người dùng", StatusCodes.Status404NotFound);
                 return response;
             }
             var checkGroupRequest = await dbContext.Groups.Where(p => p.GroupId == groupId && p.CampaignId == campaignId).SingleOrDefaultAsync();
             if (checkGroupRequest == null)
             {
-                response.ToFailedResponse("không tìm thấy nhóm", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Không tìm thấy nhóm", StatusCodes.Status404NotFound);
                 return response;
             }
             var checkGroup = await dbContext.GroupUsers.Where(p => p.UserId == userId && p.CampaignId == campaignId).ToListAsync();
@@ -267,13 +268,13 @@ namespace Capstone_VotingSystem.Services.UserService
             var users = await dbContext.Users.Where(p => p.Status == true && p.UserId == userId).SingleOrDefaultAsync();
             if (users == null)
             {
-                response.ToFailedResponse("không tìm thấy người dùng nào", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Không tìm thấy người dùng nào", StatusCodes.Status404NotFound);
                 return response;
             }
             var account = await dbContext.Accounts.Where(p => p.Status == true && p.UserName == userId).SingleOrDefaultAsync();
             if (account == null)
             {
-                response.ToFailedResponse("không tìm thấy tài khoản nào", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Không tìm thấy tài khoản nào", StatusCodes.Status404NotFound);
                 return response;
             }
             var checkPer = checkPermissionNumber(request.Voter, request.Candidate, request.Moderator);
@@ -307,13 +308,13 @@ namespace Capstone_VotingSystem.Services.UserService
             var users = await dbContext.Users.Where(p => p.Status == true && p.UserId == id).SingleOrDefaultAsync();
             if (users == null)
             {
-                response.ToFailedResponse("không tìm thấy người dùng hoặc người dùng đã bị xóa", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Không tìm thấy người dùng hoặc người dùng đã bị xóa", StatusCodes.Status404NotFound);
                 return response;
             }
             var account = await dbContext.Accounts.Where(p => p.Status == true && p.UserName == id).SingleOrDefaultAsync();
             if (account == null)
             {
-                response.ToFailedResponse("không tìm thấy tài khoản nào hoặc đã bị xóa", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Không tìm thấy tài khoản nào hoặc đã bị xóa", StatusCodes.Status404NotFound);
                 return response;
             }
             var map = _mapper.Map<GetUserByIdResponse>(users);

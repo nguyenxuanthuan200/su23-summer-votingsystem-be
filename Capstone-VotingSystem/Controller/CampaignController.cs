@@ -239,6 +239,25 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-
+        //[Authorize(Roles = "Admin")]
+        [HttpGet("admin-manage")]
+        [SwaggerOperation(summary: "Get all campaign for admin")]
+        public async Task<IActionResult> GetCampaignForAdmin()
+        {
+            try
+            {
+                var result = await campaignService.GetCampaignForAdmin();
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    e.Message);
+            }
+        }
     }
 }

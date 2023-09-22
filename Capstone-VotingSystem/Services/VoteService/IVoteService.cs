@@ -12,6 +12,7 @@ namespace Capstone_VotingSystem.Services.VoteService
         Task<APIResponse<string>> CreateVote(CreateVoteRequest request);
         Task<APIResponse<string>> CreateVoteLike(CreateVoteLikeRequest request);
         //Task<APIResponse<string>> UndoVote(CreateVoteLikeRequest request);
-        Task<APIResponse<IEnumerable<SatisticalVoteInCampaignResponse>>> StatisticalVoteByCampaign(StatisticalVoteRequest request);
+        //Task<APIResponse<IEnumerable<SatisticalVoteInCampaignResponse>>> StatisticalVoteByCampaign(StatisticalVoteRequest request);
+        Task<APIResponse<SatisticalVoteInCampaignResponse>> StatisticalVoteByCampaign(StatisticalVoteRequest request);
     }
 }
