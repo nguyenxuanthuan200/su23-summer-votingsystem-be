@@ -11,6 +11,5 @@
         public string? Email { get; set; }
         public string? AvatarUrl { get; set; }
         public bool? Status { get; set; }
-        public Guid? GroupId { get; set; }
     }
 }
