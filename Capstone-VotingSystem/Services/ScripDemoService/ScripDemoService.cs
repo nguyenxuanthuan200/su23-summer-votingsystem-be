@@ -234,7 +234,9 @@ namespace Capstone_VotingSystem.Services.ScripDemoService
 
             int groupCategoryOfCandidate = 0;
 
-            if (groupOfCandidate.Equals("Bộ môn Âm nhạc Truyền thống") || groupOfCandidate.Equals("Bộ môn Tiếng Anh dự bị") || groupOfCandidate.Equals("Bộ môn Kỹ năng mềm") || groupOfCandidate.Equals("Bộ môn Toán") || groupOfCandidate.Equals("Bộ môn Giáo dục thể chất"))
+            if(groupOfCandidate.Equals("566fa89f-5730-45cc-b97d-2842ba1199e7") || groupOfCandidate.Equals("6101f9ff-55e1-4785-914f-216dadfbfae5")
+                || groupOfCandidate.Equals("98d60b6d-5c5e-4cdb-b289-be92ffc77206") || groupOfCandidate.Equals("c5a820f6-1093-4355-80be-d814ae0dfad0")
+                || groupOfCandidate.Equals("d8111aba-574e-4c2f-837a-e9a1cbfd36d2")) 
                 groupCategoryOfCandidate = 1;
 
             var listVoteOfUser = await dbContext.Votings.Where(p => p.UserId == userId && p.StageId == stageid && p.Status == true).ToListAsync();
@@ -245,20 +247,22 @@ namespace Capstone_VotingSystem.Services.ScripDemoService
             {
                 var checkCandidateOfVote = await dbContext.Candidates.Where(p => p.CandidateId == vote.CandidateId && p.CampaignId == campaignId && p.Status == true).SingleOrDefaultAsync();
                 var checkGroupCandidateOfVote = await dbContext.Groups.Where(p => p.GroupId == checkCandidateOfVote.GroupId && p.CampaignId == campaignId && p.IsVoter == false).SingleOrDefaultAsync();
-                if (checkGroupCandidateOfVote.Name.Equals("Bộ môn Âm nhạc Truyền thống") || checkGroupCandidateOfVote.Name.Equals("Bộ môn Tiếng Anh dự bị") || checkGroupCandidateOfVote.Name.Equals("Bộ môn Kỹ năng mềm") || checkGroupCandidateOfVote.Name.Equals("Bộ môn Toán") || checkGroupCandidateOfVote.Name.Equals("Bộ môn Giáo dục thể chất"))
+                if (checkGroupCandidateOfVote.Name.Equals("566fa89f-5730-45cc-b97d-2842ba1199e7") || checkGroupCandidateOfVote.Name.Equals("6101f9ff-55e1-4785-914f-216dadfbfae5")
+                    || checkGroupCandidateOfVote.Name.Equals("98d60b6d-5c5e-4cdb-b289-be92ffc77206") || checkGroupCandidateOfVote.Name.Equals("c5a820f6-1093-4355-80be-d814ae0dfad0")
+                    || checkGroupCandidateOfVote.Name.Equals("d8111aba-574e-4c2f-837a-e9a1cbfd36d2"))
                     countdb = countdb + 1;
                 else
                     countcn = countcn + 1;
 
             }
 
-            if (groupOfUser.Equals("Kỳ dự bị") && groupCategoryOfCandidate == 1)
+            if (groupOfUser.Equals("647be514-4a6a-4298-991d-912af5d16921") && groupCategoryOfCandidate == 1)
                 return "success";
-            if (groupOfUser.Equals("Kỳ chuyên ngành(HK1-HK6)") && groupCategoryOfCandidate == 1 && countdb == 0)
+            if (groupOfUser.Equals("8307dd09-2299-49b4-85ad-5aba6e5c474a") && groupCategoryOfCandidate == 1 && countdb == 0)
                 return "success";
-            if (groupOfUser.Equals("Kỳ chuyên ngành(HK1-HK6)") && groupCategoryOfCandidate == 0 && countcn <= 1)
+            if (groupOfUser.Equals("8307dd09-2299-49b4-85ad-5aba6e5c474a") && groupCategoryOfCandidate == 0 && countcn <= 1)
                 return "success";
-            if (groupOfUser.Equals("Kỳ chuyên ngành(HK7-HK9)") && groupCategoryOfCandidate == 0 && countcn <= 2)
+            if (groupOfUser.Equals("04fa2169-155c-4b42-8a9a-48aa3336d461") && groupCategoryOfCandidate == 0 && countcn <= 2)
                 return "success";
 
             return "false";

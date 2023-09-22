@@ -67,7 +67,6 @@ namespace Capstone_VotingSystem.Services.StageService
             {
                 stage.StageId = id;
                 stage.CampaignId = request.CampaignId;
-                stage.Description = request.Description;
                 stage.Title = request.Title;
                 stage.Content = request.Content;
                 if (request.FormId != null)
@@ -139,7 +138,6 @@ namespace Capstone_VotingSystem.Services.StageService
                     {
                         StageId = x.StageId,
                         CampaignId = x.CampaignId,
-                        Description = x.Description,
                         Title = x.Title,
                         StartTime = x.StartTime,
                         EndTime = x.EndTime,
@@ -233,7 +231,6 @@ namespace Capstone_VotingSystem.Services.StageService
                 return response;
             }
 
-            upStage.Description = request.Description;
             upStage.Title = request.Title;
             upStage.StartTime = request.StartTime;
             upStage.EndTime = request.EndTime;

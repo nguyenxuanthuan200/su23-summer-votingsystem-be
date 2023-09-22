@@ -95,8 +95,6 @@ namespace Capstone_VotingSystem.Entities
                     .ValueGeneratedNever()
                     .HasColumnName("activityId");
 
-                entity.Property(e => e.CandidateId).HasColumnName("candidateId");
-
                 entity.Property(e => e.Content)
                     .HasMaxLength(500)
                     .HasColumnName("content");
@@ -145,6 +143,10 @@ namespace Capstone_VotingSystem.Entities
 
                 entity.Property(e => e.CategoryId).HasColumnName("categoryId");
 
+                entity.Property(e => e.Description)
+                    .HasMaxLength(500)
+                    .HasColumnName("description");
+
                 entity.Property(e => e.EndTime)
                     .HasColumnType("datetime")
                     .HasColumnName("endTime");
@@ -159,6 +161,8 @@ namespace Capstone_VotingSystem.Entities
                 entity.Property(e => e.Process)
                     .HasMaxLength(50)
                     .HasColumnName("process");
+
+                entity.Property(e => e.PublishTheResult).HasColumnName("publishTheResult");
 
                 entity.Property(e => e.Representative).HasColumnName("representative");
 
@@ -206,14 +210,14 @@ namespace Capstone_VotingSystem.Entities
                     .HasColumnName("candidateId");
 
                 entity.Property(e => e.AvatarUrl)
-                    .HasMaxLength(50)
+                    .HasMaxLength(500)
                     .IsUnicode(false)
                     .HasColumnName("avatarURL");
 
                 entity.Property(e => e.CampaignId).HasColumnName("campaignId");
 
                 entity.Property(e => e.Description)
-                    .HasMaxLength(200)
+                    .HasMaxLength(800)
                     .HasColumnName("description");
 
                 entity.Property(e => e.FullName)
@@ -502,11 +506,6 @@ namespace Capstone_VotingSystem.Entities
                     .IsUnicode(false)
                     .HasColumnName("username");
 
-                entity.HasOne(d => d.Campaign)
-                    .WithMany(p => p.Notifications)
-                    .HasForeignKey(d => d.CampaignId)
-                    .HasConstraintName("FK_Notification_Campaign");
-
                 entity.HasOne(d => d.UsernameNavigation)
                     .WithMany(p => p.Notifications)
                     .HasForeignKey(d => d.Username)
@@ -633,12 +632,8 @@ namespace Capstone_VotingSystem.Entities
                 entity.Property(e => e.CampaignId).HasColumnName("campaignId");
 
                 entity.Property(e => e.Content)
-                    .HasMaxLength(50)
+                    .HasMaxLength(500)
                     .HasColumnName("content");
-
-                entity.Property(e => e.Description)
-                    .HasMaxLength(200)
-                    .HasColumnName("description");
 
                 entity.Property(e => e.EndTime)
                     .HasColumnType("datetime")

@@ -14,7 +14,6 @@ namespace Capstone_VotingSystem.Entities
         public string Username { get; set; } = null!;
         public Guid? CampaignId { get; set; }
 
-        public virtual Campaign? Campaign { get; set; }
         public virtual Account UsernameNavigation { get; set; } = null!;
     }
 }

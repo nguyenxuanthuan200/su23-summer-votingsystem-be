@@ -220,7 +220,6 @@ namespace Capstone_VotingSystem.Services.GroupService
                 }
 
 
-                //groupVoter = groupVoter.Where(p => p.IsStudentMajor == false);
                 foreach (var i in groupVoter)
                 {
                     if (i.IsStudentMajor == false)

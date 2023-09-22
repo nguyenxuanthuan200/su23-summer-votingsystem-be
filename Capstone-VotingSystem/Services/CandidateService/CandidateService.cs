@@ -541,6 +541,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 FormId = checkStage.FormId,
                 StageName = checkStage.Title,
                 CampaignName = checkcam.Title,
+                Description = checkcam.Description,
             };
             List<ListCandidateVotedByUser> listVoted = new();
             var checkVote = await dbContext.Votings.Where(p => p.StageId == stageId && p.UserId == userId && p.Status == true).ToListAsync();
@@ -660,43 +661,58 @@ namespace Capstone_VotingSystem.Services.CandidateService
             if (getStage.CampaignId == cam)
             {
                 var groupNames = dbContext.Users.Where(u => u.UserId == userId).Join(dbContext.GroupUsers, u => u.UserId, ug => ug.UserId, (u, ug) => ug.GroupId)
-          .Join(dbContext.Groups, gid => gid, g => g.GroupId, (gid, g) => g.Name);
+          .Join(dbContext.Groups, gid => gid, g => g.GroupId, (gid, g) => g.GroupId);
 
+                Guid hk7to9 = Guid.Parse("04fa2169-155c-4b42-8a9a-48aa3336d461");
+                Guid hk1to6 = Guid.Parse("8307dd09-2299-49b4-85ad-5aba6e5c474a");
+                Guid dkdb = Guid.Parse("647be514-4a6a-4298-991d-912af5d16921");
+                string GroupNameOfVoter = "";
                 foreach (var item in groupNames)
                 {
-                    if (item.Equals("8307dd09-2299-49b4-85ad-5aba6e5c474a"))
+                    if (item == hk1to6)
                     {
                         VoteBM = 1;
                         VoteAM = 2;
-                        result.GroupNameOfVoter = item;
+                        GroupNameOfVoter = item.ToString();
                     }
-                    else if (item.Equals("04fa2169-155c-4b42-8a9a-48aa3336d461"))
+                    else if (item == hk7to9)
                     {
                         VoteBM = 0;
                         VoteAM = 3;
-                        result.GroupNameOfVoter = item;
+                        GroupNameOfVoter = item.ToString();
                     }
-                    else if (item.Equals("647be514-4a6a-4298-991d-912af5d16921"))
+                    else if (item == dkdb)
                     {
                         VoteBM = 3;
                         VoteAM = 0;
-                        result.GroupNameOfVoter = item;
+                        GroupNameOfVoter = item.ToString();
                     }
 
                 }
-
+                if (!string.IsNullOrEmpty(GroupNameOfVoter))
+                {
+                    var group = await dbContext.Groups.Where(p => p.GroupId == Guid.Parse(GroupNameOfVoter)).SingleOrDefaultAsync();
+                    result.GroupNameOfVoter = group.Name;
+                }
+              
                 foreach (var item in checkVote)
                 {
                     //          var groupGroup = dbContext.Votings.Where(u => u.VotingId == item.VotingId && u.Status == true).Join(dbContext.Candidates, u => u.CandidateId, ug => ug.CandidateId, (u, ug) => ug.GroupId)
                     //.Join(dbContext.Groups, gid => gid, g => g.GroupId , (gid, g) => g.Name);
                     var groupGroup = dbContext.Votings.Where(u => u.VotingId == item.VotingId && u.Status == true)
                 .Join(dbContext.Candidates, v => v.CandidateId, c => c.CandidateId, (v, c) => new { v, c })
-                .Join(dbContext.Groups, vc => vc.c.GroupId, g => g.GroupId, (vc, g) => g.Name);
+                .Join(dbContext.Groups, vc => vc.c.GroupId, g => g.GroupId, (vc, g) => g.GroupId);
+
+                    Guid bm1 = Guid.Parse("566fa89f-5730-45cc-b97d-2842ba1199e7");
+                    Guid bm2 = Guid.Parse("6101f9ff-55e1-4785-914f-216dadfbfae5");
+                    Guid bm3 = Guid.Parse("98d60b6d-5c5e-4cdb-b289-be92ffc77206");
+                    Guid bm4 = Guid.Parse("c5a820f6-1093-4355-80be-d814ae0dfad0");
+                    Guid bm5 = Guid.Parse("d8111aba-574e-4c2f-837a-e9a1cbfd36d2");
                     foreach (var itemm in groupGroup)
                     {
-                        if (item.Equals("566fa89f-5730-45cc-b97d-2842ba1199e7") || item.Equals("6101f9ff-55e1-4785-914f-216dadfbfae5")
-                || item.Equals("98d60b6d-5c5e-4cdb-b289-be92ffc77206") || item.Equals("c5a820f6-1093-4355-80be-d814ae0dfad0")
-                || item.Equals("d8111aba-574e-4c2f-837a-e9a1cbfd36d2"))
+                        if (itemm == bm1 || itemm == bm2
+                || itemm == bm3 || itemm == bm4
+                || itemm == bm5)
                         {
                             VoteBM--;
                         }

@@ -197,6 +197,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 cam.CategoryId = request.CategoryId;
                 cam.VisibilityCandidate = request.VisibilityCandidate;
                 cam.Representative = false;
+                cam.PublishTheResult = true;
 
             };
             await dbContext.Campaigns.AddAsync(cam);
@@ -290,7 +291,6 @@ namespace Capstone_VotingSystem.Services.CampaignService
                            StageId = x.StageId,
                            Content = x.Content,
                            Title = x.Title,
-                           Description = x.Description,
                            StartTime = x.StartTime,
                            Process = x.Process,
                            LimitVote = x.LimitVote,
@@ -367,7 +367,6 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 GetStageResponse stage = new GetStageResponse();
                 stage.StageId = item.StageId;
                 stage.Title = item.Title;
-                stage.Description = item.Description;
                 stage.Content = item.Content;
                 stage.StartTime = item.StartTime;
                 stage.EndTime = item.EndTime;
@@ -480,6 +479,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
             cam.Title = request.Title;
             cam.CategoryId = request.CategoryId;
             cam.VisibilityCandidate = request.VisibilityCandidate;
+            cam.PublishTheResult = request.PublishTheResult;
             cam.ImgUrl = uploadResult.SecureUrl?.AbsoluteUri ?? cam.ImgUrl;
             dbContext.Campaigns.Update(cam);
             await dbContext.SaveChangesAsync();
@@ -608,7 +608,6 @@ namespace Capstone_VotingSystem.Services.CampaignService
                 GetStageResponse stage = new GetStageResponse();
                 stage.StageId = item.StageId;
                 stage.Title = item.Title;
-                stage.Description = item.Description;
                 stage.Content = item.Content;
                 stage.StartTime = item.StartTime;
                 stage.EndTime = item.EndTime;

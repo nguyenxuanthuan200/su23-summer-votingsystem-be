@@ -8,6 +8,7 @@
         public string Visibility { get; set; }
         public Guid CategoryId { get; set; }
         public bool VisibilityCandidate { get; set; }
+        public bool PublishTheResult { get; set; }
         public IFormFile? ImageFile { get; set; }
     }
 }

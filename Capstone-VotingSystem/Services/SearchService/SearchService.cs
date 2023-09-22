@@ -57,7 +57,6 @@ namespace Capstone_VotingSystem.Services.SearchService
                            StageId = x.StageId,
                            Content = x.Content,
                            Title = x.Title,
-                           Description = x.Description,
                            Process = x.Process,
                            LimitVote = x.LimitVote,
                            IsUseForm = x.IsUseForm,
