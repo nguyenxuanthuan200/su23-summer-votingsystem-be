@@ -22,6 +22,12 @@ namespace Capstone_VotingSystem.Services.GroupService
         {
             APIResponse<string> response = new();
 
+            var checkUser = await dbContext.Users.Where(x => x.UserId == userName && x.Status == true).SingleOrDefaultAsync();
+            if (checkUser == null)
+            {
+                response.ToFailedResponse("Tài khoản này không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
             var checkGroup = await dbContext.GroupUsers.Where(x => x.UserId == userName && x.CampaignId == campaignId).ToListAsync();
 
             foreach (var item in checkGroup)
