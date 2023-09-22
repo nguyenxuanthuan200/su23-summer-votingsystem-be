@@ -18,6 +18,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
         //Task<APIResponse<IEnumerable<GetCampaignResponse>>> GetCampaignNeedApprove();
         Task<APIResponse<GetCampaignResponse>> ApproveCampaign(Guid id);
         Task<APIResponse<string>> DeleteCampaign(Guid CampaignId, DeleteCampaignRequest request);
+        Task<APIResponse<string>> UnDeleteCampaign(Guid CampaignId);
         Task<APIResponse<ImageCampaignResponse>> AddImageCampaignAsync(IFormFile file, string folderName, Guid? campaignId);
     }
 }

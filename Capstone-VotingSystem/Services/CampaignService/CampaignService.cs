@@ -703,5 +703,36 @@ namespace Capstone_VotingSystem.Services.CampaignService
             response.ToSuccessResponse(response.Data, "Lấy danh sách thành công", StatusCodes.Status200OK);
             return response;
         }
+
+        public async Task<APIResponse<string>> UnDeleteCampaign(Guid CampaignId)
+        {
+            APIResponse<string> response = new();
+            var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == CampaignId);
+            if (cam == null)
+            {
+                response.ToFailedResponse("Chiến dịch vẫn còn hoạt động", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
+            Guid idNoti = Guid.NewGuid();
+            Notification noti = new Notification()
+            {
+                NotificationId = idNoti,
+                Title = "Thông báo chiến dịch",
+                Message = "Chiến dịch - " + cam.Title + "của bạn vừa được gỡ lệnh cấm.",
+                CreateDate = currentDateTimeVn,
+                IsRead = false,
+                Status = true,
+                Username = cam.UserId,
+                CampaignId = cam.CampaignId,
+            };
+            cam.Status = true;
+            dbContext.Campaigns.Update(cam);
+            await dbContext.Notifications.AddAsync(noti);
+            await dbContext.SaveChangesAsync();
+            response.ToSuccessResponse("Bỏ gỡ chiến dịch thành công", StatusCodes.Status200OK);
+            return response;
+        }
     }
 }

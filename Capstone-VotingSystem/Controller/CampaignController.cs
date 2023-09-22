@@ -61,7 +61,7 @@ namespace Capstone_VotingSystem.Controller
         }
         // [Authorize(Roles = "User,Admin")]
         [HttpPut("update-process")]
-        [SwaggerOperation(summary: "update process campaign and stage ")]
+        [SwaggerOperation(summary: "Update process campaign and stage ")]
         public async Task<IActionResult> UpdateProcess()
         {
             try
@@ -223,14 +223,18 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [HttpPut("campaignid")]
-        [SwaggerOperation(summary: "Update Image Campaign")]
-        public async Task<IActionResult> AddCampaignImage(IFormFile formFile, Guid? campaignid)
+        //[Authorize(Roles = "Admin")]
+        [HttpPut("{campaignid}")]
+        [SwaggerOperation(summary: "Unban Campaign")]
+        public async Task<IActionResult> UnBanCampaign(Guid campaignid)
         {
             try
             {
-                var folderName = "campaign";
-                var result = await campaignService.AddImageCampaignAsync(formFile, folderName, campaignid);
+                var result = await campaignService.UnDeleteCampaign(campaignid);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
                 return Ok(result);
             }
             catch (Exception)
@@ -239,6 +243,22 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
+        //[HttpPut("campaignid")]
+        //[SwaggerOperation(summary: "Update Image Campaign")]
+        //public async Task<IActionResult> AddCampaignImage(IFormFile formFile, Guid? campaignid)
+        //{
+        //    try
+        //    {
+        //        var folderName = "campaign";
+        //        var result = await campaignService.AddImageCampaignAsync(formFile, folderName, campaignid);
+        //        return Ok(result);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError,
+        //            "Error retrieving data from the database.");
+        //    }
+        //}
         //[Authorize(Roles = "Admin")]
         [HttpGet("admin-manage")]
         [SwaggerOperation(summary: "Get all campaign for admin")]
