@@ -415,9 +415,9 @@ namespace Capstone_VotingSystem.Services.CandidateService
             return response;
         }
 
-        public async Task<APIResponse<GetCandidateByIdResponse>> UpdateCandidateProfile(Guid id, UpdateCandidateProfileRequest request)
+        public async Task<APIResponse<GetListCandidateByUserIdResponse>> UpdateCandidateProfile(Guid id, UpdateCandidateProfileRequest request)
         {
-            APIResponse<GetCandidateByIdResponse> response = new();
+            APIResponse<GetListCandidateByUserIdResponse> response = new();
             var candidate = await dbContext.Candidates.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CandidateId == id);
             if (candidate == null)
             {
