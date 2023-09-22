@@ -82,13 +82,13 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         //[Authorize(Roles = "Admin")]
-        [HttpGet("{id}")]
+        [HttpGet("campaign/{campaignid}")]
         [SwaggerOperation(summary: "Get Feedback By CampaignId")]
-        public async Task<IActionResult> GetFeedBackByCampaignId(Guid id)
+        public async Task<IActionResult> GetFeedBackByCampaignId(Guid campaignid)
         {
             try
             {
-                var result = await _feedback.GetFeedBackByCampaignId(id);
+                var result = await _feedback.GetFeedBackByCampaignId(campaignid);
                 if (result.Success == false)
                 {
                     return BadRequest(result);

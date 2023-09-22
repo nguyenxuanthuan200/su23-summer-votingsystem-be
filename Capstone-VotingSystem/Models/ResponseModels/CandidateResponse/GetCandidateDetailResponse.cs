@@ -15,6 +15,7 @@ namespace Capstone_VotingSystem.Models.ResponseModels.CandidateResponse
         public string? AvatarUrl { get; set; }
         public Guid StageId { get; set; }
         public Guid CampaignId { get; set; }
+        public Guid? FormId { get; set; }
         public int Score { get; set; }
         public List<GetActivityByCandidateResponse> ListActivity { get; set; }
     }

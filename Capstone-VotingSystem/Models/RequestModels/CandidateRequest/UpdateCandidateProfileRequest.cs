@@ -4,6 +4,7 @@
     {
         public string? Description { get; set; }
         public string? FullName { get; set; }
+        public Guid GroupId { get; set; }
         public IFormFile? ImageFile { get; set; }
     }
 }

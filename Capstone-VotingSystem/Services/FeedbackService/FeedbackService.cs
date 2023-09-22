@@ -72,7 +72,7 @@ namespace Capstone_VotingSystem.Services.FeedbackService
                 return response;
             }
             var checkFeedback = await dbContext.FeedBacks.SingleOrDefaultAsync(p => p.UserId == checkUser.UserId && p.Status == true && p.CampaignId == checkCampaign.CampaignId);
-            if (checkFeedback == null)
+            if (checkFeedback != null)
             {
                 response.ToFailedResponse("Đã đánh giá chiến dịch này rồi", StatusCodes.Status400BadRequest);
                 return response;
