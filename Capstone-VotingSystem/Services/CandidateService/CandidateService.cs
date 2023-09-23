@@ -332,7 +332,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 return response;
             }
             var checkForm = await dbContext.Forms.Where(p => p.FormId == checkStage.FormId && p.Status == true).SingleOrDefaultAsync();
-
+            var checkGroup = await dbContext.Groups.Where(p => p.GroupId == checkcandi.GroupId).Select(p=>p.Name).SingleOrDefaultAsync();
             var scoreStage = await dbContext.Scores.Where(p => p.StageId == stageId && p.CandidateId == candidateId).SingleOrDefaultAsync();
             var score = 0;
             if (scoreStage != null)
@@ -352,6 +352,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
             map.Score = score;
             map.FullName = checkcandi.FullName;
             map.AvatarUrl = checkcandi.AvatarUrl;
+            map.GroupName = checkGroup;
             if (checkForm != null)
             {
                 map.FormId = checkForm.FormId;
