@@ -74,14 +74,13 @@ namespace Capstone_VotingSystem.Services.RatioService
                .SingleOrDefaultAsync();
             if (check == null)
             {
-                response.ToFailedResponse("Campaign không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var getById = await dbContext.Ratios.Where(p => p.CampaignId == campaignId)
-                .ToListAsync();
+            var getById = await dbContext.Ratios.Where(p => p.CampaignId == campaignId).ToListAsync();
             if (getById == null || getById.Count == 0)
             {
-                response.ToFailedResponse(" không tồn tại Ratio nào hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Không tồn tại trọng số nào hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
             var ListratioRe = new List<RatioResponse>();
@@ -101,8 +100,9 @@ namespace Capstone_VotingSystem.Services.RatioService
                 ratioRe.GroupNameOfCandidate = groupNameOfCandidate.Name;
                 ratioRe.CampaignId = i.CampaignId;
                 ListratioRe.Add(ratioRe);
-            }
 
+                ListratioRe = ListratioRe.OrderBy(p => p.GroupNameOfVoter).ToList();
+            }
             response.Data = ListratioRe;
             response.ToSuccessResponse(response.Data, "Lấy danh sách tỷ trọng thành công", StatusCodes.Status200OK);
             return response;

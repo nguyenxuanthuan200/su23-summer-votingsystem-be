@@ -403,7 +403,7 @@ namespace Capstone_VotingSystem.Services.VoteService
                 if (checkGroup != null)
                     groupOfUser = checkGroup.GroupId.ToString();
             }
-            string groupOfCandidate;
+            Guid groupOfCandidate;
             var checkCandidate = await dbContext.Candidates.Where(p => p.CandidateId == candidateId && p.CampaignId == campaignId && p.Status == true).SingleOrDefaultAsync();
             if (checkCandidate == null)
             {
@@ -414,13 +414,16 @@ namespace Capstone_VotingSystem.Services.VoteService
             {
                 return "Nhóm của ứng cử viên này không thuộc chiến dịch này hoặc đã bị loại bỏ khỏi chiến dịch";
             }
-            groupOfCandidate = checkGroupCandidate.GroupId.ToString();
+            groupOfCandidate = checkGroupCandidate.GroupId;
 
             int groupCategoryOfCandidate = 0;
-
-            if (groupOfCandidate.Equals("566fa89f-5730-45cc-b97d-2842ba1199e7") || groupOfCandidate.Equals("6101f9ff-55e1-4785-914f-216dadfbfae5")
-                || groupOfCandidate.Equals("98d60b6d-5c5e-4cdb-b289-be92ffc77206") || groupOfCandidate.Equals("c5a820f6-1093-4355-80be-d814ae0dfad0")
-                || groupOfCandidate.Equals("d8111aba-574e-4c2f-837a-e9a1cbfd36d2"))
+            Guid db1 = Guid.Parse("566fa89f-5730-45cc-b97d-2842ba1199e7");
+            Guid db2 = Guid.Parse("6101f9ff-55e1-4785-914f-216dadfbfae5");
+            Guid db3 = Guid.Parse("98d60b6d-5c5e-4cdb-b289-be92ffc77206");
+            Guid db4 = Guid.Parse("c5a820f6-1093-4355-80be-d814ae0dfad0");
+            Guid db5 = Guid.Parse("d8111aba-574e-4c2f-837a-e9a1cbfd36d2");
+            if (groupOfCandidate == db1 || groupOfCandidate == db2 || groupOfCandidate == db3 || groupOfCandidate == db4
+                || groupOfCandidate == db5)
                 groupCategoryOfCandidate = 1;
 
             var listVoteOfUser = await dbContext.Votings.Where(p => p.UserId == userId && p.StageId == stageid && p.Status == true).ToListAsync();
@@ -431,9 +434,9 @@ namespace Capstone_VotingSystem.Services.VoteService
             {
                 var checkCandidateOfVote = await dbContext.Candidates.Where(p => p.CandidateId == vote.CandidateId && p.CampaignId == campaignId && p.Status == true).SingleOrDefaultAsync();
                 var checkGroupCandidateOfVote = await dbContext.Groups.Where(p => p.GroupId == checkCandidateOfVote.GroupId && p.CampaignId == campaignId && p.IsVoter == false).SingleOrDefaultAsync();
-                if (checkGroupCandidateOfVote.Name.Equals("566fa89f-5730-45cc-b97d-2842ba1199e7") || checkGroupCandidateOfVote.Name.Equals("6101f9ff-55e1-4785-914f-216dadfbfae5")
-                    || checkGroupCandidateOfVote.Name.Equals("98d60b6d-5c5e-4cdb-b289-be92ffc77206") || checkGroupCandidateOfVote.Name.Equals("c5a820f6-1093-4355-80be-d814ae0dfad0")
-                    || checkGroupCandidateOfVote.Name.Equals("d8111aba-574e-4c2f-837a-e9a1cbfd36d2"))
+                if (checkGroupCandidateOfVote.GroupId == db1 || checkGroupCandidateOfVote.GroupId == db2
+                    || checkGroupCandidateOfVote.GroupId == db3 || checkGroupCandidateOfVote.GroupId == db4
+                    || checkGroupCandidateOfVote.GroupId == db5)
                     countdb = countdb + 1;
                 else
                     countcn = countcn + 1;

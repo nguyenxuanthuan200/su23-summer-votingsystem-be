@@ -332,7 +332,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 return response;
             }
             var checkForm = await dbContext.Forms.Where(p => p.FormId == checkStage.FormId && p.Status == true).SingleOrDefaultAsync();
-            var checkGroup = await dbContext.Groups.Where(p => p.GroupId == checkcandi.GroupId).Select(p=>p.Name).SingleOrDefaultAsync();
+            var checkGroup = await dbContext.Groups.Where(p => p.GroupId == checkcandi.GroupId).Select(p => p.Name).SingleOrDefaultAsync();
             var scoreStage = await dbContext.Scores.Where(p => p.StageId == stageId && p.CandidateId == candidateId).SingleOrDefaultAsync();
             var score = 0;
             if (scoreStage != null)
@@ -695,7 +695,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                     var group = await dbContext.Groups.Where(p => p.GroupId == Guid.Parse(GroupNameOfVoter)).SingleOrDefaultAsync();
                     result.GroupNameOfVoter = group.Name;
                 }
-              
+
                 foreach (var item in checkVote)
                 {
                     //          var groupGroup = dbContext.Votings.Where(u => u.VotingId == item.VotingId && u.Status == true).Join(dbContext.Candidates, u => u.CandidateId, ug => ug.CandidateId, (u, ug) => ug.GroupId)
@@ -711,9 +711,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                     Guid bm5 = Guid.Parse("d8111aba-574e-4c2f-837a-e9a1cbfd36d2");
                     foreach (var itemm in groupGroup)
                     {
-                        if (itemm == bm1 || itemm == bm2
-                || itemm == bm3 || itemm == bm4
-                || itemm == bm5)
+                        if (itemm == bm1 || itemm == bm2 || itemm == bm3 || itemm == bm4 || itemm == bm5)
                         {
                             VoteBM--;
                         }
