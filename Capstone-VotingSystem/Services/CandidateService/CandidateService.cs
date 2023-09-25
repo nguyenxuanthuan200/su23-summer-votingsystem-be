@@ -548,6 +548,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
             var checkVote = await dbContext.Votings.Where(p => p.StageId == stageId && p.UserId == userId && p.Status == true).ToListAsync();
 
             var listCandidate = await dbContext.Candidates.Where(p => p.Status == true && p.CampaignId == checkcam.CampaignId).ToListAsync();
+            listCandidate = listCandidate.OrderBy(candidate => candidate.FullName.Split().Last()).ToList();
             List<ListCandidateStageResponse> result = new List<ListCandidateStageResponse>();
             foreach (var item in listCandidate)
             {
