@@ -7,5 +7,7 @@ namespace Capstone_VotingSystem.Services.StatisticalService
     {
         Task<APIResponse<IEnumerable<GetResultCampaignResponse>>> GetResultCampaign(Guid campaignId);
         Task<APIResponse<StatisticalTotalResponse>> StatisticalTotal();
+        Task<APIResponse<StatisticalVoterJoinCampaignResponse>> StatisticalVoterJoinCampaign(Guid campaignId);
+        Task<APIResponse<IEnumerable<TotalVoterInCampaignResponse>>> StatisticalVoteOfCandidateGroup(Guid campaignId);
     }
 }
