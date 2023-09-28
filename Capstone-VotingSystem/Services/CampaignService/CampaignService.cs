@@ -442,7 +442,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
             }
             if (!request.Visibility.Equals("public") && !request.Visibility.Equals("private"))
             {
-                response.ToFailedResponse("Trạng thái không đúng định dạng!! (public or private)", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Trạng thái không đúng định dạng!! (công khai hoặc không công khai)", StatusCodes.Status400BadRequest);
                 return response;
             }
             var uploadResult = new ImageUploadResult();
@@ -479,7 +479,6 @@ namespace Capstone_VotingSystem.Services.CampaignService
             cam.Title = request.Title;
             cam.CategoryId = request.CategoryId;
             cam.VisibilityCandidate = request.VisibilityCandidate;
-            cam.PublishTheResult = request.PublishTheResult;
             cam.ImgUrl = uploadResult.SecureUrl?.AbsoluteUri ?? cam.ImgUrl;
             dbContext.Campaigns.Update(cam);
             await dbContext.SaveChangesAsync();
@@ -732,6 +731,25 @@ namespace Capstone_VotingSystem.Services.CampaignService
             await dbContext.Notifications.AddAsync(noti);
             await dbContext.SaveChangesAsync();
             response.ToSuccessResponse("Bỏ gỡ chiến dịch thành công", StatusCodes.Status200OK);
+            return response;
+        }
+
+        public async Task<APIResponse<string>> UpdatePublicResult(Guid campaignId)
+        {
+            APIResponse<string> response = new();
+            var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == campaignId);
+            if (cam == null)
+            {
+                response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            if (cam.PublishTheResult == true)
+                cam.PublishTheResult = false;
+            else
+                cam.PublishTheResult = true;
+            dbContext.Campaigns.Update(cam);
+            await dbContext.SaveChangesAsync();
+            response.ToSuccessResponse("Thay đổi thành công", StatusCodes.Status200OK);
             return response;
         }
     }

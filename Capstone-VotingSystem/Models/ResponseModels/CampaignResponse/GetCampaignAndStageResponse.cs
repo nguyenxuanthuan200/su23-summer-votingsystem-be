@@ -17,6 +17,7 @@ namespace Capstone_VotingSystem.Models.ResponseModels.CampaignResponse
         public string UserId { get; set; }
         public Guid CategoryId { get; set; }
         public bool VisibilityCandidate { get; set; }
+        public bool PublishTheResult { get; set; }
         public List<GetStageResponse> Stage { get; set; }
     }
 }

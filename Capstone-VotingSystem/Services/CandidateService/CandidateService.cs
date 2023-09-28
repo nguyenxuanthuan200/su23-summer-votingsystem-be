@@ -543,6 +543,7 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 StageName = checkStage.Title,
                 CampaignName = checkcam.Title,
                 Description = checkcam.Description,
+                LimitVoteOfStage = checkStage.LimitVote,
             };
             List<ListCandidateVotedByUser> listVoted = new();
             var checkVote = await dbContext.Votings.Where(p => p.StageId == stageId && p.UserId == userId && p.Status == true).ToListAsync();

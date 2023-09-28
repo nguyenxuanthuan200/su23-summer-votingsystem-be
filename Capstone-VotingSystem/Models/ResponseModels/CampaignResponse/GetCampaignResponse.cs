@@ -14,5 +14,6 @@
         public string UserId { get; set; } = null!;
         public Guid CategoryId { get; set; }
         public bool VisibilityCandidate { get; set; }
+        public bool PublishTheResult { get; set; }
     }
 }

@@ -12,6 +12,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
         Task<APIResponse<GetCampaignAndStageResponse>> GetCampaignById(Guid id);
         Task<APIResponse<GetCampaignAndStageResponse>> GetCampaignRepresentative();
         Task<APIResponse<string>> UpdateProcess();
+        Task<APIResponse<string>> UpdatePublicResult(Guid campaignId);
         Task<APIResponse<string>> UpdateCampaignRepresentative(Guid id);
         Task<APIResponse<IEnumerable<GetCampaignResponse>>> GetCampaignByUserId(string uid);
         Task<APIResponse<IEnumerable<GetCampaignForAdminResponse>>> GetCampaignForAdmin();
