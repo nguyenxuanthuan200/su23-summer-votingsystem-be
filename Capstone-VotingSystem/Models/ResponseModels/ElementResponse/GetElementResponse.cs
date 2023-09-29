@@ -6,6 +6,6 @@
         public string? Answer { get; set; }
         public bool? Status { get; set; }
         public Guid? QuestionId { get; set; }
-        public decimal? Score { get; set; }
+        public decimal Score { get; set; }
     }
 }

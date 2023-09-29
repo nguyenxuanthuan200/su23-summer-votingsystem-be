@@ -474,7 +474,7 @@ namespace Capstone_VotingSystem.Services.CampaignService
             }
             cam.StartTime = request.StartTime;
             cam.EndTime = request.EndTime;
-            //cam.Status = request.Status;
+            cam.Description = request.Description;
             cam.Visibility = request.Visibility;
             cam.Title = request.Title;
             cam.CategoryId = request.CategoryId;

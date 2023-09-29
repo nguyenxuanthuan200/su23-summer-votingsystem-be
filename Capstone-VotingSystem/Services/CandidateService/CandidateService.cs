@@ -425,6 +425,17 @@ namespace Capstone_VotingSystem.Services.CandidateService
                 response.ToFailedResponse("Ứng cử viên không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
                 return response;
             }
+            var checkCam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(p => p.CampaignId == candidate.CampaignId);
+            if (checkCam == null)
+            {
+                response.ToFailedResponse("Chiến dịch không tồn tại hoặc đã bị xóa", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            if (checkCam.Process != "Chưa bắt đầu" || checkCam.IsApprove == true)
+            {
+                response.ToFailedResponse("Không thể thay đổi thông tin khi chiến dịch đang bắt đầu hoặc đã được xác nhận", StatusCodes.Status400BadRequest);
+                return response;
+            }
             var uploadResult = new ImageUploadResult();
             if (request.ImageFile != null && request.ImageFile.Length > 0)
             {

@@ -102,7 +102,7 @@ namespace Capstone_VotingSystem.Controller
         //}
         //[Authorize(Roles = "User")]
         [HttpPost("list-candidate/")]
-        [SwaggerOperation(summary: "Create list Candidate to Campagin")]
+        [SwaggerOperation(summary: "Create list Candidate to campaign")]
         public async Task<IActionResult> CreateCandidateCampaign(CreateListCandidateRequest request)
         {
             try
@@ -122,7 +122,7 @@ namespace Capstone_VotingSystem.Controller
         }
         //[Authorize(Roles = "User")]
         [HttpPost]
-        [SwaggerOperation(summary: "Add list Candidate to Campagin")]
+        [SwaggerOperation(summary: "Add list Candidate to campaign")]
         public async Task<IActionResult> CreateCandidateCampaign(CreateCandidateCampaignRequest request)
         {
             try
@@ -142,7 +142,7 @@ namespace Capstone_VotingSystem.Controller
         }
         // [Authorize(Roles = "User")]
         [HttpDelete("{id}")]
-        [SwaggerOperation(summary: "Delete Candidate in Campaign")]
+        [SwaggerOperation(summary: "Delete Candidate in campaign")]
         public async Task<IActionResult> DeleteCandidate(Guid id, DeleteCandidateRequest request)
         {
             try

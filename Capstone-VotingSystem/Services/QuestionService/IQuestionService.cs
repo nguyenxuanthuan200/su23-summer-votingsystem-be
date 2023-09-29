@@ -8,6 +8,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
     public interface IQuestionService
     {
         Task<APIResponse<IEnumerable<GetQuestionResponse>>> GetListQuestionForm(Guid formid);
+        Task<APIResponse<GetQuestionResponse>> GetQuestionById(Guid questionId);
         Task<APIResponse<int>> GetNumberQuestionInForm(Guid formid);
         Task<APIResponse<string>> CreateQuestion(CreateListQuestionRequest request);
         Task<APIResponse<GetQuestionNoElementResponse>> CreateQuestionNoElement(CreateQuestionWithNoElementRequest request);

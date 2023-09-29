@@ -42,6 +42,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
             await dbContext.SaveChangesAsync();
             var mapq = _mapper.Map<GetQuestionResponse>(checkquestion);
             mapq.TypeName = checktypequestion.Name;
+            mapq.TypeId = checktypequestion.TypeId;
             var element = await dbContext.Elements.Where(p => p.QuestionId == checkquestion.QuestionId && p.Status == true).ToListAsync();
             List<GetElementResponse> listelement = element.Select(
            x =>
@@ -56,6 +57,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
                };
            }
            ).ToList();
+            listelement = listelement.OrderBy(x => x.Answer).ToList();
             mapq.Element = listelement;
             response.Data = mapq;
             response.ToSuccessResponse(response.Data, "Thêm câu trả lời vào câu hỏi thành công", StatusCodes.Status200OK);
@@ -251,6 +253,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 quest.QuestionId = item.QuestionId;
                 quest.Content = item.Content;
                 quest.FormId = item.FormId;
+                quest.TypeId = item.TypeId;
                 quest.TypeName = type.Name;
                 var element = await dbContext.Elements.Where(p => p.QuestionId == item.QuestionId).ToListAsync();
                 List<GetElementResponse> listelement = element.Select(
@@ -266,7 +269,18 @@ namespace Capstone_VotingSystem.Services.QuestionService
                    };
                }
                ).ToList();
+                listelement = listelement.OrderBy(x => x.Answer).ToList();
+
                 quest.Element = listelement;
+                Guid typeRatingAnswer = Guid.Parse("284a18e0-6d3b-4f71-83de-aa79513a3cd7");
+                decimal scoreOfRating = 0;
+                if (quest.TypeId == typeRatingAnswer)
+                {
+                    var ele = quest.Element.Where(p => p.Answer.Equals("5 star")).SingleOrDefault();
+                    //  var getScore = await dbContext.Elements.Where(p => p.QuestionId == item.QuestionId && p.Content.Equals("5 star")).SingleOrDefaultAsync();
+                    scoreOfRating = ele.Score;
+                    quest.ScoreOfRatingQuestion = (int)scoreOfRating;
+                }
 
                 listquestion.Add(quest);
             }
@@ -289,6 +303,56 @@ namespace Capstone_VotingSystem.Services.QuestionService
             return response;
         }
 
+        public async Task<APIResponse<GetQuestionResponse>> GetQuestionById(Guid questionId)
+        {
+            APIResponse<GetQuestionResponse> response = new();
+            var question = await dbContext.Questions.Where(p => p.QuestionId == questionId && p.Status == true).SingleOrDefaultAsync();
+            if (question == null)
+            {
+                response.ToFailedResponse("Không có câu hỏi nào phù hợp theo yêu cầu hoặc đã bị xóa ", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var questiontype = await dbContext.Types.Where(p => p.TypeId == question.TypeId).SingleOrDefaultAsync();
+            if (questiontype == null)
+            {
+                response.ToFailedResponse("Không có loại câu hỏi nào phù hợp theo yêu cầu ", StatusCodes.Status400BadRequest);
+                return response;
+            }
+
+            Guid typeRatingAnswer = Guid.Parse("284a18e0-6d3b-4f71-83de-aa79513a3cd7");
+            decimal scoreOfRating = 0;
+            if (questiontype.TypeId == typeRatingAnswer)
+            {
+                var getScore = await dbContext.Elements.Where(p => p.QuestionId == question.QuestionId && p.Content.Equals("5 star")).SingleOrDefaultAsync();
+                scoreOfRating = getScore.Score;
+            }
+            var mapq = _mapper.Map<GetQuestionResponse>(question);
+            mapq.TypeName = questiontype.Name;
+            mapq.TypeId = questiontype.TypeId;
+            mapq.ScoreOfRatingQuestion = (int)scoreOfRating;
+            List<GetElementResponse> listelement = new();
+            var elementt = await dbContext.Elements.Where(p => p.QuestionId == question.QuestionId && p.Status == true).ToListAsync();
+            List<GetElementResponse> listelementt = elementt.Select(
+           x =>
+           {
+               return new GetElementResponse()
+               {
+                   ElementId = x.ElementId,
+                   Answer = x.Content,
+                   QuestionId = x.QuestionId,
+                   Score = x.Score,
+                   Status = x.Status,
+               };
+           }
+           ).ToList();
+            listelementt = listelementt.OrderBy(x => x.Answer).ToList();
+            mapq.Element = listelementt;
+            response.Data = mapq;
+            response.ToSuccessResponse(response.Data, "Lấy chi tiết câu hỏi và câu trả lời thành công", StatusCodes.Status200OK);
+            return response;
+
+        }
+
         public async Task<APIResponse<GetQuestionResponse>> UpdateQuestion(Guid id, UpdateQuestionRequest request)
         {
             APIResponse<GetQuestionResponse> response = new();
@@ -298,39 +362,85 @@ namespace Capstone_VotingSystem.Services.QuestionService
                 response.ToFailedResponse("Không có câu hỏi nào phù hợp theo yêu cầu ", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var questiontype = await dbContext.Types.Where(p => p.TypeId == request.TypeId).SingleOrDefaultAsync();
-            if (questiontype == null)
+            Guid type1Answer = Guid.Parse("283a18e0-6d3b-4f71-83de-aa79513a3cd7");
+            Guid typeManyAnswer = Guid.Parse("285a18e0-6d3b-4f71-83de-aa79513a3cd7");
+            Guid typeRatingAnswer = Guid.Parse("284a18e0-6d3b-4f71-83de-aa79513a3cd7");
+            if (question.TypeId == type1Answer || question.TypeId == typeManyAnswer)
+            {
+                if (request.TypeId == typeRatingAnswer)
+                {
+                    response.ToFailedResponse("Không thể thay đổi kiểu câu hỏi bình chọn sang câu hỏi đánh giá ", StatusCodes.Status400BadRequest);
+                    return response;
+                }
+            }
+            if (question.TypeId == typeRatingAnswer)
+            {
+                if (request.TypeId != typeRatingAnswer)
+                {
+                    response.ToFailedResponse("Không thể thay đổi kiểu câu hỏi đánh giá sang câu hỏi bình chọn ", StatusCodes.Status400BadRequest);
+                    return response;
+                }
+            }
+
+            var questiontypeOfRequest = await dbContext.Types.Where(p => p.TypeId == request.TypeId).SingleOrDefaultAsync();
+            if (questiontypeOfRequest == null)
             {
                 response.ToFailedResponse("Không có loại câu hỏi nào phù hợp theo yêu cầu ", StatusCodes.Status400BadRequest);
                 return response;
             }
+            if (questiontypeOfRequest.TypeId == typeRatingAnswer)
+            {
+                question.Content = request.Content;
+                if (request.TotalScore % 5 != 0)
+                {
+                    response.ToFailedResponse("Điểm phải chia hết cho 5", StatusCodes.Status400BadRequest);
+                    return response;
+                }
+                var ListElementRating = await dbContext.Elements.Where(p => p.QuestionId == question.QuestionId && p.Status == true).ToListAsync();
+                ListElementRating = ListElementRating.OrderBy(x => x.Content).ToList();
+                var so = request.TotalScore / 5;
+                int a = 1;
+                foreach (var n in ListElementRating)
+                {
+                    n.Score = so * a;
+                    dbContext.Elements.Update(n);
+                    await dbContext.SaveChangesAsync();
+                    a = a + 1;
+                }
+                dbContext.Questions.Update(question);
+                await dbContext.SaveChangesAsync();
+            }
             question.Content = request.Content;
-            question.TypeId = request.TypeId;
+            question.TypeId = questiontypeOfRequest.TypeId;
             dbContext.Questions.Update(question);
             await dbContext.SaveChangesAsync();
 
             var mapq = _mapper.Map<GetQuestionResponse>(question);
-            mapq.TypeName = questiontype.Name;
+            mapq.TypeName = questiontypeOfRequest.Name;
+            mapq.TypeId = questiontypeOfRequest.TypeId;
             List<GetElementResponse> listelement = new();
-            foreach (var item in request.Element)
+            if (request.TypeId != typeRatingAnswer)
             {
-                var element = await dbContext.Elements.Where(p => p.QuestionId == id && p.ElementId == item.ElementId).SingleOrDefaultAsync();
-                if (element == null)
+                foreach (var item in request.Element)
                 {
-                    response.ToFailedResponse("Câu trả lời không nằm trong câu hỏi heo yêu cầu ", StatusCodes.Status400BadRequest);
-                    return response;
-                }
-                else
-                {
-                    element.Content = item.Answer;
-                    element.Score = item.Rate;
-                    dbContext.Elements.Update(element);
-                    await dbContext.SaveChangesAsync();
-                }
+                    var element = await dbContext.Elements.Where(p => p.QuestionId == id && p.ElementId == item.ElementId).SingleOrDefaultAsync();
+                    if (element == null)
+                    {
+                        response.ToFailedResponse("Câu trả lời không nằm trong câu hỏi heo yêu cầu ", StatusCodes.Status400BadRequest);
+                        return response;
+                    }
+                    else
+                    {
+                        element.Content = item.Answer;
+                        element.Score = item.Rate;
+                        dbContext.Elements.Update(element);
+                        await dbContext.SaveChangesAsync();
+                    }
 
-                //var map = _mapper.Map<GetElementResponse>(element);
-                //listelement.Add(map);
+                    //var map = _mapper.Map<GetElementResponse>(element);
+                    //listelement.Add(map);
 
+                }
             }
             var elementt = await dbContext.Elements.Where(p => p.QuestionId == question.QuestionId && p.Status == true).ToListAsync();
             List<GetElementResponse> listelementt = elementt.Select(
@@ -346,6 +456,7 @@ namespace Capstone_VotingSystem.Services.QuestionService
                };
            }
            ).ToList();
+            listelementt = listelementt.OrderBy(x => x.Answer).ToList();
             mapq.Element = listelementt;
             response.Data = mapq;
             response.ToSuccessResponse(response.Data, "Cập nhật câu hỏi và câu trả lời thành công", StatusCodes.Status200OK);

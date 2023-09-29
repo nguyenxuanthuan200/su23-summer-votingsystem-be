@@ -224,7 +224,7 @@ namespace Capstone_VotingSystem.Controller
             }
         }
         //[Authorize(Roles = "Admin")]
-        [HttpPut("{campaignid}")]
+        [HttpPut("unban/{campaignid}")]
         [SwaggerOperation(summary: "Unban Campaign")]
         public async Task<IActionResult> UnBanCampaign(Guid campaignid)
         {

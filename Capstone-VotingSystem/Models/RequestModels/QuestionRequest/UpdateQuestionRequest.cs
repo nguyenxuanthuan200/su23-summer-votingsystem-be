@@ -6,6 +6,7 @@ namespace Capstone_VotingSystem.Models.RequestModels.QuestionRequest
     {
         public string Content { get; set; }
         public Guid TypeId { get; set; }
+        public int TotalScore { get; set; }
         public List<UpdateElementRequest> Element { get; set; }
     }
 }

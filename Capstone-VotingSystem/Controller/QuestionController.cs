@@ -37,6 +37,25 @@ namespace Capstone_VotingSystem.Controller
                 return BadRequest();
             }
         }
+        // [Authorize(Roles = "User,Admin")]
+        [HttpGet("{id}")]
+        [SwaggerOperation(summary: "Get question by id")]
+        public async Task<IActionResult> GetQuestionById(Guid id)
+        {
+            try
+            {
+                var result = await questionService.GetQuestionById(id);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
         // [Authorize(Roles = "User")]
         [HttpGet("form/{id}/total-question")]
         [SwaggerOperation(summary: "Get number question in form by form id")]
@@ -80,7 +99,7 @@ namespace Capstone_VotingSystem.Controller
         }
        //[Authorize(Roles = "User")]
         [HttpPost]
-        [SwaggerOperation(summary: "Create new question rating không câu trả lời")]
+        [SwaggerOperation(summary: "Create new question rating type")]
         public async Task<IActionResult> CreateQuestionNoElement(CreateQuestionWithNoElementRequest request)
         {
             try
