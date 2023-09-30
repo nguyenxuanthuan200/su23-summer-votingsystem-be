@@ -706,8 +706,8 @@ namespace Capstone_VotingSystem.Services.CampaignService
         public async Task<APIResponse<string>> UnDeleteCampaign(Guid CampaignId)
         {
             APIResponse<string> response = new();
-            var cam = await dbContext.Campaigns.Where(p => p.Status == true).SingleOrDefaultAsync(c => c.CampaignId == CampaignId);
-            if (cam == null)
+            var cam = await dbContext.Campaigns.SingleOrDefaultAsync(c => c.CampaignId == CampaignId);
+            if (cam.Status ==true)
             {
                 response.ToFailedResponse("Chiến dịch vẫn còn hoạt động", StatusCodes.Status400BadRequest);
                 return response;

@@ -27,28 +27,28 @@ namespace Capstone_VotingSystem.Services.ScripDemoService
                 {
                     if (stage.Process == "Chưa bắt đầu")
                     {
-                            stage.Process = "Đã kết thúc";
+                        stage.Process = "Đã kết thúc";
                         dbContext.Stages.Update(stage);
 
                     }
                     else if (stage.Process == "Đang diễn ra")
                     {
-                            stage.Process = "Đã kết thúc";
-                            dbContext.Stages.Update(stage);
+                        stage.Process = "Đã kết thúc";
+                        dbContext.Stages.Update(stage);
                     }
                 }
                 if (campaign.Process == "Chưa bắt đầu")
                 {
-                        campaign.Process = "Đã kết thúc";
-                        dbContext.Campaigns.Update(campaign);
-              
+                    campaign.Process = "Đã kết thúc";
+                    dbContext.Campaigns.Update(campaign);
+
                 }
                 else if (campaign.Process == "Đang diễn ra")
                 {
-                
-                        campaign.Process = "Đã kết thúc";
-                        dbContext.Campaigns.Update(campaign);
-              
+
+                    campaign.Process = "Đã kết thúc";
+                    dbContext.Campaigns.Update(campaign);
+
                 }
             }
             else
@@ -103,7 +103,7 @@ namespace Capstone_VotingSystem.Services.ScripDemoService
 
                 var checkGroupUser = await dbContext.GroupUsers.Where(p => p.UserId == userId && p.CampaignId == checkStateId.CampaignId).ToListAsync();
                 var GroupUser = new Group();
-               
+
                 foreach (var item in checkGroupUser)
                 {
                     var group = await dbContext.Groups.Where(p => p.GroupId == item.GroupId && p.IsVoter == true && p.IsStudentMajor == false).SingleOrDefaultAsync();
@@ -178,25 +178,62 @@ namespace Capstone_VotingSystem.Services.ScripDemoService
                             vote.Status = true;
                             vote.SendingTime = currentDateTimeVn;
                         }
+                        double scoreVote = 0;
+                        if (checkStateId.IsUseForm == true)
+                        {
+                            List<Element> listElement = new();
+                            var getListQuestion = await dbContext.Questions.Where(p => p.FormId == checkStateId.FormId && p.Status == true).ToListAsync();
+                            foreach (var r in getListQuestion)
+                            {
+                                var getElement = await dbContext.Elements.Where(p => p.QuestionId == r.QuestionId && p.Status == true).OrderBy(x => Guid.NewGuid()).FirstOrDefaultAsync();
+                                listElement.Add(getElement);
+                            }
+                            decimal scorevotedetail = 0;
+                            foreach (var e in listElement)
+                            {
+                                var scoreElement = await dbContext.Elements.Where(p => p.ElementId == e.ElementId).SingleOrDefaultAsync();
+                                if (scoreElement != null)
+                                {
+                                    scorevotedetail += scoreElement.Score;
+                                }
+
+                                var ide = Guid.NewGuid();
+                                VotingDetail votingDetail = new VotingDetail();
+                                {
+                                    votingDetail.VotingDetailId = ide;
+                                    votingDetail.CreateTime = currentDateTimeVn;
+                                    votingDetail.ElementId = e.ElementId;
+                                    votingDetail.VotingId = vote.VotingId;
+                                }
+                                await dbContext.VotingDetails.AddAsync(votingDetail);
+                                //await dbContext.SaveChangesAsync();
+                            }
+                            scoreVote = Decimal.ToDouble(scorevotedetail);
+                        }
+
                         var checkscore = await dbContext.Scores.Where(p => p.StageId == StageId && p.CandidateId == getRandomCandidate.CandidateId).SingleOrDefaultAsync();
                         if (checkscore == null)
                         {
                             var scoreid = Guid.NewGuid();
                             Score sc = new();
                             {
-                                sc.Point = ratioGroup.Proportion;
+                                if (checkStateId.IsUseForm == true)
+                                    sc.Point = scoreVote * ratioGroup.Proportion;
+                                else sc.Point = ratioGroup.Proportion;
                                 sc.ScoreId = scoreid;
                                 sc.CandidateId = getRandomCandidate.CandidateId;
                                 sc.StageId = StageId;
                             }
                             await dbContext.Scores.AddAsync(sc);
-                            await dbContext.SaveChangesAsync();
+                            //await dbContext.SaveChangesAsync();
                         }
                         else
                         {
-                            checkscore.Point += ratioGroup.Proportion;
+                            if (checkStateId.IsUseForm == true)
+                                checkscore.Point += scoreVote * ratioGroup.Proportion;
+                            else checkscore.Point += ratioGroup.Proportion;
                             dbContext.Scores.Update(checkscore);
-                            await dbContext.SaveChangesAsync();
+                            //await dbContext.SaveChangesAsync();
                         }
 
                         await dbContext.Votings.AddAsync(vote);
@@ -217,9 +254,9 @@ namespace Capstone_VotingSystem.Services.ScripDemoService
             {
                 var checkGroup = await dbContext.Groups.Where(p => p.GroupId == i.GroupId && p.CampaignId == campaignId && p.IsVoter == true && p.IsStudentMajor == false).SingleOrDefaultAsync();
                 if (checkGroup != null)
-                    groupOfUser = checkGroup.Name;
+                    groupOfUser = checkGroup.GroupId.ToString();
             }
-            string groupOfCandidate;
+            Guid groupOfCandidate;
             var checkCandidate = await dbContext.Candidates.Where(p => p.CandidateId == candidateId && p.CampaignId == campaignId && p.Status == true).SingleOrDefaultAsync();
             if (checkCandidate == null)
             {
@@ -230,13 +267,16 @@ namespace Capstone_VotingSystem.Services.ScripDemoService
             {
                 return "Nhóm của ứng cử viên này không thuộc chiến dịch này hoặc đã bị loại bỏ khỏi chiến dịch";
             }
-            groupOfCandidate = checkGroupCandidate.Name;
+            groupOfCandidate = checkGroupCandidate.GroupId;
 
             int groupCategoryOfCandidate = 0;
-
-            if(groupOfCandidate.Equals("566fa89f-5730-45cc-b97d-2842ba1199e7") || groupOfCandidate.Equals("6101f9ff-55e1-4785-914f-216dadfbfae5")
-                || groupOfCandidate.Equals("98d60b6d-5c5e-4cdb-b289-be92ffc77206") || groupOfCandidate.Equals("c5a820f6-1093-4355-80be-d814ae0dfad0")
-                || groupOfCandidate.Equals("d8111aba-574e-4c2f-837a-e9a1cbfd36d2")) 
+            Guid db1 = Guid.Parse("566fa89f-5730-45cc-b97d-2842ba1199e7");
+            Guid db2 = Guid.Parse("6101f9ff-55e1-4785-914f-216dadfbfae5");
+            Guid db3 = Guid.Parse("98d60b6d-5c5e-4cdb-b289-be92ffc77206");
+            Guid db4 = Guid.Parse("c5a820f6-1093-4355-80be-d814ae0dfad0");
+            Guid db5 = Guid.Parse("d8111aba-574e-4c2f-837a-e9a1cbfd36d2");
+            if (groupOfCandidate == db1 || groupOfCandidate == db2 || groupOfCandidate == db3 || groupOfCandidate == db4
+                || groupOfCandidate == db5)
                 groupCategoryOfCandidate = 1;
 
             var listVoteOfUser = await dbContext.Votings.Where(p => p.UserId == userId && p.StageId == stageid && p.Status == true).ToListAsync();
@@ -247,9 +287,9 @@ namespace Capstone_VotingSystem.Services.ScripDemoService
             {
                 var checkCandidateOfVote = await dbContext.Candidates.Where(p => p.CandidateId == vote.CandidateId && p.CampaignId == campaignId && p.Status == true).SingleOrDefaultAsync();
                 var checkGroupCandidateOfVote = await dbContext.Groups.Where(p => p.GroupId == checkCandidateOfVote.GroupId && p.CampaignId == campaignId && p.IsVoter == false).SingleOrDefaultAsync();
-                if (checkGroupCandidateOfVote.Name.Equals("566fa89f-5730-45cc-b97d-2842ba1199e7") || checkGroupCandidateOfVote.Name.Equals("6101f9ff-55e1-4785-914f-216dadfbfae5")
-                    || checkGroupCandidateOfVote.Name.Equals("98d60b6d-5c5e-4cdb-b289-be92ffc77206") || checkGroupCandidateOfVote.Name.Equals("c5a820f6-1093-4355-80be-d814ae0dfad0")
-                    || checkGroupCandidateOfVote.Name.Equals("d8111aba-574e-4c2f-837a-e9a1cbfd36d2"))
+                if (checkGroupCandidateOfVote.GroupId == db1 || checkGroupCandidateOfVote.GroupId == db2
+                    || checkGroupCandidateOfVote.GroupId == db3 || checkGroupCandidateOfVote.GroupId == db4
+                    || checkGroupCandidateOfVote.GroupId == db5)
                     countdb = countdb + 1;
                 else
                     countcn = countcn + 1;

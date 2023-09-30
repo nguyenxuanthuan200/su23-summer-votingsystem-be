@@ -184,12 +184,12 @@ namespace Capstone_VotingSystem.Services.FeedbackService
                     };
                 }
                 ).ToList();
-            if (result == null)
+            if (result.Count() == 0)
             {
-                response.ToFailedResponse("lấy danh sách thất bại", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Không có đánh giá nào", StatusCodes.Status400BadRequest);
                 return response;
             }
-            response.ToSuccessResponse(result, "lấy danh sách thành công", StatusCodes.Status200OK);
+            response.ToSuccessResponse(result.OrderByDescending(hh => hh.CreateDate), "Lấy danh sách thành công", StatusCodes.Status200OK);
             return response;
         }
 
@@ -228,7 +228,7 @@ namespace Capstone_VotingSystem.Services.FeedbackService
                 item.CampaignName = getCampaign.Title;
 
             }
-            response.ToSuccessResponse(result, "lấy danh sách thành công", StatusCodes.Status200OK);
+            response.ToSuccessResponse(result.OrderByDescending(hh => hh.CreateDate), "lấy danh sách thành công", StatusCodes.Status200OK);
             return response;
         }
     }
