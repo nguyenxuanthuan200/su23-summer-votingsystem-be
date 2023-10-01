@@ -11,14 +11,13 @@ namespace Capstone_VotingSystem.Entities
         }
 
         public Guid QuestionId { get; set; }
-        public string? Title { get; set; }
-        public string? Content { get; set; }
-        public bool? Status { get; set; }
-        public Guid? FormId { get; set; }
-        public Guid? TypeId { get; set; }
+        public string Content { get; set; } = null!;
+        public bool Status { get; set; }
+        public Guid FormId { get; set; }
+        public Guid TypeId { get; set; }
 
-        public virtual Form? Form { get; set; }
-        public virtual Type? Type { get; set; }
+        public virtual Form Form { get; set; } = null!;
+        public virtual Type Type { get; set; } = null!;
         public virtual ICollection<Element> Elements { get; set; }
     }
 }

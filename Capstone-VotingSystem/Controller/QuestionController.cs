@@ -18,7 +18,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.questionService = questionService;
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpGet("form/{id}")]
         [SwaggerOperation(summary: "Get list question by form id")]
         public async Task<IActionResult> GetListQuestionForm(Guid id)
@@ -37,10 +37,48 @@ namespace Capstone_VotingSystem.Controller
                 return BadRequest();
             }
         }
-        [Authorize(Roles = "User")]
+        // [Authorize(Roles = "User,Admin")]
+        [HttpGet("{id}")]
+        [SwaggerOperation(summary: "Get question by id")]
+        public async Task<IActionResult> GetQuestionById(Guid id)
+        {
+            try
+            {
+                var result = await questionService.GetQuestionById(id);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+        // [Authorize(Roles = "User")]
+        [HttpGet("form/{id}/total-question")]
+        [SwaggerOperation(summary: "Get number question in form by form id")]
+        public async Task<IActionResult> GetNumberQuestionInForm(Guid id)
+        {
+            try
+            {
+                var result = await questionService.GetNumberQuestionInForm(id);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+        // [Authorize(Roles = "User")]
         [HttpPost("elements")]
-        [SwaggerOperation(summary: "Create new question and element")]
-        public async Task<IActionResult> CreateQuestion(CreateQuestionRequest request)
+        [SwaggerOperation(summary: "Create new list question and element")]
+        public async Task<IActionResult> CreateQuestion(CreateListQuestionRequest request)
         {
             try
             {
@@ -59,9 +97,9 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
-        [Authorize(Roles = "User")]
+       //[Authorize(Roles = "User")]
         [HttpPost]
-        [SwaggerOperation(summary: "Create new question rating không câu trả lời")]
+        [SwaggerOperation(summary: "Create new question rating type")]
         public async Task<IActionResult> CreateQuestionNoElement(CreateQuestionWithNoElementRequest request)
         {
             try
@@ -81,7 +119,7 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpPost("{id}/element")]
         [SwaggerOperation(summary: "Create new element for question")]
         public async Task<IActionResult> CreateElementQuestion(Guid id,CreateElementRequest request)
@@ -103,7 +141,7 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Question and Element")]
         public async Task<IActionResult> UpdateQuestion(Guid id, UpdateQuestionRequest request)
@@ -125,7 +163,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User")]
+       // [Authorize(Roles = "User")]
         [HttpDelete("{id}")]
         [SwaggerOperation(summary: "Delete Question")]
         public async Task<IActionResult> DeleteQuestion(Guid id)

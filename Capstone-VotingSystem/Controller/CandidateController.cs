@@ -21,14 +21,14 @@ namespace Capstone_VotingSystem.Controller
         {
             this.candidateService = candidateService;
         }
-        [Authorize(Roles = "User,Admin")]
-        [HttpGet("{id}")]
-        [SwaggerOperation(summary: "Get candidate by id")]
-        public async Task<IActionResult> GetCandidateById(Guid id)
+        // [Authorize(Roles = "User,Admin")]
+        [HttpGet("{candidateid}/stage/{stageid}")]
+        [SwaggerOperation(summary: "Get candidate by stage id")]
+        public async Task<IActionResult> GetCandidateByStageId(Guid candidateid, Guid stageid)
         {
             try
             {
-                var result = await candidateService.GetCandidateById(id);
+                var result = await candidateService.GetCandidateByStageId(candidateid, stageid);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -37,10 +37,31 @@ namespace Capstone_VotingSystem.Controller
             }
             catch (Exception)
             {
-                return BadRequest();
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
             }
         }
-        //[Authorize(Roles = "User,Admin")]
+        // [Authorize(Roles = "User,Admin")]
+        [HttpGet("{candidateid}")]
+        [SwaggerOperation(summary: "Get candidate by Id")]
+        public async Task<IActionResult> GetCandidateById(Guid candidateid)
+        {
+            try
+            {
+                var result = await candidateService.GetCandidateById(candidateid);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        // [Authorize(Roles = "User,Admin")]
         [HttpGet("campaign/{id}")]
         [SwaggerOperation(summary: "Get list candidate by campaign id")]
         public async Task<IActionResult> GetListCandidateCampaign(Guid id)
@@ -56,36 +77,37 @@ namespace Capstone_VotingSystem.Controller
             }
             catch (Exception)
             {
-                return BadRequest();
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "Admin")]
-        [HttpGet]
-        [SwaggerOperation(summary: "Get All Candidate with role admin")]
-        public async Task<IActionResult> GetAllCandidate()
+        //[HttpPost("accounts")]
+        //[SwaggerOperation(summary: "Create list account Candidate to Campagin")]
+        //public async Task<IActionResult> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request)
+        //{
+        //    try
+        //    {
+        //        var response = await candidateService.CreateAccountCandidateCampaign(request);
+        //        if (response.Success == false)
+        //        {
+        //            return BadRequest(response);
+        //        }
+        //        return Ok(response);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError,
+        //            "Error retrieving data from the database.");
+        //    }
+        //}
+        //[Authorize(Roles = "User")]
+        [HttpPost("list-candidate/")]
+        [SwaggerOperation(summary: "Create list Candidate to campaign")]
+        public async Task<IActionResult> CreateCandidateCampaign(CreateListCandidateRequest request)
         {
             try
             {
-                var result = await candidateService.GetAllCandidate();
-                if (result.Success == false)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-        }
-        [Authorize(Roles = "User,Admin")]
-        [HttpPost("account")]
-        [SwaggerOperation(summary: "Create account Candidate to Campagin with some info of Candidate")]
-        public async Task<IActionResult> CreateAccountCandidateCampaign(CreateAccountCandidateRequest request)
-        {
-            try
-            {
-                var response = await candidateService.CreateAccountCandidateCampaign(request);
+                var response = await candidateService.CreateListCandidate(request);
                 if (response.Success == false)
                 {
                     return BadRequest(response);
@@ -94,14 +116,13 @@ namespace Capstone_VotingSystem.Controller
             }
             catch (Exception)
             {
-                return BadRequest();
-
-
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User")]
+        //[Authorize(Roles = "User")]
         [HttpPost]
-        [SwaggerOperation(summary: "Add Candidate to Campagin with some info of Candidate")]
+        [SwaggerOperation(summary: "Add list Candidate to campaign")]
         public async Task<IActionResult> CreateCandidateCampaign(CreateCandidateCampaignRequest request)
         {
             try
@@ -113,15 +134,15 @@ namespace Capstone_VotingSystem.Controller
                 }
                 return Ok(response);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return BadRequest(ex);
-
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User")]
+        // [Authorize(Roles = "User")]
         [HttpDelete("{id}")]
-        [SwaggerOperation(summary: "Delete Candidate trong Campaign")]
+        [SwaggerOperation(summary: "Delete Candidate in campaign")]
         public async Task<IActionResult> DeleteCandidate(Guid id, DeleteCandidateRequest request)
         {
             try
@@ -139,13 +160,13 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [HttpGet("stageid")]
-        [SwaggerOperation(summary: "Get All Candidate with role user")]
-        public async Task<IActionResult> GetListCandidateByStage(Guid stageid)
+        [HttpGet("stage/{stageid}/user/{userid}")]
+        [SwaggerOperation(summary: "Get All Candidate by Stage")]
+        public async Task<IActionResult> GetListCandidateByStage(Guid stageid, string userid)
         {
             try
             {
-                var result = await candidateService.getListcandidatStage(stageid);
+                var result = await candidateService.GetListCandidatStage(stageid, userid);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -154,7 +175,50 @@ namespace Capstone_VotingSystem.Controller
             }
             catch (Exception)
             {
-                return BadRequest();
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        //[Authorize(Roles = "User")]
+        [HttpGet("user/{userid}")]
+        [SwaggerOperation(summary: "Get List Candidate by UserId")]
+        public async Task<IActionResult> GetListCandidateByUserId(string userid)
+        {
+            try
+            {
+                var result = await candidateService.GetListCandidateByUserId(userid);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        // [Authorize(Roles = "User")]
+        [HttpPut("{id}")]
+        [SwaggerOperation(summary: "Update Candidate")]
+        public async Task<IActionResult> UpdateCampaign(Guid id, [FromForm] UpdateCandidateProfileRequest request)
+        {
+            try
+            {
+                var result = await candidateService.UpdateCandidateProfile(id, request);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
             }
         }
     }

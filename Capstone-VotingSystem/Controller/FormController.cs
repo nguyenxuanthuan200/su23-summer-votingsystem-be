@@ -17,9 +17,9 @@ namespace Capstone_VotingSystem.Controller
         {
             this.formService = formService;
         }
-        [Authorize(Roles = "User,Admin")]
+       // [Authorize(Roles = "User,Admin")]
         [HttpGet]
-        [SwaggerOperation(summary: "Get all Form have status true and visibility is public")]
+        [SwaggerOperation(summary: "Get all Form public and is approve")]
         public async Task<IActionResult> GetForm()
         {
             try
@@ -37,7 +37,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User,Admin")]
+       // [Authorize(Roles = "User,Admin")]
         [HttpGet("{id}")]
         [SwaggerOperation(summary: "Get Form By Id")]
         public async Task<IActionResult> GetFormById(Guid id)
@@ -57,7 +57,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User,Admin")]
+      //  [Authorize(Roles = "User,Admin")]
         [HttpGet("user/{id}")]
         [SwaggerOperation(summary: "Get Form By User Id")]
         public async Task<IActionResult> GetFormByUserId(string id)
@@ -77,7 +77,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User,Admin")]
+       // [Authorize(Roles = "User,Admin")]
         [HttpPost]
         [SwaggerOperation(summary: "Create new Form")]
         public async Task<IActionResult> CreateForm(CreateFormRequest request)
@@ -99,7 +99,7 @@ namespace Capstone_VotingSystem.Controller
 
             }
         }
-        [Authorize(Roles = "User,Admin")]
+       // [Authorize(Roles = "User,Admin")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Form")]
         public async Task<IActionResult> UpdateForm(Guid id, UpdateFormByUser request)
@@ -121,7 +121,7 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User,Admin")]
+       // [Authorize(Roles = "User,Admin")]
         [HttpDelete("{id}")]
         [SwaggerOperation(summary: "Delete Form")]
         public async Task<IActionResult> DeleteForm(Guid id,DeleteFormRequest request)
@@ -134,6 +134,48 @@ namespace Capstone_VotingSystem.Controller
                     return BadRequest(result);
                 }
                 return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        //[Authorize(Roles = "Admin")]
+        [HttpGet("list-approve")]
+        [SwaggerOperation(summary: "Get Form Need Approve")]
+        public async Task<IActionResult> GetFormNeedApprove()
+        {
+            try
+            {
+                var result = await formService.GetFormNeedApprove();
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        // [Authorize(Roles = "Admin")]
+        [HttpPut("approve/{formid}")]
+        [SwaggerOperation(summary: "Approve Form")]
+        public async Task<IActionResult> ApproveForm(Guid formid)
+        {
+            try
+            {
+                var result = await formService.ApproveForm(formid);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+
+
             }
             catch (Exception)
             {

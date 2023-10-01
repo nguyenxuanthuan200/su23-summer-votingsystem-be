@@ -3,8 +3,7 @@
     public class GetActivityResponse
     {
         public Guid ActivityId { get; set; }
-        public string? Title { get; set; }
-        public string? Content { get; set; }
-        public Guid? CandidateId { get; set; }
+        public string Title { get; set; }
+        public string Content { get; set; }
     }
 }

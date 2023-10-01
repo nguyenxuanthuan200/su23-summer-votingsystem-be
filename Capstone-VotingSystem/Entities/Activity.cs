@@ -5,11 +5,15 @@ namespace Capstone_VotingSystem.Entities
 {
     public partial class Activity
     {
-        public Guid ActivityId { get; set; }
-        public string? Title { get; set; }
-        public string? Content { get; set; }
-        public Guid? CandidateId { get; set; }
+        public Activity()
+        {
+            ActivityContents = new HashSet<ActivityContent>();
+        }
 
-        public virtual Candidate? Candidate { get; set; }
+        public Guid ActivityId { get; set; }
+        public string Title { get; set; } = null!;
+        public string? Content { get; set; }
+
+        public virtual ICollection<ActivityContent> ActivityContents { get; set; }
     }
 }

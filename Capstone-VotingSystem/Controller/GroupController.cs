@@ -17,14 +17,14 @@ namespace Capstone_VotingSystem.Controller
         {
             this.groupService = groupService;
         }
-        [Authorize(Roles = "User,Admin")]
-        [HttpGet]
-        [SwaggerOperation(summary: "Get all Group (role user and admin)")]
-        public async Task<IActionResult> GetGroup()
+        //[Authorize(Roles = "User,Admin")]
+        [HttpGet("campaign/{id}")]
+        [SwaggerOperation(summary: "Get list group by campaign")]
+        public async Task<IActionResult> GetGroupByCampagin(Guid id)
         {
             try
             {
-                var result = await groupService.GetListGroup();
+                var result = await groupService.GetListGroupByCampaign(id);
                 if (result.Success == false)
                 {
                     return BadRequest(result);
@@ -37,9 +37,49 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "User,Admin")]
+        [HttpGet("user/{id}/campaign/{camid}")]
+        [SwaggerOperation(summary: "Check Group of Voter for campaign")]
+        public async Task<IActionResult> CheckGroupUser(string id,Guid camid)
+        {
+            try
+            {
+                var result = await groupService.CheckGroupUser(id,camid);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        //[Authorize(Roles = "User,Admin")]
+        [HttpGet("statistical/campaign/{campaignid}")]
+        [SwaggerOperation(summary: "Statistical group by campaign")]
+        public async Task<IActionResult> StatisticalGroupByCampaign(Guid campaignid)
+        {
+            try
+            {
+                var result = await groupService.StatisticalGroupByCampaign(campaignid);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
+        }
+        // [Authorize(Roles = "Admin")]
         [HttpPost]
-        [SwaggerOperation(summary: "Create new Group (role admin)")]
+        [SwaggerOperation(summary: "Create new Group for campaign")]
         public async Task<IActionResult> CreateGroup(CreateGroupRequest request)
         {
             try
@@ -57,9 +97,9 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        [SwaggerOperation(summary: "Update Group (role admin)")]
+        [SwaggerOperation(summary: "Update Group for campaign")]
         public async Task<IActionResult> UpdateGroup(Guid id, UpdateGroupRequest request)
         {
             try

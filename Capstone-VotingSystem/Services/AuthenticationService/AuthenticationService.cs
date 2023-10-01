@@ -24,7 +24,7 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
 
         public async Task<ResponseAccount> GenerateToken(Account account)
         {
-            //var user = await dbContext.Users.SingleOrDefaultAsync(p => p.UserId == account.UserName);
+            var user = await dbContext.Users.SingleOrDefaultAsync(p => p.UserId == account.UserName);
             var roleName = await dbContext.Roles.SingleOrDefaultAsync(p => p.RoleId == account.RoleId);
 
             if (roleName == null)
@@ -37,8 +37,9 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                 {
                     new Claim(ClaimTypes.Role, "Admin"),
                     new Claim("Username", account.UserName),
-                    new Claim("RoleId", roleName.RoleId.ToString()),
+                    //new Claim("RoleId", roleName.RoleId.ToString()),
                     new Claim("RoleName", roleName.Name),
+                    new Claim("Avatar", user.AvatarUrl != null ? user.AvatarUrl: ""),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
 
                     };
@@ -74,8 +75,10 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                 {
                     new Claim(ClaimTypes.Role, "User"),
                     new Claim("Username", account.UserName),
-                    new Claim("RoleId", roleName.RoleId.ToString()),
+                    //new Claim("RoleId", roleName.RoleId.ToString()),
                     new Claim("RoleName", roleName.Name),
+                    new Claim("Avatar",  user.AvatarUrl != null ? user.AvatarUrl: ""),
+                    new Claim("Permission", user.Permission.ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                     };
 
@@ -130,6 +133,8 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                     user.FullName = userrecord.DisplayName;
                     user.AvatarUrl = userrecord.PhotoUrl;
                     user.Email = userrecord.Email;
+                    user.Status = true;
+                    user.Permission = 0;
                 }
                 var claims = new[]
                    {
@@ -138,6 +143,7 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                     new Claim("userId", user.UserId),
                     new Claim("RoleName", role.Name),
                     new Claim("Photo", userrecord.PhotoUrl),
+                    new Claim("Permission", user.Permission.ToString())
 
                     };
 
@@ -169,6 +175,7 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
             }
             if (check != null)
             {
+                var checkUser = await dbContext.Users.Where(p => p.UserId == userrecord.Email).SingleOrDefaultAsync();
                 var status = await dbContext.Accounts.Where(p => p.Status.Equals("True").Equals("False")).FirstOrDefaultAsync();
 
                 if (true)
@@ -180,8 +187,8 @@ namespace Capstone_VotingSystem.Services.AuthenticationService
                     new Claim("RoleId", role.RoleId.ToString()),
                     new Claim("RoleName", role.Name),
                     new Claim("Username", userrecord.Email),
-                    //new Claim("Email", userrecord.Email),
                     new Claim("Photo", userrecord.PhotoUrl),
+                    new Claim("Permission", checkUser.Permission.ToString())
                     };
 
                     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtConfig:Key"]));

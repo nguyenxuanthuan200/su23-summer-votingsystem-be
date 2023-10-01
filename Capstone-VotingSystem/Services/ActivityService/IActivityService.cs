@@ -6,9 +6,10 @@ namespace Capstone_VotingSystem.Services.ActivityService
 {
     public interface IActivityService
     {
-        Task<APIResponse<IEnumerable<GetActivityResponse>>> GetActivityByCandidate(Guid candidateId);
-        Task<APIResponse<GetActivityResponse>> CreateActivity(CreateActivityRequest request);
-        Task<APIResponse<GetActivityResponse>> UpdateActivity(Guid id, UpdateActivityRequest request);
-        Task<APIResponse<string>> DeleteActivity(Guid activityId, DeleteActivityRequest request);
+        Task<APIResponse<IEnumerable<GetActivityByCandidateResponse>>> GetActivityByCandidateId(Guid candidateId);
+        Task<APIResponse<IEnumerable<GetActivityResponse>>> GetActivity();
+        Task<APIResponse<string>> CreateActivityContent(CreateActivityRequest request);
+        Task<APIResponse<string>> UpdateActivityContent(Guid id, UpdateActivityRequest request);
+        Task<APIResponse<string>> DeleteActivityContent(Guid activityContentId);
     }
 }

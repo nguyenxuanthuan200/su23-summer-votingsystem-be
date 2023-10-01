@@ -31,18 +31,23 @@ namespace Capstone_VotingSystem.Services.SearchService
             List<GetCampaignAndStageResponse> listCamn = new List<GetCampaignAndStageResponse>();
             var listCampaign = dbContext.Campaigns.AsQueryable();
 
-            listCampaign = listCampaign.Where(p => p.Status == true && p.Visibility == "public");
+            listCampaign = listCampaign.Where(p => p.Status == true && p.Visibility == "public" && p.IsApprove == true);
             //check keyword
             if (!string.IsNullOrEmpty(request.Keyword))
             {
                 listCampaign = listCampaign.Where(p => p.Title.Contains(request.Keyword));
             }
-            var lis =listCampaign.ToList();
+            //check process
+            if (!string.IsNullOrEmpty(request.Process))
+            {
+                listCampaign = listCampaign.Where(p => p.Process.Contains(request.Process));
+            }
+            var lis = listCampaign.ToList();
             foreach (var item in lis)
             {
                 var map = _mapper.Map<GetCampaignAndStageResponse>(item);
                 var stage = await dbContext.Stages.Where(p => p.CampaignId == item.CampaignId).ToListAsync();
-                if (stage != null && stage.Count >0)
+                if (stage != null && stage.Count > 0)
                 {
                     List<GetStageResponse> listStage = stage.Select(
                    x =>
@@ -52,7 +57,9 @@ namespace Capstone_VotingSystem.Services.SearchService
                            StageId = x.StageId,
                            Content = x.Content,
                            Title = x.Title,
-                           Description = x.Description,
+                           Process = x.Process,
+                           LimitVote = x.LimitVote,
+                           IsUseForm = x.IsUseForm,
                            StartTime = x.StartTime,
                            EndTime = x.EndTime,
                            CampaignId = x.CampaignId,
@@ -80,7 +87,7 @@ namespace Capstone_VotingSystem.Services.SearchService
             return response;
 
         }
-      
+
         public async Task<APIResponse<PagedListCandidateResponse>> SearchFilterCandidate(SearchCandidateRequest request)
         {
             APIResponse<PagedListCandidateResponse> response = new();

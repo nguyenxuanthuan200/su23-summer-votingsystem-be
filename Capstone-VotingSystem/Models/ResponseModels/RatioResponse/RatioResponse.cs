@@ -3,9 +3,11 @@
     public class RatioResponse
     {
         public Guid RatioGroupId { get; set; }
-        public decimal? Percent { get; set; }
-        public Guid? GroupId { get; set; }
+        public double? Proportion { get; set; }
+        public Guid? GroupVoterId { get; set; }
+        public string GroupNameOfVoter { get; set; }
         public Guid? CampaignId { get; set; }
         public Guid? GroupCandidateId { get; set; }
+        public string GroupNameOfCandidate { get; set; }
     }
 }

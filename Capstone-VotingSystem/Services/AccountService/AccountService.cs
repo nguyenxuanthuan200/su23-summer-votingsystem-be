@@ -1,9 +1,9 @@
 ﻿using Capstone_VotingSystem.Core.CoreModel;
 using Capstone_VotingSystem.Entities;
+using Capstone_VotingSystem.Models.RequestModels.AccountRequest;
 using Capstone_VotingSystem.Models.ResponseModels.AccountResponse;
 using Capstone_VotingSystem.Models.ResponseModels.ActionHistoryResponse;
 using Microsoft.EntityFrameworkCore;
-using Octokit;
 
 namespace Capstone_VotingSystem.Services.AccountService
 {
@@ -22,70 +22,114 @@ namespace Capstone_VotingSystem.Services.AccountService
             var account = await dbContext.Accounts.Where(p => p.UserName == id && p.Status == true).SingleOrDefaultAsync();
             if (account == null)
             {
-                response.ToFailedResponse("account không tồn tại hoặc đã bị ban", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Tài khoản không tồn tại hoặc đã bị cấm", StatusCodes.Status400BadRequest);
                 return response;
             }
             var user = await dbContext.Users.Where(p => p.UserId == id && p.Status == true).SingleOrDefaultAsync();
             if (user == null)
             {
-                response.ToFailedResponse("account không tồn tại hoặc đã bị ban", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Tài khoản không tồn tại hoặc đã bị cấm", StatusCodes.Status400BadRequest);
                 return response;
             }
             account.Status = false;
             user.Status = false;
             dbContext.Accounts.Update(account);
-            await dbContext.SaveChangesAsync();
             dbContext.Users.Update(user);
             await dbContext.SaveChangesAsync();
-            response.ToSuccessResponse("Ban account thành công", StatusCodes.Status200OK);
+            response.ToSuccessResponse("Cấm tài khoản thành công", StatusCodes.Status200OK);
             return response;
         }
 
-        public async Task<APIResponse<IEnumerable<AccountResponse>>> GetAllAcount()
+        public async Task<APIResponse<string>> CreateAccount(CreateAccountRequest request)
         {
-            APIResponse<IEnumerable<AccountResponse>> response = new();
-            var account = await dbContext.Accounts.Where(p => p.Status == true).ToListAsync();
-            if (account == null)
+            APIResponse<string> response = new();
+            var checkAccount = await dbContext.Accounts.Where(p => p.UserName == request.UserName).SingleOrDefaultAsync();
+            if (checkAccount != null)
             {
-                response.ToFailedResponse("không thấy tài khoản", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Tên tài khoản đã tồn tại. Vui lòng chọn tên tài khoản khác", StatusCodes.Status400BadRequest);
                 return response;
             }
-            var users = await dbContext.Users.Where(p => p.Status == true).ToListAsync();
-            if (users == null)
+            if (request.Password != request.RePassword)
             {
-                response.ToFailedResponse("Không tìm thấy thông tin người dùng", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Mật khẩu nhập lại không trùng khớp với mật khẩu. Vui lòng kiểm tra và thử lại !!", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var getRole = await dbContext.Roles.Where(p => p.Name.ToUpper().Equals(request.RoleName.ToUpper())).SingleOrDefaultAsync();
+            if (getRole == null)
+            {
+                response.ToFailedResponse("Vai trò không tồn tại. Vui lòng kiểm tra và thử lại !!", StatusCodes.Status400BadRequest);
                 return response;
             }
 
-            IEnumerable<AccountResponse> result = account.Join(users, a => a.UserName, u => u.UserId, (a, u) =>
-                {
-                    return new AccountResponse()
-                    {
-                        UserName = a.UserName,
-                        CreateAt = a.CreateAt,
-                        RoleId = a.RoleId,
-                        Status = a.Status,
-                        FullName = u.FullName,
-                        Phone = u.Phone,
-                        AvatarUrl = u.AvatarUrl,
-                        StatusUser = u.Status,
-                        Address = u.Address,
-                        Dob = u.Dob,
-                        Email = u.Email,
-                        Gender = u.Gender,
-                        GroupId = u.GroupId,
-                    };
-                }
-                ).ToList();
-            if (result == null)
+            TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            DateTime currentDateTimeVn = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
+            Account acc = new Account();
             {
-                response.ToFailedResponse("không thấy", StatusCodes.Status400BadRequest);
-                return response;
+                acc.UserName = request.UserName;
+                acc.Password = request.Password;
+                acc.CreateAt = currentDateTimeVn;
+                acc.Status = true;
+                acc.RoleId = getRole.RoleId;
             }
-            response.ToSuccessResponse(response.Data = result, "Lấy danh sách thành công", StatusCodes.Status200OK);
+            User us = new User();
+            {
+                us.UserId = request.UserName;
+                us.FullName = "";
+                us.Status = true;
+                us.Permission = 0;
+            }
+            await dbContext.Users.AddAsync(us);
+            await dbContext.Accounts.AddAsync(acc);
+            await dbContext.SaveChangesAsync();
+            response.ToSuccessResponse("Tạo tài khoản thành công", StatusCodes.Status200OK);
             return response;
 
         }
+
+        //public async Task<APIResponse<IEnumerable<AccountResponse>>> GetAllAcount()
+        //{
+        //    APIResponse<IEnumerable<AccountResponse>> response = new();
+        //    var account = await dbContext.Accounts.Where(p => p.Status == true).ToListAsync();
+        //    if (account == null)
+        //    {
+        //        response.ToFailedResponse("không thấy tài khoản", StatusCodes.Status400BadRequest);
+        //        return response;
+        //    }
+        //    var users = await dbContext.Users.Where(p => p.Status == true).ToListAsync();
+        //    if (users == null)
+        //    {
+        //        response.ToFailedResponse("Không tìm thấy thông tin người dùng", StatusCodes.Status404NotFound);
+        //        return response;
+        //    }
+
+        //    IEnumerable<AccountResponse> result = account.Join(users, a => a.UserName, u => u.UserId, (a, u) =>
+        //        {
+        //            return new AccountResponse()
+        //            {
+        //                UserName = a.UserName,
+        //                CreateAt = a.CreateAt,
+        //                RoleId = a.RoleId,
+        //                Status = a.Status,
+        //                FullName = u.FullName,
+        //                Phone = u.Phone,
+        //                AvatarUrl = u.AvatarUrl,
+        //                StatusUser = u.Status,
+        //                Address = u.Address,
+        //                Dob = u.Dob,
+        //                Email = u.Email,
+        //                Gender = u.Gender,
+        //            };
+        //        }
+        //        ).ToList();
+        //    if (result == null)
+        //    {
+        //        response.ToFailedResponse("không thấy", StatusCodes.Status400BadRequest);
+        //        return response;
+        //    }
+        //    response.ToSuccessResponse(response.Data = result, "Lấy danh sách thành công", StatusCodes.Status200OK);
+        //    return response;
+
+        //}
 
         public async Task<APIResponse<IEnumerable<AccountResponse>>> GetUsername(string? username)
         {
@@ -93,7 +137,7 @@ namespace Capstone_VotingSystem.Services.AccountService
             var checkUserName = await dbContext.Accounts.Where(p => p.UserName == username).SingleOrDefaultAsync();
             if (checkUserName == null)
             {
-                response.ToFailedResponse("không tồn tại user", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Người dùng không tồn tại.", StatusCodes.Status404NotFound);
                 return response;
             }
             var acc = await dbContext.Accounts.Where(p => p.UserName == username).ToListAsync();
@@ -113,11 +157,36 @@ namespace Capstone_VotingSystem.Services.AccountService
             }
             if (result == null)
             {
-                response.ToFailedResponse("Không có Candidate nào trong Campaign", StatusCodes.Status400BadRequest);
+                response.ToFailedResponse("Không có ứng cử viên nào trong chiến dịch", StatusCodes.Status400BadRequest);
                 return response;
             }
             response.ToSuccessResponse(response.Data = result, "Lấy danh sách thành công", StatusCodes.Status200OK);
             return response;
         }
+        public async Task<APIResponse<string>> UnbanAccount(string id)
+        {
+            APIResponse<string> response = new();
+            var account = await dbContext.Accounts.Where(p => p.UserName == id && p.Status == false).SingleOrDefaultAsync();
+            if (account == null)
+            {
+                response.ToFailedResponse("Tài khoản không bị cấm hoặc không tồn tại", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            var user = await dbContext.Users.Where(p => p.UserId == id && p.Status == false).SingleOrDefaultAsync();
+            if (user == null)
+            {
+                response.ToFailedResponse("Tài khoản không bị cấm hoặc không tồn tại", StatusCodes.Status400BadRequest);
+                return response;
+            }
+            account.Status = true;
+            user.Status = true;
+            dbContext.Accounts.Update(account);
+            dbContext.Users.Update(user);
+            await dbContext.SaveChangesAsync();
+            response.ToSuccessResponse("Gỡ cấm tài khoản thành công", StatusCodes.Status200OK);
+            return response;
+        }
+
+
     }
 }

@@ -15,6 +15,8 @@ using Capstone_VotingSystem.Services.FeedbackService;
 using Capstone_VotingSystem.Services.SearchService;
 using Capstone_VotingSystem.Services.ActivityService;
 using Capstone_VotingSystem.Services.ScoreService;
+using Capstone_VotingSystem.Services.ScripDemoService;
+using Capstone_VotingSystem.Services.StatisticalService;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -23,7 +25,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using Capstone_VotingSystem.Helpers;
-using Capstone_VotingSystem.Services.CloudinaryService;
 using Capstone_VotingSystem.Services.AccountService;
 using Capstone_VotingSystem.Services.NotificationService;
 using Capstone_VotingSystem.Services.ActionTypeService;
@@ -58,7 +59,6 @@ builder.Services.AddScoped<IRatioService, RatioService>();
 builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
@@ -69,6 +69,8 @@ builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<IActivityService, ActivityService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IScoreService, ScoreService>();
+builder.Services.AddScoped<IScripDemoService, ScripDemoService>();
+builder.Services.AddScoped<IStatisticalService, StatisticalService>();
 
 
 

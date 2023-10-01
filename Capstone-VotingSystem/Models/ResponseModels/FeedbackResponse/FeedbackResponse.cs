@@ -8,5 +8,6 @@
         public bool? Status { get; set; }
         public string? UserId { get; set; }
         public Guid? CampaignId { get; set; }
+        public string? CampaignName { get; set; }
     }
 }

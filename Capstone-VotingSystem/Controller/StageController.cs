@@ -39,43 +39,18 @@ namespace Capstone_VotingSystem.Controller
                     "Error retrieving data from the database.");
             }
         }
-
-        //
-        [SwaggerOperation(summary: "checkdate stage")]
-        [HttpGet("{starttime},{endtime},{newstarttime},{newendtime}")]
-        public async Task<IActionResult> checkdatestage(DateTime starttime, DateTime endtime, DateTime newstarttime, DateTime newendtime)
+        [SwaggerOperation(summary: "Get Stage By Id")]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetStageById(Guid id)
         {
             try
             {
-                DateTime startTime = starttime;
-                DateTime endTime = endtime;
-                DateTime newStartTime =newstarttime;
-                DateTime newEndTime = newendtime;
-                TimeZoneInfo vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
-
-                // Chuyển đổi giá trị của hai biến datetime mới sang múi giờ của Việt Nam
-               // DateTime newStartVn = TimeZoneInfo.ConvertTimeFromUtc(newStartTime.ToUniversalTime(), vnTimeZone);
-               // DateTime newEndVn = TimeZoneInfo.ConvertTimeFromUtc(newEndTime.ToUniversalTime(), vnTimeZone);
-
-                var check = DateTime.Compare(newStartTime, startTime);
-                var check1 = DateTime.Compare(newEndTime, endTime) <= 0;
-                if (DateTime.Compare(newEndTime, newStartTime) <= 0 )
+                var result = await campaignStageService.GetStageById(id);
+                if (result.Success == false)
                 {
-                    return BadRequest();
-                    //Console.WriteLine("Start time is after current time, and end time is after start time.");
+                    return BadRequest(result);
                 }
-                // Kiểm tra giá trị của hai biến DateTime mới
-                if (DateTime.Compare(newStartTime, startTime) >= 0 && DateTime.Compare(newEndTime, endTime) <= 0)
-                {
-                    //Console.WriteLine("New start time and new end time are within the range of start time and end time.");
-                }
-                else
-                {
-                    //response.ToFailedResponse("Thời gian bắt đầu của giai đoạn và thời gian kết thúc của giai đoạn không nằm trong phạm vi của thời gian bắt đầu và thời gian kết thúc của chiến dịch.", StatusCodes.Status400BadRequest);
-                    //return response;
-                    return BadRequest();
-                }
-                return Ok();
+                return Ok(result);
             }
             catch (Exception)
             {
@@ -84,11 +59,7 @@ namespace Capstone_VotingSystem.Controller
             }
         }
 
-
-
-
-        //
-        [Authorize(Roles = "User")]
+        //[Authorize(Roles = "User")]
         [HttpPost]
         [SwaggerOperation(summary: "Create new Stage")]
         public async Task<IActionResult> CreateCampaignStage(CreateStageRequest request)
@@ -102,20 +73,20 @@ namespace Capstone_VotingSystem.Controller
                 }
                 return Ok(result);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                   e.Message);
+                     "Error retrieving data from the database.");
             }
         }
-        [Authorize(Roles = "User")]
+        // [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         [SwaggerOperation(summary: "Update Stage")]
-        public async Task<IActionResult> UpdateCampaignStage(Guid id,UpdateStageRequest request)
+        public async Task<IActionResult> UpdateCampaignStage(Guid id, UpdateStageRequest request)
         {
             try
             {
-                var result = await campaignStageService.UpdateCampaignStage(id,request);
+                var result = await campaignStageService.UpdateCampaignStage(id, request);
 
                 if (result.Success == false)
                 {
@@ -126,9 +97,29 @@ namespace Capstone_VotingSystem.Controller
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error updating Store!");
+                    "Error retrieving data from the database.");
             }
 
+        }
+        //[Authorize(Roles = "User")]
+        [SwaggerOperation(summary: "Delete Stage")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteStage(Guid id)
+        {
+            try
+            {
+                var result = await campaignStageService.DeleteStage(id);
+                if (result.Success == false)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+            }
         }
     }
 }

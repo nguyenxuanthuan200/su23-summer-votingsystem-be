@@ -17,7 +17,7 @@ namespace Capstone_VotingSystem.Controller
         {
             this.scoreService = scoreService;
         }
-        [Authorize(Roles = "User,Admin")]
+       // [Authorize(Roles = "User,Admin")]
         [HttpGet]
         [SwaggerOperation(summary: "Get Score")]
         public async Task<IActionResult> GetScore([FromQuery] GetScoreByCampaginRequest request)

@@ -20,10 +20,10 @@ namespace Capstone_VotingSystem.Services.ScoreService
         public async Task<APIResponse<GetScoreResponse>> GetScore(GetScoreByCampaginRequest request)
         {
             APIResponse<GetScoreResponse> response = new();
-            var checkCampagin = await dbContext.Campaigns.Where(p => p.CampaignId == request.CampaignId && p.Status == true && p.UserId == request.UserId).SingleOrDefaultAsync();
+            var checkCampagin = await dbContext.Campaigns.Where(p => p.CampaignId == request.CampaignId && p.Status == true).SingleOrDefaultAsync();
             if (checkCampagin == null)
             {
-                response.ToFailedResponse("Campaign không tồn tại hoặc bạn không đủ quyền truy cập", StatusCodes.Status404NotFound);
+                response.ToFailedResponse("Chiến dịch không tồn tại hoặc bạn không đủ quyền truy cập", StatusCodes.Status404NotFound);
                 return response;
             }
             //var checkCampagin = await dbContext.Campaigns.Where(p => p.CampaignId == request.CampaginId && p.Status == true).SingleOrDefaultAsync();
@@ -47,7 +47,7 @@ namespace Capstone_VotingSystem.Services.ScoreService
 
             foreach (var candidate in CandidateInCampaign)
             {
-                int? score = 0;
+                double score = 0;
                 ListScoreInStage = new();
                 foreach (var stage in StageInCampagin)
                 {
@@ -60,15 +60,15 @@ namespace Capstone_VotingSystem.Services.ScoreService
                         scoreInStage.StageScore = 0;
                     }
                     else
-                        scoreInStage.StageScore = scoreStage.Score1;
-                   // ListScoreInStage = new();
+                        scoreInStage.StageScore = scoreStage.Point;
+                    
                     ListScoreInStage.Add(scoreInStage);
                     score += scoreInStage.StageScore;
                 }
-                var getName = await dbContext.Users.Where(p => p.UserId == candidate.UserId).SingleOrDefaultAsync();
+                //var getName = await dbContext.Users.Where(p => p.UserId == candidate.UserId).SingleOrDefaultAsync();
                 candidateScore = new();
                 candidateScore.CandidateId = candidate.CandidateId;
-                candidateScore.FullName = getName.FullName;
+                candidateScore.FullName = candidate.FullName;
                 candidateScore.TotalScore = score;
                 candidateScore.listStageScore = ListScoreInStage;
                 ListCandidateInStage.Add(candidateScore);

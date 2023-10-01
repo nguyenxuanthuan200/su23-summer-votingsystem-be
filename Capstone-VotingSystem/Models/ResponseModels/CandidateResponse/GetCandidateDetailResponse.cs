@@ -1,4 +1,6 @@
-﻿namespace Capstone_VotingSystem.Models.ResponseModels.CandidateResponse
+﻿using Capstone_VotingSystem.Models.ResponseModels.ActivityResponse;
+
+namespace Capstone_VotingSystem.Models.ResponseModels.CandidateResponse
 {
     public class GetCandidateDetailResponse
     {
@@ -11,5 +13,11 @@
         public DateTime? Dob { get; set; }
         public string? Email { get; set; }
         public string? AvatarUrl { get; set; }
+        public Guid StageId { get; set; }
+        public Guid CampaignId { get; set; }
+        public Guid? FormId { get; set; }
+        public string GroupName { get; set; }
+        public int Score { get; set; }
+        public List<GetActivityByCandidateResponse> ListActivity { get; set; }
     }
 }

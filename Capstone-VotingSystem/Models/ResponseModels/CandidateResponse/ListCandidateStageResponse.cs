@@ -1,4 +1,6 @@
-﻿namespace Capstone_VotingSystem.Models.ResponseModels.CandidateResponse
+﻿using Capstone_VotingSystem.Models.ResponseModels.ActivityResponse;
+
+namespace Capstone_VotingSystem.Models.ResponseModels.CandidateResponse
 {
     public class ListCandidateStageResponse
     {
@@ -7,7 +9,7 @@
         public string? UserId { get; set; }
 
         public Guid? GroupId { get; set; }
-        public string? GroupName { get; set; }
+        public string GroupName { get; set; }
         public string? FullName { get; set; }
         public string? Phone { get; set; }
         public string? Gender { get; set; }
@@ -16,5 +18,7 @@
         public string? AvatarUrl { get; set; }
 
         public int? StageScore { get; set; }
+        public bool isVoted { get; set; } = false;
+        public List<GetActivityByCandidateResponse> ListActivity { get; set; }
     }
 }
