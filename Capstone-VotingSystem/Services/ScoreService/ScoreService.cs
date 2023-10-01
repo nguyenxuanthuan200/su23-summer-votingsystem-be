@@ -20,7 +20,7 @@ namespace Capstone_VotingSystem.Services.ScoreService
         public async Task<APIResponse<GetScoreResponse>> GetScore(GetScoreByCampaginRequest request)
         {
             APIResponse<GetScoreResponse> response = new();
-            var checkCampagin = await dbContext.Campaigns.Where(p => p.CampaignId == request.CampaignId && p.Status == true && p.UserId == request.UserId).SingleOrDefaultAsync();
+            var checkCampagin = await dbContext.Campaigns.Where(p => p.CampaignId == request.CampaignId && p.Status == true).SingleOrDefaultAsync();
             if (checkCampagin == null)
             {
                 response.ToFailedResponse("Chiến dịch không tồn tại hoặc bạn không đủ quyền truy cập", StatusCodes.Status404NotFound);
